@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/eclinic_background"
+        android:orientation="vertical">
+
+        <!-- Zdjęcie Profilowe -->
+        <ImageView
+            android:id="@+id/ivProfilePicture"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"/>
+
+        <Button
+            android:id="@+id/btnChangePicture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Zmień zdjęcie"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp" />
+
+        <!-- Imię -->
+        <EditText
+            android:id="@+id/etFirstName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Imię"
+            android:layout_marginTop="16dp" />
+
+        <!-- Nazwisko -->
+        <EditText
+            android:id="@+id/etLastName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nazwisko"
+            android:layout_marginTop="8dp" />
+
+        <!-- Numer PWZ -->
+        <EditText
+            android:id="@+id/etPwz"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Numer PWZ"
+            android:layout_marginTop="8dp" />
+
+        <!-- Wykształcenie -->
+        <EditText
+            android:id="@+id/etEducation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Wykształcenie"
+            android:inputType="textMultiLine"
+            android:lines="3"
+            android:layout_marginTop="8dp" />
+
+        <!-- Doświadczenie -->
+        <EditText
+            android:id="@+id/etExperience"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Doświadczenie"
+            android:inputType="textMultiLine"
+            android:lines="3"
+            android:layout_marginTop="8dp" />
+
+        <!-- Przycisk aktualizacji profilu -->
+        <Button
+            android:id="@+id/btnUpdateProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Aktualizuj profil"
+            android:layout_marginTop="16dp" />
+
+    </LinearLayout>
+</ScrollView>
