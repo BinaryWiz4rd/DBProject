@@ -64,4 +64,40 @@ class LogIn : AppCompatActivity() {
                 }
             }
     }
+
+    /* POTEM TA KLASA MOZE WYGLADAC TAK
+    private fun loginUser (email: String, password: String) {
+    if (email.isEmpty() || password.isEmpty()) {
+        Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+        return
+    }
+
+    auth.signInWithEmailAndPassword(email, password)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
+
+                //fetchujemy info z bazy danych z firebase
+                val userId = auth.currentUser ?.uid
+                if (userId != null) {
+                    val userModel = UserModel()
+                    userModel.getUser Data(userId) { user ->
+                        if (user != null) {
+                            if (user.role == "doctor") {
+                                //start MainDoctorActivity
+                                val intent = Intent(this, MainDoctorActivity::class.java)
+                                startActivity(intent)
+                            } else {
+                                przypadki z pacjentem i adminem
+                            }
+                        }
+                    }
+                }
+                finish()
+            } else {
+                Toast.makeText(this, "Login Failed!", Toast.LENGTH_SHORT).show()
+            }
+        }
+}
+     */
 }
