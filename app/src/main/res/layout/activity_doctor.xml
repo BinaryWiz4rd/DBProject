@@ -5,11 +5,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/signup"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="match_parent">
+    <!--
     android:orientation="vertical"
     android:gravity="center"
     android:background="@drawable/eclinic_background"
-    tools:context=".view.DoctorActivity">
+    tools:context=".Doctor.DoctorActivity">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -56,5 +57,5 @@
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
-
+-->
 </LinearLayout>

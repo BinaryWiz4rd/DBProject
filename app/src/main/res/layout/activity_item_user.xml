@@ -1,10 +1,12 @@
-<!-- res/layout/item_user.xml -->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="wrap_content">
+    <!--
     android:orientation="vertical"
-    android:background="@drawable/rounded_frame_background"
+    android:background=""
     android:padding="8dp">
+
 
     <TextView
         android:id="@+id/tvName"
@@ -18,4 +20,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Rola" />
+        -->
 </LinearLayout>

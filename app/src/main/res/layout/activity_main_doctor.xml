@@ -4,9 +4,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/teal_700"
-    tools:context=".MainDoctorActivity">
+    android:layout_height="match_parent">
+    <!--
+    android:background=""
+    tools:context=".Doctor.MainDoctorActivity">
+
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -48,5 +50,6 @@
         app:layout_anchorGravity="center"
         app:maxImageSize="40dp"
         app:tint="@android:color/white" />
+    -->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

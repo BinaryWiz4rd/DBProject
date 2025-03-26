@@ -5,7 +5,7 @@
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.SpecializationActivity">
+    tools:context=".Doctor.SpecializationActivity">
 
     <!-- Admin Side Panel (Only visible for admins) -->
     <com.example.project.ui.AdminSidePanel

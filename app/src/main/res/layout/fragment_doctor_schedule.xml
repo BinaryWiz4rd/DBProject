@@ -4,8 +4,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@drawable/eclinic_background">
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/patientsTitleTextView"
