@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Wypełnienie kwadratu (kolor tła) -->
+    <solid android:color="@android:color/white" />
+
+    <!-- Delikatne zaokrąglenie rogów -->
+    <corners android:radius="16dp" />
+
+    <!-- Opcjonalnie obramowanie (ramka) -->
+    <stroke
+        android:width="2dp"
+        android:color="@android:color/black" />
+
+    <!-- Wymuszenie kwadratowego kształtu 200dp x 200dp -->
+    <size
+        android:width="200dp"
+        android:height="200dp" />
+</shape>

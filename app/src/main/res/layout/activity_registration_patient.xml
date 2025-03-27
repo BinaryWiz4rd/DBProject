@@ -6,7 +6,6 @@
     android:id="@+id/registrationPatientLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <!--
     android:background="@drawable/eclinic_background"
     tools:context=".RegistrationPatientActivity">
 
@@ -128,5 +127,5 @@
             android:textColor="@color/white" />
 
     </LinearLayout>
--->
+
 </androidx.constraintlayout.widget.ConstraintLayout>
