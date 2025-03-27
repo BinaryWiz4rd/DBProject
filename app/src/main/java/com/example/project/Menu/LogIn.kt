@@ -1,4 +1,4 @@
-/**package com.example.project.Menu
+package com.example.project.Menu
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,8 +7,8 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.project.Doctor.Doctor
 import com.example.project.R
-import com.example.project.Doctor.DoctorActivity
 import com.google.firebase.auth.FirebaseAuth
 
 class LogIn : AppCompatActivity() {
@@ -57,7 +57,7 @@ class LogIn : AppCompatActivity() {
                     Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
 
                     // Po zalogowaniu przenosimy do DoctorActivity
-                    val intent = Intent(this, DoctorActivity::class.java)
+                    val intent = Intent(this, Doctor::class.java)
                     startActivity(intent)
                     finish() // Zamknij aktywność logowania, aby nie wracać do niej przy cofnięciu
                 } else {
@@ -65,6 +65,7 @@ class LogIn : AppCompatActivity() {
                 }
             }
     }
+}
 
     /* POTEM TA KLASA MOZE WYGLADAC TAK
     private fun loginUser (email: String, password: String) {
@@ -101,5 +102,5 @@ class LogIn : AppCompatActivity() {
         }
 }
 
-}
-*/
+        }
+     */

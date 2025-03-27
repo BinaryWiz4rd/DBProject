@@ -1,4 +1,4 @@
-/**package com.example.project.Doctor
+package com.example.project.Doctor
 
 import android.content.Intent
 import android.os.Bundle
@@ -42,4 +42,3 @@ class PatientDetailsActivity : AppCompatActivity() {
         }
     }
 }
-*/

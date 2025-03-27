@@ -1,4 +1,4 @@
-/** package com.example.project.Menu
+package com.example.project.Menu
 
 import android.content.Intent
 import android.os.Bundle
@@ -118,4 +118,3 @@ class RegistrationDoctorActivity : AppCompatActivity() {
             }
     }
 }
-*/

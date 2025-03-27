@@ -1,5 +1,6 @@
-/**package com.example.project.Doctor
+package com.example.project.Doctor
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -74,4 +75,3 @@ class MainDoctorActivity : AppCompatActivity() {
         return true //potem sie tu pobawi
     }
 }
-*/

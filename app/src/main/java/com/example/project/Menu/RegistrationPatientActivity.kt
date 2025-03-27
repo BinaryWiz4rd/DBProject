@@ -1,4 +1,4 @@
-/** package com.example.project.Menu
+package com.example.project.Menu
 
 import com.example.project.R
 import android.os.Bundle
@@ -107,4 +107,3 @@ class RegistrationPatientActivity : AppCompatActivity() {
         return age >= 18
     }
 }
-*/

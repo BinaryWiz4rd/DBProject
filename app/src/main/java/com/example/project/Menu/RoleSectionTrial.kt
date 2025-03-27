@@ -1,12 +1,13 @@
-/** package com.example.project.Menu
+package com.example.project.Menu
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.example.project.Patient.PatientActivity
+import com.example.project.Admin.MainAdminActivity
+import com.example.project.Doctor.MainDoctorActivity
+import com.example.project.Patient.MainPatientActivity
 import com.example.project.R
-import com.example.project.Doctor.DoctorActivity
 
 class RoleSectionTrial : AppCompatActivity() {
 
@@ -35,18 +36,17 @@ class RoleSectionTrial : AppCompatActivity() {
     private fun navigateToRole(role: String) {
         when (role) {
             "doctor" -> {
-                val intent = Intent(this, DoctorActivity::class.java)
+                val intent = Intent(this, MainDoctorActivity::class.java)
                 startActivity(intent)
             }
             "admin" -> {
-                val intent = Intent(this, AdminActivity::class.java)
+                val intent = Intent(this, MainAdminActivity::class.java)
                 startActivity(intent)
             }
             "patient" -> {
-                val intent = Intent(this, PatientActivity::class.java)
+                val intent = Intent(this, MainPatientActivity::class.java)
                 startActivity(intent)
             }
         }
     }
 }
-*/
