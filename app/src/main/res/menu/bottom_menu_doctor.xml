@@ -3,17 +3,16 @@
 
     <item
         android:id="@+id/schedule"
-        android:title="Schedule"/>
-        <!--android:icon="@drawable/schedule"-->
+        android:title="Schedule"
+        android:icon="@drawable/schedule"/>
     <item
         android:id="@+id/calendar"
-        android:title="Calendar"/>
-        <!--android:icon="@drawable/calendar"-->
-
-   <!-- <item
+        android:title="Calendar"
+        android:icon="@drawable/calendar"/>
+   <item
         android:id="@+id/chat"
         android:icon="@drawable/chat"
-        android:visible="false"/> -->
+        android:visible="false"/>
 
 
 </menu>

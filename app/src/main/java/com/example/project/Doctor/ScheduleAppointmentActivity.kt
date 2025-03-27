@@ -1,6 +1,6 @@
-/**package com.example.project.Doctor
+package com.example.project.Doctor
 
-import android.os.Build
+/*import android.os.Build
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -85,5 +85,4 @@ class ScheduleAppointmentActivity : AppCompatActivity() {
             // Ewentualnie tutaj możesz zapisać appointment w bazie / wysłać do API itp.
         }
     }
-}
-*/
+}*/

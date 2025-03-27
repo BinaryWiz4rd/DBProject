@@ -1,4 +1,4 @@
-/** package com.example.project.Menu
+package com.example.project.Menu
 
 import android.content.Intent
 import android.os.Bundle
@@ -21,4 +21,3 @@ class SplashScreen : AppCompatActivity() {
         }, 3000) // 3000 ms = 3 sekundy
     }
 }
-*/

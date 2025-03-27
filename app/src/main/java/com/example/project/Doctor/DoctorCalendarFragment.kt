@@ -1,4 +1,4 @@
-/** package com.example.project.Doctor
+package com.example.project.Doctor
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -60,4 +60,3 @@ class DoctorCalendarFragment : Fragment() {
         loadAppointments(date)
     }
 }
-*/

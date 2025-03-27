@@ -11,7 +11,6 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.project.Activity.DetailActivity
 import com.example.project.Domain.DoctorsModel
 import com.example.project.databinding.ViewholderTopDoctor2Binding
-import com.example.project.databinding.ViewholderTopDoctorBinding
 
 class TopDoctorAdapter2(val items: MutableList<DoctorsModel>) :
     RecyclerView.Adapter<TopDoctorAdapter2.Viewholder>() {

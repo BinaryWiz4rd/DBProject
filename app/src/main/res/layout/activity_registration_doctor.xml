@@ -6,24 +6,16 @@
     android:id="@+id/signup"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/purple"
     tools:context=".Menu.RegistrationDoctorActivity">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/white_halo" />
+<!--android:background="@drawable/eclinic_background"-->
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="32dp"
-        android:background="@drawable/corner_registration_login"
+        android:background="@drawable/rounded_frame_background"
         android:elevation="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -34,11 +26,11 @@
         <ImageView
             android:id="@+id/logoImage"
             android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_height="120dp"/>
+            <!--android:src="@drawable/logo"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="24dp"
-            android:contentDescription="App Logo"
-            app:srcCompat="@drawable/icon"/>
+            android:contentDescription="App Logo" -->
 
         <EditText
             android:id="@+id/etDoctorFirstName"
@@ -126,7 +118,7 @@
             android:text="Register"
             android:textSize="18sp"
             android:padding="12dp"
-            android:backgroundTint="@color/darkPurple"
+            android:backgroundTint="@color/purple"
             android:textColor="@color/white"
             android:layout_marginBottom="16dp" />
 
@@ -138,7 +130,7 @@
             android:text="Already have an account? Log in"
             android:textSize="14sp"
             android:padding="12dp"
-            android:backgroundTint="@color/lightPurple"
+            android:backgroundTint="@color/purple"
             android:textColor="@color/white"
             android:layout_marginBottom="16dp" />
 

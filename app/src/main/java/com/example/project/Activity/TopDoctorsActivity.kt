@@ -2,15 +2,9 @@ package com.example.project.Activity
 
 import android.os.Bundle
 import android.view.View
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.project.Adapter.TopDoctorAdapter
 import com.example.project.Adapter.TopDoctorAdapter2
-import com.example.project.R
 import com.example.project.ViewModel.MainViewModel
 import com.example.project.databinding.ActivityTopDoctorsBinding
 
