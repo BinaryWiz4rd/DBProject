@@ -6,6 +6,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -13,6 +15,9 @@ import java.util.Date
 import java.util.Locale
 
 class RegistrationPatientActivity : AppCompatActivity() {
+
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     private lateinit var etFirstName: EditText
     private lateinit var etLastName: EditText
@@ -26,6 +31,9 @@ class RegistrationPatientActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration_patient)
+
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
 
         etFirstName = findViewById(R.id.etFirstName)
         etLastName = findViewById(R.id.etLastName)
@@ -93,7 +101,34 @@ class RegistrationPatientActivity : AppCompatActivity() {
         }
 
         // Logika rejestracji – np. zapis danych lub przejście do kolejnego ekranu
-        Toast.makeText(this, "Rejestracja zakończona sukcesem", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, "Rejestracja zakończona sukcesem", Toast.LENGTH_SHORT).show()
+
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val userId = auth.currentUser?.uid
+                    if (userId != null) {
+                        val patient = hashMapOf(
+                            "email" to email,
+                            "firstName" to firstName,
+                            "lastName" to lastName,
+                            "dateOfBirth" to dateOfBirthStr
+                        )
+
+                        db.collection("patients").document(userId)
+                            .set(patient)
+                            .addOnSuccessListener {
+                                Toast.makeText(this, "Registration was successful.", Toast.LENGTH_SHORT).show()
+                                finish()
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(this, "Error saving user data.", Toast.LENGTH_SHORT).show()
+                            }
+                    }
+                } else {
+                    Toast.makeText(this, "Registration failed.", Toast.LENGTH_LONG).show()
+                }
+            }
     }
 
     // Metoda sprawdzająca, czy użytkownik jest pełnoletni
