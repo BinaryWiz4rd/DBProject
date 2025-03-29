@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.example.project.Doctor.MainDoctorActivity
 import com.example.project.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -26,7 +27,8 @@ class RegistrationDoctorActivity : AppCompatActivity() {
     private lateinit var etPWZ: EditText
     private lateinit var spinnerSpecialization: Spinner
 
-    private lateinit var userRole: String
+    //private lateinit var userRole: String
+    private var userRole: String = "doctor"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +65,7 @@ class RegistrationDoctorActivity : AppCompatActivity() {
         }
 
         btnRegister.setOnClickListener {
-            registerUser()
+            registerDoctor()
         }
 
         btnAlreadyHaveAccount.setOnClickListener {
@@ -72,7 +74,7 @@ class RegistrationDoctorActivity : AppCompatActivity() {
         }
     }
 
-    private fun registerUser() {
+    private fun registerDoctor() {
         val email = etEmail.text.toString().trim()
         val password = etPassword.text.toString().trim()
         val firstName = etDoctorFirstName.text.toString().trim()
@@ -86,6 +88,10 @@ class RegistrationDoctorActivity : AppCompatActivity() {
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
             return
         }
+        if (!pwz.matches(Regex("\\d{7,}"))){
+            Toast.makeText(this, "Wrong PWZ number (minimum of 7 digits)", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
@@ -93,17 +99,17 @@ class RegistrationDoctorActivity : AppCompatActivity() {
                     val userId = auth.currentUser?.uid
                     if (userId != null) {
                         // Tworzymy obiekt użytkownika zawierający dodatkowe dane
-                        val user = hashMapOf(
+                        val doctor = hashMapOf(
                             "email" to email,
-                            "role" to userRole,
+                            "role" to "doctor",
                             "firstName" to firstName,
                             "lastName" to lastName,
                             "pwz" to pwz,
                             "specialization" to specialization
                         )
 
-                        db.collection("users").document(userId)
-                            .set(user)
+                        db.collection("doctors").document(userId)
+                            .set(doctor)
                             .addOnSuccessListener {
                                 Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show()
                                 finish()
@@ -116,5 +122,11 @@ class RegistrationDoctorActivity : AppCompatActivity() {
                     Toast.makeText(this, "Registration failed", Toast.LENGTH_SHORT).show()
                 }
             }
+    }
+
+    private fun navigateToMainDoctorActivity() {
+        val intent = Intent(this, MainDoctorActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

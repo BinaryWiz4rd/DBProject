@@ -8,6 +8,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.project.Doctor.Doctor
+import com.example.project.Doctor.MainDoctorActivity
 import com.example.project.R
 import com.google.firebase.auth.FirebaseAuth
 
@@ -57,7 +58,8 @@ class LogIn : AppCompatActivity() {
                     Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
 
                     // Po zalogowaniu przenosimy do DoctorActivity
-                    val intent = Intent(this, Doctor::class.java)
+                    val intent = Intent(this, MainDoctorActivity::class.java)
+                    //val intent = Intent(this, Doctor::class.java)
                     startActivity(intent)
                     finish() // Zamknij aktywność logowania, aby nie wracać do niej przy cofnięciu
                 } else {
