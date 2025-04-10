@@ -24,9 +24,6 @@
             android:name=".Patient.MainPatientActivity"
             android:exported="false" />
         <activity
-            android:name=".Patient.MainPatientActivity"
-            android:exported="false" />
-        <activity
             android:name=".Activity.TopDoctorsActivity"
             android:exported="false" />
         <activity
