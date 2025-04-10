@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FAEFFF"
+    android:background="#FFFFFF"
     android:orientation="vertical"
     tools:context=".Admin.MainAdminActivity">
 
@@ -13,52 +13,106 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:elevation="2dp"
+        android:background="#FFFFFF">
 
         <SearchView
-            android:layout_width="308dp"
-            android:layout_height="match_parent" />
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:queryHint="Search..."
+            android:iconifiedByDefault="false"
+            android:background="@drawable/search_background"
+            android:layout_marginEnd="16dp" />
 
         <ImageView
-            android:layout_width="24dp"
-            android:layout_height="wrap_content"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:contentDescription="Notification"
-            android:src="@drawable/notifications" />
+            android:src="@drawable/notifications"
+            android:padding="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless" />
     </LinearLayout>
 
-    <com.google.android.material.chip.ChipGroup
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="8dp"
-        app:singleSelection="false">
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp">
 
-        <com.google.android.material.chip.Chip
+        <com.google.android.material.chip.ChipGroup
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Doctors"
-            app:checkedIconVisible="true"
-            app:chipBackgroundColor="@color/purple" />
+            android:orientation="horizontal"
+            android:padding="8dp"
+            app:singleSelection="true"
+            app:selectionRequired="true"
+            app:singleLine="true"
+            app:chipSpacingHorizontal="12dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.chip.Chip
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Patients"
-            app:checkedIconVisible="true"
-            app:chipBackgroundColor="@color/purple" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_doctors"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Doctors"
+                android:checked="true"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:textStyle="bold"
+                android:textColor="#673AB7"
+                app:chipStrokeColor="#673AB7"
+                app:chipStrokeWidth="1dp"
+                app:checkedIconVisible="true"
+                app:chipBackgroundColor="@drawable/chip_background_color" />
 
-        <com.google.android.material.chip.Chip
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Admins"
-            app:checkedIconVisible="true"
-            app:chipBackgroundColor="@color/purple" />
-    </com.google.android.material.chip.ChipGroup>
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_patients"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Patients"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:textStyle="bold"
+                android:textColor="#673AB7"
+                app:chipStrokeColor="#673AB7"
+                app:chipStrokeWidth="1dp"
+                app:checkedIconVisible="true"
+                app:chipBackgroundColor="@drawable/chip_background_color" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_admins"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Admins"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:textStyle="bold"
+                android:textColor="#673AB7"
+                app:chipStrokeColor="#673AB7"
+                app:chipStrokeWidth="1dp"
+                app:checkedIconVisible="true"
+                app:chipBackgroundColor="@drawable/chip_background_color" />
+        </com.google.android.material.chip.ChipGroup>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Users"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#212121"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:padding="8dp"
-        android:scrollbars="vertical"/>
+        android:clipToPadding="false"
+        android:scrollbars="vertical" />
 </LinearLayout>

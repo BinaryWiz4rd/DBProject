@@ -1,4 +1,4 @@
-package com.example.project.Doctor
+/*package com.example.project.Doctor
 
 import android.view.LayoutInflater
 import android.view.View
@@ -28,4 +28,4 @@ class UsersAdapter(private val users: List<User>) : RecyclerView.Adapter<UsersAd
     }
 
     override fun getItemCount(): Int = users.size
-}
+}*/
