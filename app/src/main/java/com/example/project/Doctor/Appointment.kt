@@ -1,4 +1,7 @@
+/*
 package com.example.project.Doctor
+
+import com.example.project.Patient.Patient
 
 data class Appointment(
     val doctor: Doctor,
@@ -11,3 +14,4 @@ data class Appointment(
                 "dla pacjenta ${patient.name} w dniu $date o godz. $time"
     }
 }
+*/
