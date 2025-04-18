@@ -18,7 +18,6 @@ class MainActivity : BaseActivity() {
 
         initCategory()
         initTopDoctors()
-
     }
 
     private fun initTopDoctors() {
@@ -48,6 +47,4 @@ class MainActivity : BaseActivity() {
         })
         viewModel.loadCategory()
     }
-
-
 }

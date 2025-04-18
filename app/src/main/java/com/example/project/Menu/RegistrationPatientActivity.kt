@@ -112,7 +112,8 @@ class RegistrationPatientActivity : AppCompatActivity() {
                             "email" to email,
                             "firstName" to firstName,
                             "lastName" to lastName,
-                            "dateOfBirth" to dateOfBirthStr
+                            "dateOfBirth" to dateOfBirthStr,
+                            "role" to "patient"
                         )
 
                         db.collection("patients").document(userId)
