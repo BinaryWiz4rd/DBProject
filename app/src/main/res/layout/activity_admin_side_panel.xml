@@ -6,7 +6,8 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.AdminSidePanel">
+    tools:context=".ui.AdminSidePanel"
+    android:background="@color/purple">
 
     <!-- Główna zawartość ekranu -->
     <FrameLayout
@@ -14,33 +15,53 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/white_halo"/>
+
         <!-- Przykładowy układ głównej zawartości -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="32dp"
+            android:background="@drawable/rounded_frame_background"
+            android:elevation="8dp"
+            android:layout_margin="16dp"
+            android:layout_gravity="center">
+
 
             <TextView
                 android:id="@+id/tvWelcome"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:scaleType="centerCrop"
                 android:text="Witaj, Administratorze!"
                 android:textSize="24sp"
-                android:textStyle="bold"
-                android:paddingBottom="16dp" />
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/btnManageUsers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Zarządzaj użytkownikami"
-                android:layout_marginBottom="12dp" />
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/rounded_frame_background"
+                android:backgroundTint="@color/lightPurple"
+                android:textColor="@color/black"
+                android:text="Zarządzaj użytkownikami" />
 
             <Button
                 android:id="@+id/btnSettings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/rounded_frame_background"
+                android:backgroundTint="@color/lightPurple"
+                android:textColor="@color/black"
                 android:text="Ustawienia"
                 android:layout_marginBottom="12dp" />
 

@@ -1,10 +1,9 @@
-package com.example.project.Activity
+package com.example.project.Doctor
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import com.bumptech.glide.Glide
-import com.example.project.Domain.DoctorsModel
 import com.example.project.databinding.ActivityDetailBinding
 
 class DetailActivity : BaseActivity() {

@@ -1,16 +1,14 @@
-package com.example.project.Activity
+package com.example.project.Doctor
 
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.project.Adapter.TopDoctorAdapter2
-import com.example.project.ViewModel.MainViewModel
 import com.example.project.databinding.ActivityTopDoctorsBinding
 
 class TopDoctorsActivity : BaseActivity() {
     private lateinit var binding: ActivityTopDoctorsBinding
-    private val viewModel=MainViewModel()
+    private val viewModel= MainViewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding=ActivityTopDoctorsBinding.inflate(layoutInflater)

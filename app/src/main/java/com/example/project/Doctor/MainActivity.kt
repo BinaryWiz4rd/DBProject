@@ -1,13 +1,10 @@
-package com.example.project.Activity
+package com.example.project.Doctor
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.project.Adapter.CategoryAdapter
-import com.example.project.Adapter.TopDoctorAdapter
-import com.example.project.ViewModel.MainViewModel
 import com.example.project.databinding.ActivityMainBinding
 
 class MainActivity : BaseActivity() {

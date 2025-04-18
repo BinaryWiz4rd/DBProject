@@ -1,4 +1,4 @@
-package com.example.project.Activity
+package com.example.project.Doctor
 
 import android.os.Bundle
 import android.view.WindowManager

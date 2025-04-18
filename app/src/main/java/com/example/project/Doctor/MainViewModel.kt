@@ -1,4 +1,4 @@
-package com.example.project.ViewModel
+package com.example.project.Doctor
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -7,8 +7,6 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.example.project.Domain.CategoryModel
-import com.example.project.Domain.DoctorsModel
 
 class MainViewModel() : ViewModel() {
 

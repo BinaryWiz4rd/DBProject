@@ -1,4 +1,4 @@
-package com.example.project.Domain
+package com.example.project.Doctor
 
 import android.os.Parcel
 import android.os.Parcelable

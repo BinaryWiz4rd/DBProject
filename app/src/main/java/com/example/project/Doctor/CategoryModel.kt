@@ -1,4 +1,4 @@
-package com.example.project.Domain
+package com.example.project.Doctor
 
 data class CategoryModel(
     val Id:Int=0,

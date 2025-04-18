@@ -1,4 +1,4 @@
-package com.example.project.Adapter
+package com.example.project.Doctor
 
 import android.content.Context
 import android.content.Intent
@@ -8,8 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.request.RequestOptions
-import com.example.project.Activity.DetailActivity
-import com.example.project.Domain.DoctorsModel
 import com.example.project.databinding.ViewholderTopDoctorBinding
 
 class TopDoctorAdapter(val items: MutableList<DoctorsModel>) :
@@ -21,14 +19,14 @@ class TopDoctorAdapter(val items: MutableList<DoctorsModel>) :
 
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TopDoctorAdapter.Viewholder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Viewholder {
         context = parent.context
         val binding =
             ViewholderTopDoctorBinding.inflate(LayoutInflater.from(context), parent, false)
         return Viewholder(binding)
     }
 
-    override fun onBindViewHolder(holder: TopDoctorAdapter.Viewholder, position: Int) {
+    override fun onBindViewHolder(holder: Viewholder, position: Int) {
         holder.binding.nameTxt.text = items[position].Name
         holder.binding.specialTxt.text = items[position].Special
         holder.binding.scoreTxt.text = items[position].Rating.toString()
@@ -40,7 +38,7 @@ class TopDoctorAdapter(val items: MutableList<DoctorsModel>) :
             .into(holder.binding.img)
 
         holder.itemView.setOnClickListener {
-            val intent=Intent(context,DetailActivity::class.java)
+            val intent=Intent(context, DetailActivity::class.java)
             intent.putExtra("object",items[position])
             context?.startActivity(intent)
         }
