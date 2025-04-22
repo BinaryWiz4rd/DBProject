@@ -1,4 +1,4 @@
-package com.example.project.Doctor
+package com.example.project.Patient
 
 import android.content.Intent
 import android.net.Uri

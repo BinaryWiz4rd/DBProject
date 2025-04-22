@@ -55,7 +55,7 @@
             android:exported="false"
             android:theme="@style/Theme.Project1983" />
         <activity
-            android:name=".Doctor.MainDoctorActivity"
+            android:name=".Patient.MainDoctorActivity"
             android:exported="false" />
     </application>
 

@@ -1,4 +1,4 @@
-package com.example.project.Doctor
+package com.example.project.Patient
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

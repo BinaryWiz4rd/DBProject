@@ -6,138 +6,132 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.AdminSidePanel"
     android:background="@color/purple">
 
-    <!-- Główna zawartość ekranu -->
     <FrameLayout
-        android:id="@+id/content_frame"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    android:id="@+id/content_frame"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/imageView"
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:scaleType="centerCrop"
+        android:src="@drawable/white_halo"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:background="@drawable/rounded_frame_background"
+        android:elevation="8dp"
+        android:layout_margin="16dp"
+        android:layout_gravity="center">
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"
-            android:scaleType="centerCrop"
-            android:src="@drawable/white_halo"/>
+            android:text="Patient Details"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp" />
 
-        <!-- Przykładowy układ głównej zawartości -->
-        <LinearLayout
+        <TextView
+            android:id="@+id/PatientName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="32dp"
+            android:text="Name: "
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/patientSurname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Surname: "
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/patientPesel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="PESEL: "
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/patientAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Address: "
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/patientPhone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Phone: "
+            android:textSize="18sp"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Medical Card"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/medicalCardDiagnosis"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Diagnosis: "
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/medicalCardMedications"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Medications: "
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/medicalCardTreatment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Treatment Plan: "
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/medicalCardNotes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Doctor Notes: "
+            android:textSize="18sp"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/btnSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:background="@drawable/rounded_frame_background"
-            android:elevation="8dp"
-            android:layout_margin="16dp"
-            android:layout_gravity="center">
+            android:backgroundTint="@color/lightPurple"
+            android:textColor="@color/black"
+            android:text="Save"
+            android:layout_marginBottom="12dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Patient Details"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:layout_gravity="center"
-                android:layout_marginBottom="16dp" />
+    </LinearLayout>
+</FrameLayout>
 
-            <TextView
-                android:id="@+id/PatientName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Name: "
-                android:textSize="18sp"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/patientSurname"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Surname: "
-                android:textSize="18sp"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/patientPesel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="PESEL: "
-                android:textSize="18sp"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/patientAddress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Address: "
-                android:textSize="18sp"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/patientPhone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Phone: "
-                android:textSize="18sp"
-                android:layout_marginBottom="16dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Medical Card"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:layout_gravity="center"
-                android:layout_marginBottom="16dp" />
-
-            <TextView
-                android:id="@+id/medicalCardDiagnosis"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Diagnosis: "
-                android:textSize="18sp"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/medicalCardMedications"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Medications: "
-                android:textSize="18sp"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/medicalCardTreatment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Treatment Plan: "
-                android:textSize="18sp"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/medicalCardNotes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Doctor Notes: "
-                android:textSize="18sp"
-                android:layout_marginBottom="16dp" />
-
-
-
-            <Button
-                android:id="@+id/btnSettings"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/rounded_frame_background"
-                android:backgroundTint="@color/lightPurple"
-                android:textColor="@color/black"
-                android:text="Save"
-                android:layout_marginBottom="12dp" />
-
-            <!-- Dodaj kolejne elementy interfejsu według potrzeb -->
-
-        </LinearLayout>
-    </FrameLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

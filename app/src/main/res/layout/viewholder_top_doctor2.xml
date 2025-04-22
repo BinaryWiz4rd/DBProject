@@ -18,7 +18,7 @@
             android:background="@drawable/light_purple_bg"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/doctor" />
+            app:srcCompat="@drawable/intro_doctor" />
 
         <TextView
             android:id="@+id/degreeTxt"

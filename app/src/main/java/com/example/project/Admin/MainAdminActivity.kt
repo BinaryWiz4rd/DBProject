@@ -1,4 +1,4 @@
-package com.example.project.Doctor
+package com.example.project.Admin
 
 import android.adservices.ondevicepersonalization.UserData
 import android.os.Bundle

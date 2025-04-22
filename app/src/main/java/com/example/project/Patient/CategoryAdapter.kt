@@ -1,4 +1,4 @@
-package com.example.project.Doctor
+package com.example.project.Patient
 
 import android.content.Context
 import android.view.LayoutInflater

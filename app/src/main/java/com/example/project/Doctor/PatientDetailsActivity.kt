@@ -13,12 +13,12 @@ class PatientDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_patient_details)
 
-        val nameTextView = findViewById<TextView>(R.id.patientName)
+        val nameTextView = findViewById<TextView>(R.id.PatientName)
         val surnameTextView = findViewById<TextView>(R.id.patientSurname)
         val peselTextView = findViewById<TextView>(R.id.patientPesel)
         val addressTextView = findViewById<TextView>(R.id.patientAddress)
         val phoneTextView = findViewById<TextView>(R.id.patientPhone)
-        val medicalCardButton = findViewById<Button>(R.id.viewMedicalCardButton)
+        val medicalCardButton = findViewById<Button>(R.id.btnSettings)
 
         val name = intent.getStringExtra("NAME") ?: "Unknown"
         val surname = intent.getStringExtra("SURNAME") ?: "Unknown"

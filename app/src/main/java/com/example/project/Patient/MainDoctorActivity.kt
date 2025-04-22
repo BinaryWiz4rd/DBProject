@@ -1,12 +1,13 @@
-package com.example.project.Doctor
+package com.example.project.Patient
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import com.example.project.Doctor.DoctorCalendarFragment
+import com.example.project.Doctor.DoctorScheduleFragment
 
 import com.example.project.R
 

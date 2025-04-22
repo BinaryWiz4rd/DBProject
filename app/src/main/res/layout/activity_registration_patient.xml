@@ -110,7 +110,7 @@
             android:id="@+id/btnRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Zarejestruj się"
+            android:text="Register"
             android:textSize="18sp"
             android:padding="12dp"
             android:backgroundTint="@color/purple"

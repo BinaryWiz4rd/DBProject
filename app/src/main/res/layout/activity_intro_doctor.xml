@@ -19,12 +19,13 @@
 
     <ImageView
         android:id="@+id/imageView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="500dp"
+        android:layout_height="760dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/intro_women" />
+        app:srcCompat="@drawable/intro_doctor" />
 
     <TextView
         android:id="@+id/textView"
@@ -32,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="64dp"
-        android:text="@string/exceptional_care_n_close_yo_you"
+        android:text="Start your day"
         android:textStyle="bold"
         android:textColor="@color/white"
         android:textSize="34sp"

@@ -7,8 +7,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.project.Doctor.Doctor
-import com.example.project.Doctor.MainDoctorActivity
+import com.example.project.Patient.MainDoctorActivity
 import com.example.project.R
 import com.google.firebase.auth.FirebaseAuth
 
