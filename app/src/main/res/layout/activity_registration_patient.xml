@@ -8,8 +8,6 @@
     android:layout_height="match_parent"
     tools:context=".Menu.RegistrationPatientActivity">
 
-<!--android:background="@drawable/eclinic_background"-->
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,16 +27,12 @@
             android:layout_height="120dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="24dp"
-            android:contentDescription="Logo aplikacji" />
-            <!--android:src="@drawable/logo"-->
-
-
-
+            android:contentDescription="Application Logo" />
         <EditText
             android:id="@+id/etFirstName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Imię"
+            android:hint="First Name"
             android:padding="12dp"
             android:textSize="16sp"
             android:inputType="textPersonName"
@@ -50,7 +44,7 @@
             android:id="@+id/etLastName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nazwisko"
+            android:hint="Last Name"
             android:padding="12dp"
             android:textSize="16sp"
             android:inputType="textPersonName"
@@ -62,7 +56,7 @@
             android:id="@+id/etDateOfBirth"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Data urodzenia (yyyy-MM-dd)"
+            android:hint="Date of Birth (yyyy-MM-dd)"
             android:padding="12dp"
             android:textSize="16sp"
             android:inputType="date"
@@ -86,7 +80,7 @@
             android:id="@+id/etPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Hasło"
+            android:hint="Password"
             android:padding="12dp"
             android:textSize="16sp"
             android:inputType="textPassword"
@@ -98,7 +92,7 @@
             android:id="@+id/etConfirmPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Powtórz hasło"
+            android:hint="Confirm Password"
             android:padding="12dp"
             android:textSize="16sp"
             android:inputType="textPassword"
@@ -122,7 +116,7 @@
             android:id="@+id/btnLogIn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Masz już konto? Zaloguj się"
+            android:text="Already have an account? Log in"
             android:textSize="14sp"
             android:padding="12dp"
             android:backgroundTint="@color/purple"
