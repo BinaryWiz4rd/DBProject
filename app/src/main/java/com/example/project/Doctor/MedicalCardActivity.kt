@@ -1,4 +1,4 @@
-package com.example.project.Doctor
+/* package com.example.project.Doctor
 
 import android.os.Bundle
 import android.widget.Button
@@ -80,4 +80,4 @@ class MedicalCardActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error saving data: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
-}
+} */
