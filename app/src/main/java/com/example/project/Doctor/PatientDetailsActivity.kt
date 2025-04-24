@@ -26,36 +26,27 @@ class PatientDetailAndMedicalCardActivity : AppCompatActivity() {
     private lateinit var notesEditText: EditText
     private lateinit var saveMedicalCardButton: Button
 
-    // Instancja Firestore
     private lateinit var db: FirebaseFirestore
 
-    // Zmienna do przechowywania PESEL pacjenta
     private lateinit var patientPesel: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Ustaw layout, który zawiera elementy z obu poprzednich layoutów
-        // UWAGA: Musisz stworzyć nowy plik layoutu XML (np. activity_patient_detail_and_medical_card.xml)
-        //        łączący widoki z activity_patient_details.xml i activity_medical_card_doctor.xml
-        setContentView(R.layout.activity_patient_details) // Upewnij się, że ten layout istnieje
+        setContentView(R.layout.activity_patient_details)
 
-        // Inicjalizacja Firestore
         db = FirebaseFirestore.getInstance()
 
-        // Inicjalizacja widoków szczegółów pacjenta
-        nameTextView = findViewById(R.id.PatientName) // Użyj ID z Twojego nowego layoutu
-        surnameTextView = findViewById(R.id.patientSurname) // Użyj ID z Twojego nowego layoutu
-        peselTextView = findViewById(R.id.patientPesel) // Użyj ID z Twojego nowego layoutu
-        addressTextView = findViewById(R.id.patientAddress) // Użyj ID z Twojego nowego layoutu
-        phoneTextView = findViewById(R.id.patientPhone) // Użyj ID z Twojego nowego layoutu
+        nameTextView = findViewById(R.id.PatientName)
+        surnameTextView = findViewById(R.id.patientSurname)
+        peselTextView = findViewById(R.id.patientPesel)
+        addressTextView = findViewById(R.id.patientAddress)
+        phoneTextView = findViewById(R.id.patientPhone)
 
-        // Inicjalizacja widoków karty medycznej (EditText i Button)
-        // UWAGA: Użyj odpowiednich ID z nowego layoutu, np. takich jak poniżej
         diagnosisEditText = findViewById(R.id.medicalCardDiagnosis)
         medicationsEditText = findViewById(R.id.medicalCardMedications)
         treatmentEditText = findViewById(R.id.medicalCardTreatment)
         notesEditText = findViewById(R.id.medicalCardNotes)
-        saveMedicalCardButton = findViewById(R.id.btnSettings) // Użyj ID z Twojego nowego layoutu
+        saveMedicalCardButton = findViewById(R.id.btnSettings)
 
         // Pobranie danych pacjenta przekazanych przez Intent
         val name = intent.getStringExtra("NAME") ?: "Unknown"

@@ -96,7 +96,7 @@ class RegistrationDoctorActivity : AppCompatActivity() {
                 if (userId != null) {
                     val doctor = hashMapOf(
                         "email" to email,
-                        " firstName" to firstName,
+                        "firstName" to firstName,
                         "lastName" to lastName,
                         "pwz" to pwz,
                         "specialization" to specialization,
@@ -104,8 +104,8 @@ class RegistrationDoctorActivity : AppCompatActivity() {
                     )
                     CoroutineScope(Dispatchers.IO).launch {
                         try {
-                            db.collection("users").document(userId)
-                                .set(doctor)
+                            db.collection("doctors")
+                                .add(doctor)
                                 .await()
                             withContext(Dispatchers.Main) {
                                 Toast.makeText(this@RegistrationDoctorActivity, "Registration successful!", Toast.LENGTH_SHORT).show()
