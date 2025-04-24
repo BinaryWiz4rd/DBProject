@@ -1,0 +1,169 @@
+Index: app/src/main/java/com/example/project/Doctor/PatientDetailsActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.project.Doctor\r\n\r\nimport android.os.Bundle\r\nimport android.widget.Button\r\nimport android.widget.EditText // Zmieniono z TextView na EditText dla edycji\r\nimport android.widget.TextView\r\nimport android.widget.Toast\r\nimport androidx.appcompat.app.AppCompatActivity\r\nimport com.example.project.R\r\nimport com.google.firebase.firestore.FirebaseFirestore\r\n\r\n// Połączona aktywność, która wyświetla szczegóły pacjenta i jego kartę medyczną\r\nclass PatientDetailAndMedicalCardActivity : AppCompatActivity() {\r\n\r\n    // Deklaracje dla widoków szczegółów pacjenta\r\n    private lateinit var nameTextView: TextView\r\n    private lateinit var surnameTextView: TextView\r\n    private lateinit var peselTextView: TextView\r\n    private lateinit var addressTextView: TextView\r\n    private lateinit var phoneTextView: TextView\r\n\r\n    // Deklaracje dla widoków karty medycznej (używamy EditText do edycji)\r\n    private lateinit var diagnosisEditText: EditText\r\n    private lateinit var medicationsEditText: EditText\r\n    private lateinit var treatmentEditText: EditText\r\n    private lateinit var notesEditText: EditText\r\n    private lateinit var saveMedicalCardButton: Button\r\n\r\n    // Instancja Firestore\r\n    private lateinit var db: FirebaseFirestore\r\n\r\n    // Zmienna do przechowywania PESEL pacjenta\r\n    private lateinit var patientPesel: String\r\n\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        // Ustaw layout, który zawiera elementy z obu poprzednich layoutów\r\n        // UWAGA: Musisz stworzyć nowy plik layoutu XML (np. activity_patient_detail_and_medical_card.xml)\r\n        //        łączący widoki z activity_patient_details.xml i activity_medical_card_doctor.xml\r\n        setContentView(R.layout.activity_patient_details) // Upewnij się, że ten layout istnieje\r\n\r\n        // Inicjalizacja Firestore\r\n        db = FirebaseFirestore.getInstance()\r\n\r\n        // Inicjalizacja widoków szczegółów pacjenta\r\n        nameTextView = findViewById(R.id.PatientName) // Użyj ID z Twojego nowego layoutu\r\n        surnameTextView = findViewById(R.id.patientSurname) // Użyj ID z Twojego nowego layoutu\r\n        peselTextView = findViewById(R.id.patientPesel) // Użyj ID z Twojego nowego layoutu\r\n        addressTextView = findViewById(R.id.patientAddress) // Użyj ID z Twojego nowego layoutu\r\n        phoneTextView = findViewById(R.id.patientPhone) // Użyj ID z Twojego nowego layoutu\r\n\r\n        // Inicjalizacja widoków karty medycznej (EditText i Button)\r\n        // UWAGA: Użyj odpowiednich ID z nowego layoutu, np. takich jak poniżej\r\n        diagnosisEditText = findViewById(R.id.medicalCardDiagnosis)\r\n        medicationsEditText = findViewById(R.id.medicalCardMedications)\r\n        treatmentEditText = findViewById(R.id.medicalCardTreatment)\r\n        notesEditText = findViewById(R.id.medicalCardNotes)\r\n        saveMedicalCardButton = findViewById(R.id.btnSettings) // Użyj ID z Twojego nowego layoutu\r\n\r\n        // Pobranie danych pacjenta przekazanych przez Intent\r\n        val name = intent.getStringExtra(\"NAME\") ?: \"Unknown\"\r\n        val surname = intent.getStringExtra(\"SURNAME\") ?: \"Unknown\"\r\n        patientPesel = intent.getStringExtra(\"PESEL\") ?: \"Unknown\" // Zapisz PESEL do zmiennej klasy\r\n        val address = intent.getStringExtra(\"ADDRESS\") ?: \"Unknown\"\r\n        val phone = intent.getStringExtra(\"PHONE\") ?: \"Unknown\"\r\n\r\n        // Sprawdzenie czy PESEL został poprawnie przekazany\r\n        if (patientPesel == \"Unknown\") {\r\n            Toast.makeText(this, \"Error: Patient PESEL not provided.\", Toast.LENGTH_LONG).show()\r\n            // Można rozważyć zamknięcie aktywności lub inne działanie\r\n            finish()\r\n            return // Zakończ onCreate, jeśli PESEL jest nieznany\r\n        }\r\n\r\n        // Ustawienie tekstu dla widoków szczegółów pacjenta\r\n        nameTextView.text = \"Name: $name\"\r\n        surnameTextView.text = \"Surname: $surname\"\r\n        peselTextView.text = \"PESEL: $patientPesel\"\r\n        addressTextView.text = \"Address: $address\"\r\n        phoneTextView.text = \"Phone: $phone\"\r\n\r\n        // Załadowanie danych karty medycznej z Firestore\r\n        loadMedicalCard(patientPesel)\r\n\r\n        // Ustawienie listenera dla przycisku zapisu karty medycznej\r\n        saveMedicalCardButton.setOnClickListener {\r\n            saveMedicalCard(patientPesel)\r\n        }\r\n    }\r\n\r\n    private fun loadMedicalCard(pesel: String) {\r\n        db.collection(\"medical_cards\").document(pesel)\r\n            .get()\r\n            .addOnSuccessListener { document ->\r\n                if (document.exists()) {\r\n                    // Ustawienie pobranych danych w polach EditText\r\n                    diagnosisEditText.setText(document.getString(\"diagnosis\") ?: \"\")\r\n                    medicationsEditText.setText(document.getString(\"medications\") ?: \"\")\r\n                    treatmentEditText.setText(document.getString(\"treatment\") ?: \"\")\r\n                    notesEditText.setText(document.getString(\"notes\") ?: \"\")\r\n                    Toast.makeText(this, \"Medical record loaded.\", Toast.LENGTH_SHORT).show()\r\n                } else {\r\n                    Toast.makeText(this, \"No medical record found for this patient. You can create one now.\", Toast.LENGTH_SHORT).show()\r\n                    // Pola EditText pozostaną puste, gotowe do wypełnienia\r\n                }\r\n            }\r\n            .addOnFailureListener { e ->\r\n                Toast.makeText(this, \"Error loading medical data: ${e.message}\", Toast.LENGTH_SHORT).show()\r\n            }\r\n    }\r\n\r\n    private fun saveMedicalCard(pesel: String) {\r\n        // Pobranie danych z pól EditText\r\n        val diagnosis = diagnosisEditText.text.toString()\r\n        val medications = medicationsEditText.text.toString()\r\n        val treatment = treatmentEditText.text.toString()\r\n        val notes = notesEditText.text.toString()\r\n\r\n        // Stworzenie mapy danych do zapisania\r\n        val medicalCard = hashMapOf(\r\n            \"diagnosis\" to diagnosis,\r\n            \"medications\" to medications,\r\n            \"treatment\" to treatment,\r\n            \"notes\" to notes\r\n            // Możesz dodać inne pola, np. datę modyfikacji\r\n            // \"lastUpdated\" to com.google.firebase.Timestamp.now()\r\n        )\r\n\r\n        // Zapisanie danych do Firestore w kolekcji 'medical_cards' używając PESEL jako ID dokumentu\r\n        db.collection(\"medical_cards\").document(pesel)\r\n            .set(medicalCard) // Użyj .set() aby nadpisać lub stworzyć dokument\r\n            .addOnSuccessListener {\r\n                Toast.makeText(this, \"Medical card saved successfully!\", Toast.LENGTH_SHORT).show()\r\n            }\r\n            .addOnFailureListener { e ->\r\n                Toast.makeText(this, \"Error saving medical data: ${e.message}\", Toast.LENGTH_SHORT).show()\r\n            }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/project/Doctor/PatientDetailsActivity.kt b/app/src/main/java/com/example/project/Doctor/PatientDetailsActivity.kt
+--- a/app/src/main/java/com/example/project/Doctor/PatientDetailsActivity.kt	(revision f8b4ad9da8fcf304deaf8d6f709c62d31ef886a6)
++++ b/app/src/main/java/com/example/project/Doctor/PatientDetailsActivity.kt	(date 1745488580194)
+@@ -1,139 +1,44 @@
+ package com.example.project.Doctor
+ 
++import android.content.Intent
+ import android.os.Bundle
+ import android.widget.Button
+-import android.widget.EditText // Zmieniono z TextView na EditText dla edycji
+ import android.widget.TextView
+-import android.widget.Toast
+ import androidx.appcompat.app.AppCompatActivity
+ import com.example.project.R
+-import com.google.firebase.firestore.FirebaseFirestore
+-
+-// Połączona aktywność, która wyświetla szczegóły pacjenta i jego kartę medyczną
+-class PatientDetailAndMedicalCardActivity : AppCompatActivity() {
+-
+-    // Deklaracje dla widoków szczegółów pacjenta
+-    private lateinit var nameTextView: TextView
+-    private lateinit var surnameTextView: TextView
+-    private lateinit var peselTextView: TextView
+-    private lateinit var addressTextView: TextView
+-    private lateinit var phoneTextView: TextView
+-
+-    // Deklaracje dla widoków karty medycznej (używamy EditText do edycji)
+-    private lateinit var diagnosisEditText: EditText
+-    private lateinit var medicationsEditText: EditText
+-    private lateinit var treatmentEditText: EditText
+-    private lateinit var notesEditText: EditText
+-    private lateinit var saveMedicalCardButton: Button
+ 
+-    // Instancja Firestore
+-    private lateinit var db: FirebaseFirestore
+-
+-    // Zmienna do przechowywania PESEL pacjenta
+-    private lateinit var patientPesel: String
++class PatientDetailsActivity : AppCompatActivity() {
+ 
+     override fun onCreate(savedInstanceState: Bundle?) {
+         super.onCreate(savedInstanceState)
+-        // Ustaw layout, który zawiera elementy z obu poprzednich layoutów
+-        // UWAGA: Musisz stworzyć nowy plik layoutu XML (np. activity_patient_detail_and_medical_card.xml)
+-        //        łączący widoki z activity_patient_details.xml i activity_medical_card_doctor.xml
+-        setContentView(R.layout.activity_patient_details) // Upewnij się, że ten layout istnieje
+-
+-        // Inicjalizacja Firestore
+-        db = FirebaseFirestore.getInstance()
++        setContentView(R.layout.activity_patient_details)
+ 
+-        // Inicjalizacja widoków szczegółów pacjenta
+-        nameTextView = findViewById(R.id.PatientName) // Użyj ID z Twojego nowego layoutu
+-        surnameTextView = findViewById(R.id.patientSurname) // Użyj ID z Twojego nowego layoutu
+-        peselTextView = findViewById(R.id.patientPesel) // Użyj ID z Twojego nowego layoutu
+-        addressTextView = findViewById(R.id.patientAddress) // Użyj ID z Twojego nowego layoutu
+-        phoneTextView = findViewById(R.id.patientPhone) // Użyj ID z Twojego nowego layoutu
++        val nameTextView = findViewById<TextView>(R.id.PatientName)
++        val surnameTextView = findViewById<TextView>(R.id.patientSurname)
++        val peselTextView = findViewById<TextView>(R.id.patientPesel)
++        val addressTextView = findViewById<TextView>(R.id.patientAddress)
++        val phoneTextView = findViewById<TextView>(R.id.patientPhone)
++        val medicalCardButton = findViewById<Button>(R.id.btnSettings)
+ 
+-        // Inicjalizacja widoków karty medycznej (EditText i Button)
+-        // UWAGA: Użyj odpowiednich ID z nowego layoutu, np. takich jak poniżej
+-        diagnosisEditText = findViewById(R.id.medicalCardDiagnosis)
+-        medicationsEditText = findViewById(R.id.medicalCardMedications)
+-        treatmentEditText = findViewById(R.id.medicalCardTreatment)
+-        notesEditText = findViewById(R.id.medicalCardNotes)
+-        saveMedicalCardButton = findViewById(R.id.btnSettings) // Użyj ID z Twojego nowego layoutu
+-
+-        // Pobranie danych pacjenta przekazanych przez Intent
+         val name = intent.getStringExtra("NAME") ?: "Unknown"
+         val surname = intent.getStringExtra("SURNAME") ?: "Unknown"
+-        patientPesel = intent.getStringExtra("PESEL") ?: "Unknown" // Zapisz PESEL do zmiennej klasy
++        val pesel = intent.getStringExtra("PESEL") ?: "Unknown"
+         val address = intent.getStringExtra("ADDRESS") ?: "Unknown"
+         val phone = intent.getStringExtra("PHONE") ?: "Unknown"
+ 
+-        // Sprawdzenie czy PESEL został poprawnie przekazany
+-        if (patientPesel == "Unknown") {
+-            Toast.makeText(this, "Error: Patient PESEL not provided.", Toast.LENGTH_LONG).show()
+-            // Można rozważyć zamknięcie aktywności lub inne działanie
+-            finish()
+-            return // Zakończ onCreate, jeśli PESEL jest nieznany
+-        }
+-
+-        // Ustawienie tekstu dla widoków szczegółów pacjenta
+         nameTextView.text = "Name: $name"
+         surnameTextView.text = "Surname: $surname"
+-        peselTextView.text = "PESEL: $patientPesel"
++        peselTextView.text = "PESEL: $pesel"
+         addressTextView.text = "Address: $address"
+         phoneTextView.text = "Phone: $phone"
+ 
+-        // Załadowanie danych karty medycznej z Firestore
+-        loadMedicalCard(patientPesel)
+-
+-        // Ustawienie listenera dla przycisku zapisu karty medycznej
+-        saveMedicalCardButton.setOnClickListener {
+-            saveMedicalCard(patientPesel)
+-        }
+-    }
+-
+-    private fun loadMedicalCard(pesel: String) {
+-        db.collection("medical_cards").document(pesel)
+-            .get()
+-            .addOnSuccessListener { document ->
+-                if (document.exists()) {
+-                    // Ustawienie pobranych danych w polach EditText
+-                    diagnosisEditText.setText(document.getString("diagnosis") ?: "")
+-                    medicationsEditText.setText(document.getString("medications") ?: "")
+-                    treatmentEditText.setText(document.getString("treatment") ?: "")
+-                    notesEditText.setText(document.getString("notes") ?: "")
+-                    Toast.makeText(this, "Medical record loaded.", Toast.LENGTH_SHORT).show()
+-                } else {
+-                    Toast.makeText(this, "No medical record found for this patient. You can create one now.", Toast.LENGTH_SHORT).show()
+-                    // Pola EditText pozostaną puste, gotowe do wypełnienia
+-                }
+-            }
+-            .addOnFailureListener { e ->
+-                Toast.makeText(this, "Error loading medical data: ${e.message}", Toast.LENGTH_SHORT).show()
++        medicalCardButton.setOnClickListener {
++            val intent = Intent(this, MedicalCardActivity::class.java).apply {
++                putExtra("NAME", name)
++                putExtra("SURNAME", surname)
++                putExtra("PESEL", pesel)
+             }
+-    }
+-
+-    private fun saveMedicalCard(pesel: String) {
+-        // Pobranie danych z pól EditText
+-        val diagnosis = diagnosisEditText.text.toString()
+-        val medications = medicationsEditText.text.toString()
+-        val treatment = treatmentEditText.text.toString()
+-        val notes = notesEditText.text.toString()
+-
+-        // Stworzenie mapy danych do zapisania
+-        val medicalCard = hashMapOf(
+-            "diagnosis" to diagnosis,
+-            "medications" to medications,
+-            "treatment" to treatment,
+-            "notes" to notes
+-            // Możesz dodać inne pola, np. datę modyfikacji
+-            // "lastUpdated" to com.google.firebase.Timestamp.now()
+-        )
+-
+-        // Zapisanie danych do Firestore w kolekcji 'medical_cards' używając PESEL jako ID dokumentu
+-        db.collection("medical_cards").document(pesel)
+-            .set(medicalCard) // Użyj .set() aby nadpisać lub stworzyć dokument
+-            .addOnSuccessListener {
+-                Toast.makeText(this, "Medical card saved successfully!", Toast.LENGTH_SHORT).show()
+-            }
+-            .addOnFailureListener { e ->
+-                Toast.makeText(this, "Error saving medical data: ${e.message}", Toast.LENGTH_SHORT).show()
+-            }
++            startActivity(intent)
++        }
+     }
+ }
+\ No newline at end of file

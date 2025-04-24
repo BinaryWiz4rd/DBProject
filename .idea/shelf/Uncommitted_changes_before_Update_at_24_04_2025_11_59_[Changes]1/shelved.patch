@@ -1,0 +1,39 @@
+Index: app/src/main/java/com/example/project/Doctor/MedicalCardActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/* package com.example.project.Doctor\r\n\r\nimport android.os.Bundle\r\nimport android.widget.Button\r\nimport android.widget.TextView\r\nimport android.widget.Toast\r\nimport androidx.appcompat.app.AppCompatActivity\r\nimport com.example.project.R\r\nimport com.google.firebase.firestore.FirebaseFirestore\r\n\r\nclass MedicalCardActivity : AppCompatActivity() {\r\n\r\n    private lateinit var db: FirebaseFirestore\r\n    private lateinit var patientNameTextView: TextView\r\n    private lateinit var diagnosisTextView: TextView\r\n    private lateinit var medicationsTextView: TextView\r\n    private lateinit var treatmentTextView: TextView\r\n    private lateinit var notesTextView: TextView\r\n    private lateinit var saveButton: Button\r\n\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        setContentView(R.layout.activity_medical_card_doctor)\r\n\r\n        db = FirebaseFirestore.getInstance()\r\n\r\n        patientNameTextView = findViewById(R.id.medicalCardPatientName)\r\n        diagnosisTextView = findViewById(R.id.medicalCardDiagnosis)\r\n        medicationsTextView = findViewById(R.id.medicalCardMedications)\r\n        treatmentTextView = findViewById(R.id.medicalCardTreatment)\r\n        notesTextView = findViewById(R.id.medicalCardNotes)\r\n        saveButton = findViewById(R.id.saveMedicalCardButton)\r\n\r\n        val patientName = intent.getStringExtra(\"NAME\") ?: \"Unknown\"\r\n        val patientSurname = intent.getStringExtra(\"SURNAME\") ?: \"Unknown\"\r\n        val patientPesel = intent.getStringExtra(\"PESEL\") ?: \"Unknown\"\r\n\r\n        patientNameTextView.text = \"Patient: $patientName $patientSurname\"\r\n\r\n        // Pobieranie danych pacjenta z Firestore\r\n        loadMedicalCard(patientPesel)\r\n\r\n        saveButton.setOnClickListener {\r\n            saveMedicalCard(patientPesel)\r\n        }\r\n    }\r\n\r\n    private fun loadMedicalCard(patientPesel: String) {\r\n        db.collection(\"medical_cards\").document(patientPesel)\r\n            .get()\r\n            .addOnSuccessListener { document ->\r\n                if (document.exists()) {\r\n                    diagnosisTextView.text = \"Diagnosis: ${document.getString(\"diagnosis\") ?: \"Not Available\"}\"\r\n                    medicationsTextView.text = \"Medications: ${document.getString(\"medications\") ?: \"Not Available\"}\"\r\n                    treatmentTextView.text = \"Treatment Plan: ${document.getString(\"treatment\") ?: \"Not Available\"}\"\r\n                    notesTextView.text = \"Doctor Notes: ${document.getString(\"notes\") ?: \"Not Available\"}\"\r\n                } else {\r\n                    Toast.makeText(this, \"No medical record found!\", Toast.LENGTH_SHORT).show()\r\n                }\r\n            }\r\n            .addOnFailureListener { e ->\r\n                Toast.makeText(this, \"Error loading data: ${e.message}\", Toast.LENGTH_SHORT).show()\r\n            }\r\n    }\r\n\r\n    private fun saveMedicalCard(patientPesel: String) {\r\n        val medicalCard = hashMapOf(\r\n            \"diagnosis\" to diagnosisTextView.text.toString().removePrefix(\"Diagnosis: \"),\r\n            \"medications\" to medicationsTextView.text.toString().removePrefix(\"Medications: \"),\r\n            \"treatment\" to treatmentTextView.text.toString().removePrefix(\"Treatment Plan: \"),\r\n            \"notes\" to notesTextView.text.toString().removePrefix(\"Doctor Notes: \")\r\n        )\r\n\r\n        db.collection(\"medical_cards\").document(patientPesel)\r\n            .set(medicalCard)\r\n            .addOnSuccessListener {\r\n                Toast.makeText(this, \"Medical card saved successfully!\", Toast.LENGTH_SHORT).show()\r\n            }\r\n            .addOnFailureListener { e ->\r\n                Toast.makeText(this, \"Error saving data: ${e.message}\", Toast.LENGTH_SHORT).show()\r\n            }\r\n    }\r\n} */\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/project/Doctor/MedicalCardActivity.kt b/app/src/main/java/com/example/project/Doctor/MedicalCardActivity.kt
+--- a/app/src/main/java/com/example/project/Doctor/MedicalCardActivity.kt	(revision f8b4ad9da8fcf304deaf8d6f709c62d31ef886a6)
++++ b/app/src/main/java/com/example/project/Doctor/MedicalCardActivity.kt	(date 1745488580192)
+@@ -1,4 +1,4 @@
+-/* package com.example.project.Doctor
++package com.example.project.Doctor
+ 
+ import android.os.Bundle
+ import android.widget.Button
+@@ -80,4 +80,4 @@
+                 Toast.makeText(this, "Error saving data: ${e.message}", Toast.LENGTH_SHORT).show()
+             }
+     }
+-} */
++}
+Index: gradle/libs.versions.toml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>[versions]\r\nagp = \"8.7.3\"\r\nglide = \"4.13.0\"\r\nkotlin = \"2.1.10\"\r\ncoreKtx = \"1.15.0\"\r\njunit = \"4.13.2\"\r\njunitVersion = \"1.2.1\"\r\nespressoCore = \"3.6.1\"\r\nappcompat = \"1.7.0\"\r\nmaterial = \"1.12.0\"\r\nactivity = \"1.10.0\"\r\nconstraintlayout = \"2.2.0\"\r\nfirebaseAuthKtx = \"23.2.0\"\r\nfirebaseDatabaseKtx = \"21.0.0\"\r\nfirebaseFirestoreKtx = \"25.1.2\"\r\n\r\n[libraries]\r\nandroidx-core-ktx = { group = \"androidx.core\", name = \"core-ktx\", version.ref = \"coreKtx\" }\r\nglide = { module = \"com.github.bumptech.glide:glide\", version.ref = \"glide\" }\r\njunit = { group = \"junit\", name = \"junit\", version.ref = \"junit\" }\r\nandroidx-junit = { group = \"androidx.test.ext\", name = \"junit\", version.ref = \"junitVersion\" }\r\nandroidx-espresso-core = { group = \"androidx.test.espresso\", name = \"espresso-core\", version.ref = \"espressoCore\" }\r\nandroidx-appcompat = { group = \"androidx.appcompat\", name = \"appcompat\", version.ref = \"appcompat\" }\r\nmaterial = { group = \"com.google.android.material\", name = \"material\", version.ref = \"material\" }\r\nandroidx-activity = { group = \"androidx.activity\", name = \"activity\", version.ref = \"activity\" }\r\nandroidx-constraintlayout = { group = \"androidx.constraintlayout\", name = \"constraintlayout\", version.ref = \"constraintlayout\" }\r\nfirebase-auth-ktx = { group = \"com.google.firebase\", name = \"firebase-auth-ktx\", version.ref = \"firebaseAuthKtx\" }\r\nfirebase-database-ktx = { group = \"com.google.firebase\", name = \"firebase-database-ktx\", version.ref = \"firebaseDatabaseKtx\" }\r\nfirebase-firestore-ktx = { group = \"com.google.firebase\", name = \"firebase-firestore-ktx\", version.ref = \"firebaseFirestoreKtx\" }\r\n\r\n[plugins]\r\nandroid-application = { id = \"com.android.application\", version.ref = \"agp\" }\r\nkotlin-android = { id = \"org.jetbrains.kotlin.android\", version.ref = \"kotlin\" }\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/gradle/libs.versions.toml b/gradle/libs.versions.toml
+--- a/gradle/libs.versions.toml	(revision f8b4ad9da8fcf304deaf8d6f709c62d31ef886a6)
++++ b/gradle/libs.versions.toml	(date 1745488648941)
+@@ -1,5 +1,5 @@
+ [versions]
+-agp = "8.7.3"
++agp = "8.9.2"
+ glide = "4.13.0"
+ kotlin = "2.1.10"
+ coreKtx = "1.15.0"
