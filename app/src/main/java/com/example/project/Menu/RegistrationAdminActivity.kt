@@ -1,5 +1,6 @@
 package com.example.project.Menu
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -8,6 +9,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.project.Admin.MainAdminActivity
+import com.example.project.Patient.MainDoctorActivity
 import com.example.project.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -108,7 +111,7 @@ class RegistrationAdminActivity : AppCompatActivity() {
                         db.collection("admins").document(it).set(admin)
                             .addOnSuccessListener {
                                 Toast.makeText(this, "Admin registration successful!", Toast.LENGTH_LONG).show()
-                                finish()
+                                navigateToMainAdminActivity()
                             }
                             .addOnFailureListener { e ->
                                 Toast.makeText(this, "Error saving admin data: ${e.message}", Toast.LENGTH_LONG).show()
@@ -123,5 +126,10 @@ class RegistrationAdminActivity : AppCompatActivity() {
                     btnRegister.isEnabled = true
                 }
             }
+    }
+    private fun navigateToMainAdminActivity() {
+        val intent = Intent(this, MainAdminActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

@@ -1,11 +1,14 @@
 package com.example.project.Menu
 
+import android.content.Intent
 import com.example.project.R
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.project.Admin.MainAdminActivity
+import com.example.project.Patient.MainPatientActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.ParseException
@@ -113,7 +116,7 @@ class RegistrationPatientActivity : AppCompatActivity() {
                             .set(patient)
                             .addOnSuccessListener {
                                 Toast.makeText(this, "Registration was successful.", Toast.LENGTH_SHORT).show()
-                                finish()
+                                navigateToMainPatientActivity()
                             }
                             .addOnFailureListener {
                                 Toast.makeText(this, "Error saving user data.", Toast.LENGTH_SHORT).show()
@@ -133,5 +136,10 @@ class RegistrationPatientActivity : AppCompatActivity() {
             age--
         }
         return age >= 18
+    }
+    private fun navigateToMainPatientActivity() {
+        val intent = Intent(this, MainPatientActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }
