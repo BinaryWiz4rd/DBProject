@@ -90,38 +90,38 @@ class RegistrationDoctorActivity : AppCompatActivity() {
 
         //uzylam coroutines zeby plynniej dzialalo, bo i tak in the end trzeba je dac
         auth.createUserWithEmailAndPassword(email, password)
-        .addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val userId = auth.currentUser ?.uid
-                if (userId != null) {
-                    val doctor = hashMapOf(
-                        "email" to email,
-                        "firstName" to firstName,
-                        "lastName" to lastName,
-                        "pwz" to pwz,
-                        "specialization" to specialization,
-                        "role" to "doctor"
-                    )
-                    CoroutineScope(Dispatchers.IO).launch {
-                        try {
-                            db.collection("doctors")
-                                .add(doctor)
-                                .await()
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(this@RegistrationDoctorActivity, "Registration successful!", Toast.LENGTH_SHORT).show()
-                                navigateToMainDoctorActivity()
-                            }
-                        } catch (e: Exception) {
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(this@RegistrationDoctorActivity, "Error saving data: ${e.message}", Toast.LENGTH_SHORT).show()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val doctorId = auth.currentUser ?.uid
+                    if (doctorId != null) {
+                        val doctor = hashMapOf(
+                            "email" to email,
+                            "firstName" to firstName,
+                            "lastName" to lastName,
+                            "pwz" to pwz,
+                            "specialization" to specialization,
+                            "role" to "doctor"
+                        )
+                        CoroutineScope(Dispatchers.IO).launch {
+                            try {
+                                db.collection("doctors").document(doctorId)
+                                    .set(doctor)
+                                    .await()
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(this@RegistrationDoctorActivity, "Registration successful!", Toast.LENGTH_SHORT).show()
+                                    navigateToMainDoctorActivity()
+                                }
+                            } catch (e: Exception) {
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(this@RegistrationDoctorActivity, "Error saving data: ${e.message}", Toast.LENGTH_SHORT).show()
+                                }
                             }
                         }
                     }
+                } else {
+                    Toast.makeText(this, "Registration failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
-            } else {
-                Toast.makeText(this, "Registration failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
             }
-        }
     }
 
     private fun navigateToMainDoctorActivity() {
