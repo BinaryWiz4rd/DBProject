@@ -51,7 +51,7 @@ class RegistrationPatientActivity : AppCompatActivity() {
         btnLogIn.setOnClickListener {
             Toast.makeText(
                 this,
-                "Przejdź do logowania",
+                "Go to login",
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -65,49 +65,42 @@ class RegistrationPatientActivity : AppCompatActivity() {
         val password = etPassword.text.toString()
         val confirmPassword = etConfirmPassword.text.toString()
 
-        // Walidacja pól
         if (firstName.isEmpty() || lastName.isEmpty() || dateOfBirthStr.isEmpty() ||
             email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()
         ) {
-            Toast.makeText(this, "Proszę wypełnić wszystkie pola", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // Sprawdzenie zgodności haseł
         if (password != confirmPassword) {
-            Toast.makeText(this, "Hasła nie są identyczne", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // Parsowanie daty urodzenia
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val dateOfBirth: Date
         try {
-            dateOfBirth = sdf.parse(dateOfBirthStr)
+            dateOfBirth = sdf.parse(dateOfBirthStr) as Date
         } catch (e: ParseException) {
-            Toast.makeText(this, "Nieprawidłowy format daty (użyj yyyy-MM-dd)", Toast.LENGTH_SHORT)
+            Toast.makeText(this, "Invalid date format (use YYYY-MM-DD)", Toast.LENGTH_SHORT)
                 .show()
             return
         }
 
-        // Sprawdzenie, czy pacjent jest pełnoletni (18 lat lub więcej)
         if (!isAdult(dateOfBirth)) {
             Toast.makeText(
                 this,
-                "Musisz być pełnoletni, aby korzystać z aplikacji",
+                "You must be 18 or older to use this application",
                 Toast.LENGTH_SHORT
             ).show()
             return
         }
 
-        // Logika rejestracji – np. zapis danych lub przejście do kolejnego ekranu
-        //Toast.makeText(this, "Rejestracja zakończona sukcesem", Toast.LENGTH_SHORT).show()
-
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    val userId = auth.currentUser?.uid
-                    if (userId != null) {
+                    val patientId = auth.currentUser?.uid
+                    if (patientId != null) {
                         val patient = hashMapOf(
                             "email" to email,
                             "firstName" to firstName,
@@ -116,7 +109,7 @@ class RegistrationPatientActivity : AppCompatActivity() {
                             "role" to "patient"
                         )
 
-                        db.collection("patients").document(userId)
+                        db.collection("patients").document(patientId)
                             .set(patient)
                             .addOnSuccessListener {
                                 Toast.makeText(this, "Registration was successful.", Toast.LENGTH_SHORT).show()
@@ -132,7 +125,6 @@ class RegistrationPatientActivity : AppCompatActivity() {
             }
     }
 
-    // Metoda sprawdzająca, czy użytkownik jest pełnoletni
     private fun isAdult(dateOfBirth: Date): Boolean {
         val dob = Calendar.getInstance().apply { time = dateOfBirth }
         val today = Calendar.getInstance()
