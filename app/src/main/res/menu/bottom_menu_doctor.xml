@@ -9,10 +9,11 @@
         android:id="@+id/calendar"
         android:title="Calendar"
         android:icon="@drawable/calendar"/>
-   <item
+<!--   <item
         android:id="@+id/chat"
-        android:icon="@drawable/chat"
-        android:visible="false"/>
+        android:title="Chat"
+        android:icon="@drawable/chat"/>
+        &lt;!&ndash;android:visible="false"&ndash;&gt;-->
 
 
 </menu>

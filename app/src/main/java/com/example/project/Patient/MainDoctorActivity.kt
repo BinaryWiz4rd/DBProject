@@ -1,15 +1,16 @@
 package com.example.project.Patient
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.example.project.Doctor.DoctorCalendarFragment
 import com.example.project.Doctor.DoctorScheduleFragment
-
 import com.example.project.R
+import com.example.project.Doctor.DoctorChatFragment
 
 class MainDoctorActivity : AppCompatActivity() {
 
@@ -33,16 +34,13 @@ class MainDoctorActivity : AppCompatActivity() {
                     loadFragment(DoctorCalendarFragment())
                     true
                 }
-                //R.id.chat -> { potem sie stworzy
-                //loadFragment(ChatFragment())
-                // true
-                // }
                 else -> false
             }
         }
 
         floatingActionButton.setOnClickListener {
-            openChatActivity()
+            loadFragment(DoctorChatFragment())
+
         }
 
         if (savedInstanceState == null) {
@@ -53,26 +51,15 @@ class MainDoctorActivity : AppCompatActivity() {
     private fun loadFragment(fragment: Fragment) {
         val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.frame_layout, fragment)
-        transaction.addToBackStack(null)
+        //transaction.addToBackStack(null) poczytac o backstack
         transaction.commit()
-    }
-
-    private fun openChatActivity() {
-        //val intent = Intent(this, ChatActivity::class.java)
-        //startActivity(intent)
     }
 
     override fun onResume() {
         super.onResume()
-
-        if (shouldShowChatItem()) {
-            bottomNavigationView.menu.findItem(R.id.chat).isVisible = true
-        } else {
-            bottomNavigationView.menu.findItem(R.id.chat).isVisible = false
-        }
     }
 
     private fun shouldShowChatItem(): Boolean {
-        return true //potem sie tu pobawi
+        return true //chyba juz niepotrzebne
     }
 }
