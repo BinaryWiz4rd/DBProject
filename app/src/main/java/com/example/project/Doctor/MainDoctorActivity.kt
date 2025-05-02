@@ -22,6 +22,10 @@ class MainDoctorActivity : AppCompatActivity() {
 
         bottomNavigationView.setOnNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
+                R.id.home -> {
+                    loadFragment(DoctorHomeFragment())
+                    true
+                }
                 R.id.schedule -> {
                     loadFragment(DoctorScheduleFragment())
                     true
@@ -40,7 +44,7 @@ class MainDoctorActivity : AppCompatActivity() {
         }
 
         if (savedInstanceState == null) {
-            loadFragment(DoctorScheduleFragment())
+            loadFragment(DoctorHomeFragment())
         }
     }
 
