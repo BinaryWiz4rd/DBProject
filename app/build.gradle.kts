@@ -60,6 +60,9 @@ dependencies {
     implementation("com.google.firebase:firebase-auth:23.0.0")
     implementation("com.google.firebase:firebase-firestore:24.10.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
+
+    implementation("com.google.firebase:firebase-database")
+
     //do bottom menu
     implementation(libs.material.v110)
     implementation(libs.glide)
