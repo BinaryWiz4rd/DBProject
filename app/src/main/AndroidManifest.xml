@@ -53,10 +53,6 @@
             android:name=".Menu.RegistrationPatientActivity"
             android:exported="true" />
         <activity
-            android:name=".Patient.MainActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Project1983" />
-        <activity
             android:name=".Doctor.MainDoctorActivity"
             android:exported="false" />
     </application>
