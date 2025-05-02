@@ -63,6 +63,8 @@ dependencies {
 
     implementation("com.google.firebase:firebase-database")
 
+    implementation("com.google.android.material:material:1.11.0")
+
     //do bottom menu
     implementation(libs.material.v110)
     implementation(libs.glide)
