@@ -1,16 +1,12 @@
-package com.example.project.Patient
+package com.example.project.Doctor
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.example.project.Doctor.DoctorCalendarFragment
-import com.example.project.Doctor.DoctorScheduleFragment
 import com.example.project.R
-import com.example.project.Doctor.DoctorChatFragment
 
 class MainDoctorActivity : AppCompatActivity() {
 
