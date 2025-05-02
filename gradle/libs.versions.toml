@@ -1,5 +1,5 @@
 [versions]
-agp = "8.9.2"
+agp = "8.7.3"
 firebaseBom = "33.12.0"
 glide = "4.13.0"
 kotlin = "2.1.10"
@@ -15,6 +15,7 @@ firebaseAuthKtx = "23.2.0"
 firebaseDatabaseKtx = "21.0.0"
 firebaseFirestoreKtx = "25.1.2"
 materialVersion = "1.1.0"
+firebaseInappmessagingKtx = "21.0.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -33,6 +34,7 @@ firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx",
 firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 material-v110 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
+firebase-inappmessaging-ktx = { group = "com.google.firebase", name = "firebase-inappmessaging-ktx", version.ref = "firebaseInappmessagingKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

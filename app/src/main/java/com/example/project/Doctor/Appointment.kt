@@ -13,5 +13,4 @@ data class Appointment(
         return "Wizyta u dr. ${doctor.name} (${doctor.specialization}) " +
                 "dla pacjenta ${patient.name} w dniu $date o godz. $time"
     }
-}
-*/
+} */
