@@ -1,24 +1,41 @@
 package com.example.project.Doctor
 
+import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import com.example.project.Menu.LogIn
+import com.example.project.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.example.project.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MainDoctorActivity : AppCompatActivity() {
 
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var floatingActionButton: FloatingActionButton
+    private lateinit var profileButton: ImageButton
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_doctor)
 
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
+
         bottomNavigationView = findViewById(R.id.bottomNavigationView)
         floatingActionButton = findViewById(R.id.floatingActionButton)
+        profileButton = findViewById(R.id.profileButton)
 
         bottomNavigationView.setOnNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
@@ -40,7 +57,10 @@ class MainDoctorActivity : AppCompatActivity() {
 
         floatingActionButton.setOnClickListener {
             loadFragment(DoctorChatFragment())
+        }
 
+        profileButton.setOnClickListener {
+            showProfileDialog()
         }
 
         if (savedInstanceState == null) {
@@ -51,15 +71,125 @@ class MainDoctorActivity : AppCompatActivity() {
     private fun loadFragment(fragment: Fragment) {
         val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.frame_layout, fragment)
-        //transaction.addToBackStack(null) poczytac o backstack
         transaction.commit()
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
+    private fun showProfileDialog() {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_profile, null)
 
-    private fun shouldShowChatItem(): Boolean {
-        return true //chyba juz niepotrzebne
+        val editTextFirstName = dialogView.findViewById<EditText>(R.id.editTextFirstName)
+        val editTextLastName = dialogView.findViewById<EditText>(R.id.editTextLastName)
+        val editTextEmail = dialogView.findViewById<EditText>(R.id.editTextEmail)
+        val editTextPWZ = dialogView.findViewById<EditText>(R.id.editTextPWZ)
+        val editTextSpecialization = dialogView.findViewById<EditText>(R.id.editTextSpecialization)
+        val buttonEdit = dialogView.findViewById<Button>(R.id.buttonEdit)
+        val buttonLogout = dialogView.findViewById<Button>(R.id.buttonLogout)
+        val buttonDeleteAccount = dialogView.findViewById<Button>(R.id.buttonDeleteAccount)
+
+        val currentUser = auth.currentUser
+        currentUser?.let { user ->
+            db.collection("doctors").document(user.uid)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        val firstName = document.getString("firstName") ?: ""
+                        val lastName = document.getString("lastName") ?: ""
+                        val email = document.getString("email") ?: ""
+                        val pwz = document.getString("pwz") ?: ""
+                        val specialization = document.getString("specialization") ?: ""
+                        editTextFirstName.setText(firstName)
+                        editTextLastName.setText(lastName)
+                        editTextEmail.setText(email)
+                        editTextPWZ.setText(pwz)
+                        editTextSpecialization.setText(specialization)
+                    } else {
+                        Toast.makeText(this, "Could not retrieve profile data.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error retrieving profile data: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        } ?: run {
+            Toast.makeText(this, "User not authenticated.", Toast.LENGTH_SHORT).show()
+        }
+
+        val builder = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setTitle("Profile")
+
+        val alertDialog = builder.create()
+        alertDialog.show()
+
+        buttonEdit.setOnClickListener {
+            val newFirstName = editTextFirstName.text.toString().trim()
+            val newLastName = editTextLastName.text.toString().trim()
+            val newEmail = editTextEmail.text.toString().trim()
+            val newPWZ = editTextPWZ.text.toString().trim()
+
+            if (newFirstName.isEmpty() || newLastName.isEmpty() || newEmail.isEmpty() || newPWZ.isEmpty()) {
+                Toast.makeText(this, "Please fill in all fields.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!newPWZ.matches(Regex("\\d{7,}"))) {
+                Toast.makeText(this, "Wrong PWZ number (minimum of 7 digits)", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            currentUser?.let { user ->
+                val updates = hashMapOf<String, Any>(
+                    "firstName" to newFirstName,
+                    "lastName" to newLastName,
+                    "email" to newEmail,
+                    "pwz" to newPWZ
+                )
+                db.collection("doctors").document(user.uid)
+                    .update(updates)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Profile updated!", Toast.LENGTH_SHORT).show()
+                        alertDialog.dismiss()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error updating profile: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+            } ?: run {
+                Toast.makeText(this, "User not authenticated.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        buttonLogout.setOnClickListener {
+            auth.signOut()
+            Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show()
+            finish()
+            startActivity(Intent(this, LogIn::class.java))
+        }
+
+        buttonDeleteAccount.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("Delete Account")
+                .setMessage("Are you sure you want to delete your account? This action cannot be undone.")
+                .setPositiveButton("Delete") { _, _ ->
+                    currentUser?.delete()
+                        ?.addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                db.collection("doctors").document(currentUser.uid)
+                                    .delete()
+                                    .addOnSuccessListener {
+                                        Toast.makeText(this, "Account deleted", Toast.LENGTH_SHORT).show()
+                                        alertDialog.dismiss()
+                                        finish()
+                                        startActivity(Intent(this, LogIn::class.java))
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Toast.makeText(this, "Error deleting user data: ${e.message}", Toast.LENGTH_SHORT).show()
+                                    }
+                            } else {
+                                Toast.makeText(this, "Error deleting account: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
     }
 }
