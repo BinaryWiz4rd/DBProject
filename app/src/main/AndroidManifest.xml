@@ -55,10 +55,6 @@
         <activity
             android:name=".Doctor.MainDoctorActivity"
             android:exported="false" />
-        <activity android:name=".Doctor.ChatActivity"
-            android:exported="false" />
-        <activity android:name=".Doctor.HomeActivity"
-            android:exported="false" />
     </application>
 
 </manifest>
