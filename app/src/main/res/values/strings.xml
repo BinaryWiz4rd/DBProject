@@ -44,6 +44,7 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     <string name="exceptional_care_n_close_yo_you">Exceptional Care\n Close yo You</string>
+    <string name="working_hours_format">Working Hours: %d:00 - %d:00</string>
     <string name="make_appointment">Make Appointment</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

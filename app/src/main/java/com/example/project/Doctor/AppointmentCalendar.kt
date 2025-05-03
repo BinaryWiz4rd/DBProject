@@ -1,6 +1,7 @@
 package com.example.project.Doctor
 
-data class Appointment(
+// to jest do calendar nie home
+data class AppointmentCalendar(
     var id: String = "",
     val patientName: String = "",
     val date: String = "",

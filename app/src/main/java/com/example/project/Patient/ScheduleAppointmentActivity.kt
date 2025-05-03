@@ -1,5 +1,4 @@
-package com.example.project.Doctor
-
+package com.example.project.Patient
 /*import android.os.Build
 import android.os.Bundle
 import android.widget.*
@@ -7,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.project.R
 
 class ScheduleAppointmentActivity : AppCompatActivity() {
+// to jest dla pacjenta
 
     private lateinit var spinnerDoctors: Spinner
     private lateinit var datePicker: DatePicker

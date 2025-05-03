@@ -1,64 +1,70 @@
-package com.example.project.Doctor // Zmień na swoją nazwę pakietu
-
+package com.example.project.Doctor
+// do DoctorCalendar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.project.Doctor.Appointment
-import com.example.project.R
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatter.ofPattern
+import com.example.project.R // Make sure R is imported correctly
 
+// Renamed to ScheduleAdapter and using ListAdapter for RecyclerView
 class ScheduleAdapter(
-    private var appointments: List<Appointment>,
-    private val onItemClick: (Appointment) -> Unit // Funkcja lambda do obsługi kliknięcia
-) : RecyclerView.Adapter<ScheduleAdapter.ViewHolder>() {
+    private val onItemClicked: (Appointment) -> Unit // Lambda for click handling
+) : ListAdapter<Appointment, ScheduleAdapter.AppointmentViewHolder>(AppointmentDiffCallback()) {
 
-    // Formatter dla czasu (np. 09:30)
-    private val timeFormatter: DateTimeFormatter = ofPattern("HH:mm")
+    // ViewHolder holds references to the views in the item layout
+    class AppointmentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        // Adjust IDs based on your activity_item_appointment.xml layout
+        private val timeTextView: TextView = itemView.findViewById(R.id.timeTextView)
+        private val patientNameTextView: TextView = itemView.findViewById(R.id.patientNameTextView)
+        // Assuming you have a TextView for doctor's name in your layout
+        private val doctorNameTextView: TextView? = itemView.findViewById(R.id.doctorNameTextView) // Make nullable if optional
 
-    // Tworzy ViewHolder (łączy layout list_item_appointment z kodem)
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        fun bind(appointment: Appointment, onItemClicked: (Appointment) -> Unit) {
+            timeTextView.text = appointment.time // Directly use the time string
+            patientNameTextView.text = "${appointment.patient.firstName} ${appointment.patient.lastName}"
+            // Display doctor's name if the TextView exists
+            doctorNameTextView?.text = "Dr. ${appointment.doctor.lastName}"
+            // Set click listener
+            itemView.setOnClickListener { onItemClicked(appointment) }
+        }
+    }
+
+    // Creates a new ViewHolder when RecyclerView needs one
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppointmentViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.activity_doctor_list_item_appointment, parent, false)
-        return ViewHolder(view)
+            // Make sure R.layout.activity_item_appointment is your correct item layout file
+            .inflate(R.layout.activity_item_appointment, parent, false)
+        return AppointmentViewHolder(view)
     }
 
-    // Wiąże dane z widokiem dla konkretnego elementu listy
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val appointment = appointments[position]
-        holder.bind(appointment)
+    // Binds data from the Appointment object to the views in the ViewHolder
+    override fun onBindViewHolder(holder: AppointmentViewHolder, position: Int) {
+        val appointment = getItem(position)
+        holder.bind(appointment, onItemClicked)
     }
 
-    // Zwraca liczbę elementów w liście
-    override fun getItemCount(): Int = appointments.size
-
-    // Funkcja do aktualizacji danych w adapterze
-    fun updateData(newAppointments: List<Appointment>) {
-        appointments = newAppointments.sortedBy { it.time } // Sortuj wg czasu
-        notifyDataSetChanged() // Informuje RecyclerView, że dane się zmieniły (są lepsze metody np. DiffUtil)
-    }
-
-    // ViewHolder - przechowuje referencje do widoków w elemencie listy
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val textViewTime: TextView = itemView.findViewById(R.id.textViewTime)
-        private val textViewPatientName: TextView = itemView.findViewById(R.id.textViewPatientName)
-
-        init {
-            // Ustawienie listenera kliknięcia na cały element
-            itemView.setOnClickListener {
-                val position = adapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    onItemClick(appointments[position])
-                }
-            }
+    // DiffUtil helps ListAdapter determine changes efficiently
+    class AppointmentDiffCallback : DiffUtil.ItemCallback<Appointment>() {
+        override fun areItemsTheSame(oldItem: Appointment, newItem: Appointment): Boolean {
+            // Compare unique IDs if you add an 'id' field to Appointment
+            // return oldItem.id == newItem.id
+            // Fallback: compare essential fields if no ID
+            return oldItem.doctor.email == newItem.doctor.email && // Assuming email is unique for doctor
+                    oldItem.patient.email == newItem.patient.email && // Assuming email is unique for patient
+                    oldItem.date == newItem.date &&
+                    oldItem.time == newItem.time
         }
 
-        fun bind(appointment: Appointment) {
-            textViewTime.text = appointment.time.format(timeFormatter)
-            textViewPatientName.text = appointment.patientName
-            // Możesz tu dodać więcej logiki, np. ustawienie ikony w zależności od statusu wizyty
+        override fun areContentsTheSame(oldItem: Appointment, newItem: Appointment): Boolean {
+            return oldItem == newItem // Checks all fields due to data class
         }
     }
+
+    // No need for explicit updateData method when using ListAdapter, use submitList() instead
+    // fun updateData(newAppointments: List<Appointment>) {
+    //     submitList(newAppointments)
+    // }
 }

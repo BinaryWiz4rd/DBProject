@@ -1,5 +1,5 @@
-/* package com.example.project.Doctor // Używam Twojej nazwy pakietu
-
+package com.example.project.Doctor // Używam Twojej nazwy pakietu
+// home
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -9,22 +9,25 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 // Importy dla Appointment i ScheduleAdapter muszą pasować do Twojej struktury projektu
-// Upewnij się, że te pliki istnieją i są poprawne w tym pakiecie
-import com.example.project.Doctor.Appointment
-import com.example.project.Doctor.ScheduleAdapter
+import com.example.project.Doctor.ScheduleAdapter // Corrected: Using ScheduleAdapter
 // Upewnij się, że plik layoutu nazywa się activity_doctor_home.xml
 import com.example.project.databinding.ActivityDoctorHomeBinding
+// Importy dla Doctor i Patient z ich pakietu
+import com.example.project.Admin.Doctor
+import com.example.project.Admin.Patient
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.util.Locale
 
 class HomeActivity : AppCompatActivity() {
 
-    // Upewnij się, że nazwa bindingu odpowiada nazwie pliku layoutu (activity_doctor_home.xml -> ActivityDoctorHomeBinding)
     private lateinit var binding: ActivityDoctorHomeBinding
-    private lateinit var scheduleAdapter: ScheduleAdapter
-    private var allAppointments: List<Appointment> = listOf()
+    private lateinit var scheduleAdapter: ScheduleAdapter // Using ScheduleAdapter
+    private var allAppointments: List<Appointment> = listOf() // Corrected: Using singular Appointment
+    private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+    private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,14 +36,13 @@ class HomeActivity : AppCompatActivity() {
 
         setupGreeting()
         setupUI()
-        loadScheduleData() // Ładuje dane testowe
+        loadScheduleData() // Loads test data (corrected object creation)
         setupSearch()
         setupWidget()
     }
 
     private fun setupGreeting() {
-        val userName = getUserFirstName() // Pobiera imię (obecnie placeholder)
-        // Upewnij się, że ID textViewGreeting istnieje w pliku activity_doctor_home.xml
+        val userName = getUserFirstName()
         if (userName != null) {
             binding.textViewGreeting.text = "Cześć, $userName!"
         } else {
@@ -49,103 +51,128 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun getUserFirstName(): String? {
-        // -------> WAŻNE: ZASTĄP TO PRAWDZIWĄ LOGIKĄ POBIERANIA IMIENIA <-------
-        // Ta funkcja musi zostać zaimplementowana, aby pobierać rzeczywiste imię zalogowanego lekarza
-        // Przykład: return getSharedPreferences("UserData", Context.MODE_PRIVATE).getString("USER_FIRST_NAME", null)
-        return "Doktorze" // Tylko przykład!
+        // -------> WAŻNE: ZASTĄP TO PRAWDZIWĄ LOGIKĄ POBIERANIA IMIENIA LEKARZA <-------
+        return "Jan" // Example
         // --------------------------------------------------------------------
     }
 
     private fun setupUI() {
-        // Upewnij się, że klasa ScheduleAdapter istnieje i działa poprawnie
-        scheduleAdapter = ScheduleAdapter(emptyList()) { appointment ->
-            Toast.makeText(this, "Kliknięto: ${appointment.patientName}", Toast.LENGTH_SHORT).show()
-            // TODO: Dodać logikę nawigacji do szczegółów wizyty po kliknięciu
-            // np. Intent do innej aktywności
+        // Initialize the corrected ScheduleAdapter
+        scheduleAdapter = ScheduleAdapter { appointment ->
+            // Click listener lambda implementation
+            Toast.makeText(this, "Kliknięto wizytę: ${appointment.patient.firstName} ${appointment.patient.lastName}", Toast.LENGTH_SHORT).show()
+            // TODO: Add navigation logic here
         }
-        // Upewnij się, że ID recyclerViewSchedule istnieje w pliku activity_doctor_home.xml
         binding.recyclerViewSchedule.apply {
             layoutManager = LinearLayoutManager(this@HomeActivity)
-            adapter = scheduleAdapter
+            adapter = scheduleAdapter // Set the ScheduleAdapter
         }
 
         val today = LocalDate.now()
-        val dateFormatter = try {
-            // Użyj polskiego locale dla poprawnego formatowania miesiąca
-            DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("pl", "PL"))
+        val displayDateFormatter = try {
+            DateTimeFormatter.ofPattern("d MMMM isobar", Locale("pl", "PL"))
         } catch (e: IllegalArgumentException) {
-            // Fallback na domyślny format, jeśli locale "pl" nie jest wspierane w pełni
             Log.w("HomeActivity", "Locale 'pl_PL' not fully supported for date format, using default.")
-            DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.getDefault())
+            DateTimeFormatter.ofPattern("d MMMM isobar", Locale.getDefault())
         }
-
-        // Upewnij się, że ID textViewScheduleTitle istnieje w pliku activity_doctor_home.xml
-        // Znak '?' zapewnia, że kod się nie wywali, jeśli widok nie zostanie znaleziony (choć nie powinien przy ViewBinding)
-        binding.textViewScheduleTitle?.text = "Plan na dziś (${today.format(dateFormatter)})"
+        binding.textViewScheduleTitle?.text = "Plan na dziś (${today.format(displayDateFormatter)})"
     }
 
 
     private fun loadScheduleData() {
-        // TODO: Załaduj dane z prawdziwego źródła (np. Firebase, API, lokalna baza danych)
-        // Obecnie używane są dane testowe. Upewnij się, że konstruktor Appointment
-        // zgadza się z przekazywanymi typami (ID, LocalTime, Nazwa, Szczegóły).
-        // To tutaj występował błąd, jeśli Appointment oczekiwał String zamiast LocalTime.
-        allAppointments = listOf(
-            Appointment("1", LocalTime.of(9, 0), "Anna Nowak", "Kontrola"),
-            Appointment("2", LocalTime.of(10, 30), "Jan Kowalski", "Ból gardła"),
-            Appointment("3", LocalTime.of(9, 45), "Katarzyna Zielińska", "Szczepienie"),
-            Appointment("4", LocalTime.of(11, 15), "Piotr Wiśniewski", "Konsultacja wyników"),
-            Appointment("5", LocalTime.of(13, 0), "Zofia Michalska", "Badanie okresowe")
+        // TODO: Load real Doctor, Patient, and Appointment data from your data source
+
+        // --- Example data matching the data class definitions ---
+        val thisDoctor = Doctor(
+            email = "jan.kowalski@example.com",
+            firstName = "Jan",
+            lastName = "Kowalski",
+            pwz = "1234567",
+            specialization = "Kardiolog"
         )
-        scheduleAdapter.updateData(allAppointments) // Przekaż dane do adaptera
+        val patient1 = Patient(
+            email = "anna.nowak@example.com",
+            firstName = "Anna",
+            lastName = "Nowak",
+            dateOfBirth = "1990-05-15"
+        )
+        val patient2 = Patient(
+            email = "piotr.wisniewski@example.com",
+            firstName = "Piotr",
+            lastName = "Wiśniewski",
+            dateOfBirth = "1985-11-22"
+        )
+        val patient3 = Patient(
+            email = "zofia.michalska@example.com",
+            firstName = "Zofia",
+            lastName = "Michalska",
+            dateOfBirth = "1978-02-10"
+        )
+
+        val todayDateStr = LocalDate.now().format(dateFormatter)
+        // -------------------------------------------------------------------
+
+        // Create list using the correct Appointment (singular) constructor
+        allAppointments = listOf(
+            Appointment(thisDoctor, patient1, todayDateStr, LocalTime.of(9, 0).format(timeFormatter)),
+            Appointment(thisDoctor, patient2, todayDateStr, LocalTime.of(10, 30).format(timeFormatter)),
+            Appointment(thisDoctor, patient1, todayDateStr, LocalTime.of(9, 45).format(timeFormatter)),
+            Appointment(thisDoctor, patient2, todayDateStr, LocalTime.of(11, 15).format(timeFormatter)),
+            Appointment(thisDoctor, patient3, todayDateStr, LocalTime.of(13, 0).format(timeFormatter))
+        )
+        // Use submitList for ListAdapter
+        scheduleAdapter.submitList(allAppointments)
     }
 
+
     private fun setupSearch() {
-        // Upewnij się, że ID editTextSearch istnieje w pliku activity_doctor_home.xml
         binding.editTextSearch.setOnEditorActionListener { v, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 val query = v.text.toString().trim()
-                performSearch(query) // Wywołaj funkcję wyszukiwania
-                // Ukrycie klawiatury po wyszukiwaniu
+                performSearch(query)
                 val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
                 imm?.hideSoftInputFromWindow(v.windowToken, 0)
-                true // Zasygnalizuj, że zdarzenie zostało obsłużone
+                true
             } else {
-                false // Zasygnalizuj, że zdarzenie nie zostało obsłużone
+                false
             }
         }
     }
 
     private fun performSearch(query: String) {
-        // TODO: Zaimplementuj faktyczną logikę wyszukiwania pacjentów
-        // Obecnie tylko wyświetla log i Toast.
-        // Wyszukiwanie powinno np. filtrować listę pacjentów lub odpytywać bazę danych/API.
+        // TODO: Implement actual patient search logic
         if (query.isNotEmpty()) {
             Log.d("HomeActivity", "Wyszukiwanie pacjenta: $query")
             Toast.makeText(this, "Wyszukiwanie: $query", Toast.LENGTH_SHORT).show()
-            // Tutaj logika filtrowania lub przejścia do ekranu wyników
         } else {
             Log.d("HomeActivity", "Wyszukiwanie anulowane lub puste")
         }
     }
 
     private fun setupWidget() {
-        // TODO: Zaimplementuj lub dostosuj logikę dla widgetu (np. następna wizyta)
+        // TODO: Implement or customize widget logic
         val now = LocalTime.now()
-        // Ten kod zakłada, że Appointment ma pole 'time' typu LocalTime
+        // This logic correctly handles time as String by parsing it back
         val nextAppointment = allAppointments
-            .filter { it.time.isAfter(now) } // Filtruj przyszłe wizyty
-            .minByOrNull { it.time } // Znajdź najwcześniejszą
+            .mapNotNull { appointment ->
+                try {
+                    Pair(appointment, LocalTime.parse(appointment.time, timeFormatter))
+                } catch (e: DateTimeParseException) {
+                    Log.e("HomeActivity", "Could not parse time string in setupWidget: ${appointment.time}", e)
+                    null
+                }
+            }
+            .filter { (_, parsedTime) -> parsedTime.isAfter(now) }
+            .minByOrNull { (_, parsedTime) -> parsedTime }
+            ?.first
 
-        val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-
-        // Upewnij się, że ID textViewWidgetTitle i textViewWidgetContent istnieją w pliku activity_doctor_home.xml
         if (nextAppointment != null) {
-            binding.textViewWidgetTitle.text = "Następna wizyta (${nextAppointment.time.format(timeFormatter)})"
-            binding.textViewWidgetContent.text = "${nextAppointment.patientName} - ${nextAppointment.details}"
+            binding.textViewWidgetTitle.text = "Następna wizyta (${nextAppointment.time})" // Time as String
+            binding.textViewWidgetContent.text = "${nextAppointment.patient.firstName} ${nextAppointment.patient.lastName}"
+            // Or use: binding.textViewWidgetContent.text = nextAppointment.getDetails()
         } else {
             binding.textViewWidgetTitle.text = "Następna wizyta"
             binding.textViewWidgetContent.text = "Brak kolejnych wizyt na dziś."
         }
     }
-} */
+}
