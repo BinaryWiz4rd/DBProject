@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.project"
-        minSdk = 26
+        minSdk = 28
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.inappmessaging.ktx)
+    implementation(libs.car.ui.lib)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

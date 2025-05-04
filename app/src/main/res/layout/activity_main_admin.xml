@@ -20,19 +20,11 @@
         <SearchView
             android:layout_width="0dp"
             android:layout_height="48dp"
-            android:layout_marginEnd="16dp"
             android:layout_weight="1"
             android:background="@drawable/search_background"
             android:iconifiedByDefault="false"
             android:queryHint="Search..." />
 
-        <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Notification"
-            android:padding="4dp"
-            android:src="@drawable/notifications" />
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -42,6 +34,7 @@
         android:layout_marginBottom="16dp">
 
         <com.google.android.material.chip.ChipGroup
+            android:id="@+id/type_filter_chip_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -60,11 +53,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="Doctors"
+                android:text="DOCTORS"
                 android:textColor="#673AB7"
                 android:textStyle="bold"
                 app:checkedIconVisible="true"
                 app:chipBackgroundColor="@drawable/chip_background_color"
+                app:chipStartPadding="12dp"
+                app:chipEndPadding="12dp"
                 app:chipStrokeColor="#673AB7"
                 app:chipStrokeWidth="1dp" />
 
@@ -73,11 +68,13 @@
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Patients"
+                android:text="PATIENTS"
                 android:textColor="#673AB7"
                 android:textStyle="bold"
                 app:checkedIconVisible="true"
                 app:chipBackgroundColor="@drawable/chip_background_color"
+                app:chipStartPadding="12dp"
+                app:chipEndPadding="12dp"
                 app:chipStrokeColor="#673AB7"
                 app:chipStrokeWidth="1dp" />
 
@@ -86,23 +83,134 @@
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Admins"
+                android:text="ADMINS"
                 android:textColor="#673AB7"
                 android:textStyle="bold"
                 app:checkedIconVisible="true"
                 app:chipBackgroundColor="@drawable/chip_background_color"
+                app:chipStartPadding="12dp"
+                app:chipEndPadding="12dp"
                 app:chipStrokeColor="#673AB7"
                 app:chipStrokeWidth="1dp" />
         </com.google.android.material.chip.ChipGroup>
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/action_filter_chip_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            app:chipSpacingHorizontal="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/type_filter_chip_group"
+            app:selectionRequired="false"
+            app:singleLine="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/filter_verified"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                app:chipIcon="@drawable/person"
+                app:chipIconVisible="true"
+                app:chipIconSize="28dp"
+                app:checkedIconVisible="true"
+                app:chipStartPadding="16dp"
+                app:chipEndPadding="6dp"
+                app:chipStrokeColor="#757575"
+                app:chipStrokeWidth="1dp"
+                app:closeIconVisible="false"
+                app:iconStartPadding="0dp"
+                app:iconEndPadding="0dp"
+                android:paddingStart="36dp"
+                android:paddingTop="6dp"
+                android:paddingEnd="6dp"
+                android:paddingBottom="6dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/filter_add"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                app:chipIcon="@drawable/person_add"
+                app:chipIconVisible="true"
+                app:chipIconSize="28dp"
+                app:checkedIconVisible="true"
+                app:chipStartPadding="16dp"
+                app:chipEndPadding="6dp"
+                app:chipStrokeColor="#757575"
+                app:chipStrokeWidth="1dp"
+                app:closeIconVisible="false"
+                app:iconStartPadding="0dp"
+                app:iconEndPadding="0dp"
+                android:paddingStart="36dp"
+                android:paddingTop="6dp"
+                android:paddingEnd="6dp"
+                android:paddingBottom="6dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/filter_delete"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                app:chipIcon="@drawable/person_delete"
+                app:chipIconVisible="true"
+                app:chipIconSize="28dp"
+                app:checkedIconVisible="true"
+                app:chipStartPadding="16dp"
+                app:chipEndPadding="6dp"
+                app:chipStrokeColor="#757575"
+                app:chipStrokeWidth="1dp"
+                app:closeIconVisible="false"
+                app:iconStartPadding="0dp"
+                app:iconEndPadding="0dp"
+                android:paddingStart="36dp"
+                android:paddingTop="6dp"
+                android:paddingEnd="6dp"
+                android:paddingBottom="6dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/filter_edit"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                app:chipIcon="@drawable/person_edit"
+                app:chipIconVisible="true"
+                app:chipIconSize="28dp"
+                app:checkedIconVisible="true"
+                app:chipStartPadding="16dp"
+                app:chipEndPadding="6dp"
+                app:chipStrokeColor="#757575"
+                app:chipStrokeWidth="1dp"
+                app:closeIconVisible="false"
+                app:iconStartPadding="0dp"
+                app:iconEndPadding="0dp"
+                android:paddingStart="36dp"
+                android:paddingTop="6dp"
+                android:paddingEnd="6dp"
+                android:paddingBottom="6dp" />
+
+        </com.google.android.material.chip.ChipGroup>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        android:text="Users"
+        android:text="User List"
         android:textColor="#212121"
         android:textSize="20sp"
         android:textStyle="bold" />
@@ -115,4 +223,5 @@
         android:clipToPadding="false"
         android:padding="8dp"
         android:scrollbars="vertical" />
+
 </LinearLayout>

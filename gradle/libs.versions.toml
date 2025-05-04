@@ -16,6 +16,7 @@ firebaseDatabaseKtx = "21.0.0"
 firebaseFirestoreKtx = "25.1.2"
 materialVersion = "1.1.0"
 firebaseInappmessagingKtx = "21.0.2"
+carUiLib = "2.6.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,6 +36,7 @@ firebase-database-ktx = { group = "com.google.firebase", name = "firebase-databa
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 material-v110 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 firebase-inappmessaging-ktx = { group = "com.google.firebase", name = "firebase-inappmessaging-ktx", version.ref = "firebaseInappmessagingKtx" }
+car-ui-lib = { group = "com.android.car.ui", name = "car-ui-lib", version.ref = "carUiLib" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
