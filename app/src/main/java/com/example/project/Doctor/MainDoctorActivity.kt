@@ -137,21 +137,72 @@ class MainDoctorActivity : AppCompatActivity() {
             }
 
             currentUser?.let { user ->
-                val updates = hashMapOf<String, Any>(
-                    "firstName" to newFirstName,
-                    "lastName" to newLastName,
-                    "email" to newEmail,
-                    "pwz" to newPWZ
-                )
+                //fetching data to compare changes
                 db.collection("doctors").document(user.uid)
-                    .update(updates)
-                    .addOnSuccessListener {
-                        Toast.makeText(this, "Profile updated!", Toast.LENGTH_SHORT).show()
-                        alertDialog.dismiss()
+                    .get()
+                    .addOnSuccessListener { document ->
+                        if (document != null && document.exists()) {
+                            val oldFirstName = document.getString("firstName") ?: ""
+                            val oldLastName = document.getString("lastName") ?: ""
+                            val oldEmail = document.getString("email") ?: ""
+                            val oldPWZ = document.getString("pwz") ?: ""
+                            val oldSpecialization = document.getString("specialization") ?: ""
+
+                            val updates = hashMapOf<String, Any>()
+                            val changes = mutableMapOf<String, Any>()
+
+                            if (newFirstName != oldFirstName) {
+                                updates["firstName"] = newFirstName
+                                changes["firstName"] = newFirstName
+                            }
+                            if (newLastName != oldLastName) {
+                                updates["lastName"] = newLastName
+                                changes["lastName"] = newLastName
+                            }
+                            if (newEmail != oldEmail) {
+                                updates["email"] = newEmail
+                                changes["email"] = newEmail
+                            }
+                            if (newPWZ != oldPWZ) {
+                                updates["pwz"] = newPWZ
+                                changes["pwz"] = newPWZ
+                            }
+                            //nie chce mi sie pozwalac na zmienianie specki, na razie sprawdzam
+                            // jak to dziala sobie
+
+                            if (changes.isNotEmpty()) {
+                                //store the edit request for admin review
+                                val editRequest = hashMapOf(
+                                    "userId" to user.uid,
+                                    "timestamp" to com.google.firebase.Timestamp.now(),
+                                    "changes" to changes
+                                )
+                                db.collection("edit_requests").add(editRequest)
+                                    .addOnSuccessListener {
+                                        // Update the user's 'edit' status
+                                        db.collection("doctors").document(user.uid)
+                                            .update("edit", true)
+                                            .addOnSuccessListener {
+                                                Toast.makeText(this@MainDoctorActivity, "Profile update requested!", Toast.LENGTH_SHORT).show()
+                                                alertDialog.dismiss()
+                                            }
+                                            .addOnFailureListener { e ->
+                                                Toast.makeText(this@MainDoctorActivity, "Error updating edit status: ${e.message}", Toast.LENGTH_SHORT).show()
+                                            }
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Toast.makeText(this@MainDoctorActivity, "Error submitting edit request: ${e.message}", Toast.LENGTH_SHORT).show()
+                                    }
+                            } else {
+                                Toast.makeText(this@MainDoctorActivity, "No changes to update.", Toast.LENGTH_SHORT).show()
+                                alertDialog.dismiss()
+                            }
+                        } else {
+                            Toast.makeText(this@MainDoctorActivity, "Could not retrieve profile data.", Toast.LENGTH_SHORT).show()
+                        }
                     }
                     .addOnFailureListener { e ->
-                        Toast.makeText(this, "Error updating profile: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
+                        Toast.makeText(this@MainDoctorActivity, "Error retrieving profile data: ${e.message}", Toast.LENGTH_SHORT).show()}
             } ?: run {
                 Toast.makeText(this, "User not authenticated.", Toast.LENGTH_SHORT).show()
             }
@@ -175,20 +226,20 @@ class MainDoctorActivity : AppCompatActivity() {
                                 db.collection("doctors").document(currentUser.uid)
                                     .delete()
                                     .addOnSuccessListener {
-                                        Toast.makeText(this, "Account deleted", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(this, "account deleted", Toast.LENGTH_SHORT).show()
                                         alertDialog.dismiss()
                                         finish()
                                         startActivity(Intent(this, LogIn::class.java))
                                     }
                                     .addOnFailureListener { e ->
-                                        Toast.makeText(this, "Error deleting user data: ${e.message}", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(this, "error deleting user data: ${e.message}", Toast.LENGTH_SHORT).show()
                                     }
                             } else {
-                                Toast.makeText(this, "Error deleting account: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, "error deleting account: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                             }
                         }
                 }
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton("cancel", null)
                 .show()
         }
     }

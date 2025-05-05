@@ -53,7 +53,7 @@ class RegistrationDoctorActivity : AppCompatActivity() {
 
         if (userRole == "doctor") {
             val specializations = listOf("Surgeon", "Dermatologist", "Orthopedist", "Urologist",
-                "Neurologist", "Orthodontist", "Anesthesiologist", "Cardiology physician")
+                "Neurologist", "Orthodontist", "Anesthesiologist", "Cardiologist")
             val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, specializations)
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinnerSpecialization.adapter = adapter
@@ -88,7 +88,6 @@ class RegistrationDoctorActivity : AppCompatActivity() {
             return
         }
 
-        //uzylam coroutines zeby plynniej dzialalo, bo i tak in the end trzeba je dac
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -100,7 +99,10 @@ class RegistrationDoctorActivity : AppCompatActivity() {
                             "lastName" to lastName,
                             "pwz" to pwz,
                             "specialization" to specialization,
-                            "role" to "doctor"
+                            "role" to "doctor",
+                            "add" to true,
+                            "delete" to false,
+                            "edit" to false
                         )
                         CoroutineScope(Dispatchers.IO).launch {
                             try {

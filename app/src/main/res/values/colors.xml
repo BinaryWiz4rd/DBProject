@@ -8,4 +8,10 @@
     <color name="grey">#acacac</color>
     <color name="light_purple">#9577C8</color>
 
+    <color name="light_orange">#F0DBAF</color>
+    <color name="light_red">#ECCFD1</color>
+    <color name="light_green">#CCE0AC</color>
+
+
+
 </resources>
