@@ -65,6 +65,7 @@ dependencies {
     implementation("com.google.firebase:firebase-database")
 
     implementation("com.google.android.material:material:1.11.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
 
     //do bottom menu
     implementation(libs.material.v110)

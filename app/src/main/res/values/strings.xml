@@ -9,24 +9,24 @@
     <string name="profile">Name</string>
 
     <string name="name">Name</string>
-        <string name="email">Email</string>
-        <string name="edit_profile">Edit Profile</string>
-        <string name="logout">Logout</string>
-        <string name="delete_account">Delete Account</string>
-        <string name="first_name">First Name</string>
-        <string name="last_name">Last Name</string>
-        <string name="pwz_number">PWZ Number</string>
-        <string name="specialization">Specialization</string>
-        <string name="home">Home</string>
-        <string name="schedule">Schedule</string>
-        <string name="calendar">Calendar</string>
-        <string name="log_in">Log In</string>
-        <string name="register">Register</string>
-        <string name="password">Password</string>
-        <string name="already_have_account">Already have an account? Log in</string>
-        <string name="register_doctor">Doctor Registration</string>
-        <string name="pwz">PWZ</string>
-        <string name="select_specialization">Select Specialization</string>
+    <string name="email">Email</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="logout">Logout</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="pwz_number">PWZ Number</string>
+    <string name="specialization">Specialization</string>
+    <string name="home">Home</string>
+    <string name="schedule">Schedule</string>
+    <string name="calendar">Calendar</string>
+    <string name="log_in">Log In</string>
+    <string name="register">Register</string>
+    <string name="password">Password</string>
+    <string name="already_have_account">Already have an account? Log in</string>
+    <string name="register_doctor">Doctor Registration</string>
+    <string name="pwz">PWZ</string>
+    <string name="select_specialization">Select Specialization</string>
 
 
     <string name="exceptional_care_n_close_yo_you">Exceptional Care\n Close yo You</string>

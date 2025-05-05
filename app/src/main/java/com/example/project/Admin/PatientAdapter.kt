@@ -3,17 +3,41 @@ package com.example.project.Admin
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.project.R
 
-class PatientAdapter(private val patientList: List<Patient>) :
-    RecyclerView.Adapter<PatientAdapter.PatientViewHolder>() {
+class PatientAdapter(
+    private var patientList: List<Patient>,
+    private val onApproveReject: (String, String, Boolean) -> Unit
+) : RecyclerView.Adapter<PatientAdapter.PatientViewHolder>() {
 
     class PatientViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val emailTextView: TextView = itemView.findViewById(R.id.tvPatientEmail)
-        val nameTextView: TextView = itemView.findViewById(R.id.tvPatientName)
-        val dobTextView: TextView = itemView.findViewById(R.id.tvPatientDOB)
+        val textViewName: TextView = itemView.findViewById(R.id.textViewName)
+        val textViewEmail: TextView = itemView.findViewById(R.id.textViewEmail)
+        val approveButton: Button? = itemView.findViewById(R.id.buttonApprove)
+        val rejectButton: Button? = itemView.findViewById(R.id.buttonReject)
+
+        fun bind(patient: Patient, onApproveReject: (String, String, Boolean) -> Unit) {
+            textViewName.text = "${patient.firstName} ${patient.lastName}"
+            textViewEmail.text = patient.email
+
+            if (patient.add == true) {
+                approveButton?.visibility = View.VISIBLE
+                rejectButton?.visibility = View.VISIBLE
+            } else {
+                approveButton?.visibility = View.GONE
+                rejectButton?.visibility = View.GONE
+            }
+
+            approveButton?.setOnClickListener {
+                onApproveReject(patient.uid, "add", true)
+            }
+            rejectButton?.setOnClickListener {
+                onApproveReject(patient.uid, "add", false)
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientViewHolder {
@@ -23,11 +47,15 @@ class PatientAdapter(private val patientList: List<Patient>) :
     }
 
     override fun onBindViewHolder(holder: PatientViewHolder, position: Int) {
-        val currentPatient = patientList[position]
-        holder.emailTextView.text = currentPatient.email
-        holder.nameTextView.text = "${currentPatient.firstName} ${currentPatient.lastName}"
-        holder.dobTextView.text = currentPatient.dateOfBirth
+        holder.bind(patientList[position], onApproveReject)
     }
 
-    override fun getItemCount() = patientList.size
+    override fun getItemCount(): Int {
+        return patientList.size
+    }
+
+    fun updateList(newPatientList: List<Patient>) {
+        patientList = newPatientList
+        notifyDataSetChanged()
+    }
 }
