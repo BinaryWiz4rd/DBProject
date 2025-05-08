@@ -28,6 +28,8 @@
     <string name="pwz">PWZ</string>
     <string name="select_specialization">Select Specialization</string>
 
+        <string name="date_of_birth_yyyy_mm_dd">Date of Birth (YYYY-MM-DD)</string>
+
 
     <string name="exceptional_care_n_close_yo_you">Exceptional Care\n Close yo You</string>
     <string name="working_hours_format">Working Hours: %d:00 - %d:00</string>

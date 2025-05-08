@@ -75,7 +75,7 @@ class MainDoctorActivity : AppCompatActivity() {
     }
 
     private fun showProfileDialog() {
-        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_profile, null)
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_profile_doctor, null)
 
         val editTextFirstName = dialogView.findViewById<EditText>(R.id.editTextFirstName)
         val editTextLastName = dialogView.findViewById<EditText>(R.id.editTextLastName)
