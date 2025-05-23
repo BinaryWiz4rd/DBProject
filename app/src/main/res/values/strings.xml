@@ -28,12 +28,44 @@
     <string name="pwz">PWZ</string>
     <string name="select_specialization">Select Specialization</string>
 
-        <string name="date_of_birth_yyyy_mm_dd">Date of Birth (YYYY-MM-DD)</string>
-
+    <string name="date_of_birth_yyyy_mm_dd">Date of Birth (YYYY-MM-DD)</string>
 
     <string name="exceptional_care_n_close_yo_you">Exceptional Care\n Close yo You</string>
     <string name="working_hours_format">Working Hours: %d:00 - %d:00</string>
     <string name="make_appointment">Make Appointment</string>
+    
+    <!-- Service formatting strings -->
+    <string name="price_format">Price: $%d</string>
+    <string name="duration_format">Duration: %d minutes</string>
+    
+    <!-- Appointment details dialog -->
+    <string name="appointment_details">Appointment Details</string>
+    <string name="appointment_date">Date:</string>
+    <string name="appointment_time">Time:</string>
+    <string name="appointment_patient">Patient:</string>
+    <string name="appointment_service">Service:</string>
+    <string name="appointment_duration">Duration:</string>
+    <string name="appointment_price">Price:</string>
+    <string name="view_in_calendar">View in Calendar</string>
+    <string name="patient_history">Patient History</string>
+    <string name="close">Close</string>
+    
+    <!-- Patient contact information -->
+    <string name="patient_email">Email:</string>
+    <string name="patient_phone">Phone:</string>
+    <string name="patient_dob">Date of Birth:</string>
+    <string name="patient_address">Address:</string>
+    <string name="contact_patient">Contact Patient</string>
+    <string name="call_patient">Call</string>
+    <string name="email_patient">Email</string>
+    <string name="message_patient">Message</string>
+    <string name="loading_history">Loading patient history...</string>
+    <string name="history_date_format">%1$s: %2$s - Dr. %3$s</string>
+    
+    <!-- Patient history dialog -->
+    <string name="no_history_found">No previous appointments found</string>
+    <string name="patient_history_title">Patient History: %s</string>
+    
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

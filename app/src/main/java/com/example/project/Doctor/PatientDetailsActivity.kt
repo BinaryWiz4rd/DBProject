@@ -1,4 +1,4 @@
-package com.example.project.Doctor
+package com.example.project.doctor
 
 import android.os.Bundle
 import android.widget.Button

@@ -2,29 +2,145 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_graph">
-    <!--
-    app:startDestination="@id/FirstFragment">
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginFragment">
 
     <fragment
-        android:id="@+id/FirstFragment"
-        android:name="com.example.project.FirstFragment"
-        android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
-
+        android:id="@+id/loginFragment"
+        android:name="com.example.project.LoginFragment"
+        android:label="LoginFragment" >
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
+            android:id="@+id/action_loginFragment_to_adminFragment"
+            app:destination="@id/adminFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_doctorFragment"
+            app:destination="@id/doctorFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_patientFragment"
+            app:destination="@id/patientFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_registrationFragment"
+            app:destination="@id/registrationFragment" />
     </fragment>
+
     <fragment
-        android:id="@+id/SecondFragment"
-        android:name="com.example.project.SecondFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
-
+        android:id="@+id/adminFragment"
+        android:name="com.example.project.Admin.AdminFragment"
+        android:label="AdminFragment" >
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            android:id="@+id/action_adminFragment_to_loginFragment"
+            app:destination="@+id/loginFragment" />
     </fragment>
-    -->
+
+    <fragment
+        android:id="@+id/doctorFragment"
+        android:name="com.example.project.doctor.DoctorFragment"
+        android:label="DoctorFragment" >
+        <action
+            android:id="@+id/action_doctorFragment_to_loginFragment"
+            app:destination="@+id/loginFragment" />
+        <action
+            android:id="@+id/action_doctorFragment_to_doctorScheduleFragment"
+            app:destination="@id/doctorScheduleFragment" />
+        <action
+            android:id="@+id/action_doctorFragment_to_doctorServicesFragment"
+            app:destination="@id/doctorServicesFragment" />
+        <action
+            android:id="@+id/action_doctorFragment_to_doctorAvailabilityFragment"
+            app:destination="@id/doctorAvailabilityFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/patientFragment"
+        android:name="com.example.project.Patient.PatientFragment"
+        android:label="PatientFragment" >
+        <action
+            android:id="@+id/action_patientFragment_to_loginFragment"
+            app:destination="@+id/loginFragment" />
+        <action
+            android:id="@+id/action_patientFragment_to_patientBrowseServicesFragment"
+            app:destination="@id/patientBrowseServicesFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registrationFragment"
+        android:name="com.example.project.RegistrationFragment"
+        android:label="RegistrationFragment" >
+        <action
+            android:id="@+id/action_registrationFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/doctorScheduleFragment"
+        android:name="com.example.project.doctor.DoctorScheduleFragment"
+        android:label="DoctorScheduleFragment" />
+
+    <fragment
+        android:id="@+id/doctorServicesFragment"
+        android:name="com.example.project.doctor.ui.DoctorServicesFragment"
+        android:label="DoctorServicesFragment" />
+
+    <fragment
+        android:id="@+id/doctorAvailabilityFragment"
+        android:name="com.example.project.doctor.DoctorAvailabilityFragment"
+        android:label="DoctorAvailabilityFragment" />
+
+    <fragment
+        android:id="@+id/patientBrowseServicesFragment"
+        android:name="com.example.project.Patient.PatientBrowseServicesFragment"
+        android:label="fragment_patient_browse_services"
+        tools:layout="@layout/fragment_patient_browse_services" >
+        <action
+            android:id="@+id/action_patientBrowseServicesFragment_to_patientServiceAvailabilityFragment"
+            app:destination="@id/patientServiceAvailabilityFragment" />
+        <argument
+            android:name="serviceId"
+            app:argType="string" />
+        <argument
+            android:name="doctorId"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/patientServiceAvailabilityFragment"
+        android:name="com.example.project.Patient.PatientServiceAvailabilityFragment" 
+        android:label="fragment_patient_service_availability"
+        tools:layout="@layout/fragment_patient_service_availability" >
+        <argument
+            android:name="serviceId"
+            app:argType="string" />
+        <argument
+            android:name="doctorId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_patientServiceAvailabilityFragment_to_confirmBookingFragment"
+            app:destination="@id/confirmBookingFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/confirmBookingFragment"
+        android:name="com.example.project.Patient.ConfirmBookingFragment" 
+        android:label="fragment_confirm_booking"
+        tools:layout="@layout/fragment_confirm_booking" >
+        <argument
+            android:name="serviceId"
+            app:argType="string" />
+        <argument
+            android:name="doctorId"
+            app:argType="string" />
+        <argument
+            android:name="availabilityId"
+            app:argType="string" />
+        <argument
+            android:name="date"
+            app:argType="string" />
+        <argument
+            android:name="startTime"
+            app:argType="string" />
+        <argument
+            android:name="endTime"
+            app:argType="string" />
+    </fragment>
+
 </navigation>

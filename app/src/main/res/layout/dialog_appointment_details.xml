@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:cardUseCompatPadding="true"
+    app:cardBackgroundColor="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">        
+        
+        <TextView            
+            android:id="@+id/textViewAppointmentTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/appointment_details"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/primary"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:background="@color/primary_light" />        
+            
+        <!-- Appointment Details Section -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Appointment Info"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@color/primary"
+            android:layout_marginBottom="8dp"/>
+            
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_my_calendar"
+                android:tint="@color/primary"
+                android:layout_marginEnd="8dp"
+                android:layout_gravity="center_vertical" />
+              
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/appointment_date"
+                android:textStyle="bold"
+                android:textSize="16sp"/>
+                
+            <TextView
+                android:id="@+id/textViewAppointmentDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"/>
+        </LinearLayout>        
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_recent_history"
+                android:tint="@color/primary"
+                android:layout_marginEnd="8dp"
+                android:layout_gravity="center_vertical" />
+              
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/appointment_time"
+                android:textStyle="bold"
+                android:textSize="16sp"/>
+                
+            <TextView
+                android:id="@+id/textViewAppointmentTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"/>
+        </LinearLayout>        
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_info_details"
+                android:tint="@color/primary"
+                android:layout_marginEnd="8dp"
+                android:layout_gravity="center_vertical" />
+              
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/appointment_service"
+                android:textStyle="bold"
+                android:textSize="16sp"/>
+                
+            <TextView
+                android:id="@+id/textViewAppointmentService"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"/>
+        </LinearLayout>        
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_today"
+                android:tint="@color/primary"
+                android:layout_marginEnd="8dp"
+                android:layout_gravity="center_vertical" />
+              
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/appointment_duration"
+                android:textStyle="bold"
+                android:textSize="16sp"/>
+                
+            <TextView
+                android:id="@+id/textViewAppointmentDuration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"/>
+        </LinearLayout>        
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+            
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_more"
+                android:tint="@color/primary"
+                android:layout_marginEnd="8dp"
+                android:layout_gravity="center_vertical" />
+              
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/appointment_price"
+                android:textStyle="bold"
+                android:textSize="16sp"/>
+                
+            <TextView
+                android:id="@+id/textViewAppointmentPrice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"/>
+        </LinearLayout>
+        
+        <!-- Patient Information Section -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Patient Information"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@color/primary"
+            android:layout_marginBottom="8dp"/>
+            
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_myplaces"
+                android:tint="@color/primary"
+                android:layout_marginEnd="8dp"
+                android:layout_gravity="center_vertical" />
+              
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/appointment_patient"
+                android:textStyle="bold"
+                android:textSize="16sp"/>
+                
+            <TextView
+                android:id="@+id/textViewAppointmentPatient"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"/>
+        </LinearLayout>
+        
+        <!-- New patient contact fields -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_dialog_email"
+                android:tint="@color/primary"
+                android:layout_marginEnd="8dp"
+                android:layout_gravity="center_vertical" />
+              
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Email: "
+                android:textStyle="bold"
+                android:textSize="16sp"/>
+                
+            <TextView
+                android:id="@+id/textViewPatientEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"/>
+        </LinearLayout>
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_call"
+                android:tint="@color/primary"
+                android:layout_marginEnd="8dp"
+                android:layout_gravity="center_vertical" />
+              
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phone: "
+                android:textStyle="bold"
+                android:textSize="16sp"/>
+                
+            <TextView
+                android:id="@+id/textViewPatientPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"/>
+        </LinearLayout>
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_day"
+                android:tint="@color/primary"
+                android:layout_marginEnd="8dp"
+                android:layout_gravity="center_vertical" />
+              
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Date of Birth: "
+                android:textStyle="bold"
+                android:textSize="16sp"/>
+                
+            <TextView
+                android:id="@+id/textViewPatientDob"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"/>
+        </LinearLayout>
+        
+        <!-- Contact options -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp">
+            
+            <Button
+                android:id="@+id/buttonCallPatient"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="@string/call_patient"
+                android:drawableLeft="@android:drawable/ic_menu_call"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"/>
+                
+            <Button
+                android:id="@+id/buttonEmailPatient"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="@string/email_patient"
+                android:drawableLeft="@android:drawable/ic_dialog_email"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"/>
+                
+            <Button
+                android:id="@+id/buttonMessagePatient"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/message_patient"
+                android:drawableLeft="@android:drawable/ic_dialog_info"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"/>
+        </LinearLayout>
+        
+        <!-- Navigation buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <Button
+                android:id="@+id/buttonPatientHistory"                
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="@string/patient_history"
+                style="@style/Widget.MaterialComponents.Button.TextButton"/>
+
+            <Button                
+                android:id="@+id/buttonViewInCalendar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="@string/view_in_calendar" 
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+            <Button
+                android:id="@+id/buttonClose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/close" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

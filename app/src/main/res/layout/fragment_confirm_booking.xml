@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".Patient.ConfirmBookingFragment">
+
+    <TextView
+        android:id="@+id/confirmBookingTitleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Confirm Your Booking"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:id="@+id/bookingDetailsServiceLabelTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Service ID:"
+        android:textSize="18sp"
+        android:layout_below="@id/confirmBookingTitleTextView"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/bookingServiceIdTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_toEndOf="@id/bookingDetailsServiceLabelTextView"
+        android:layout_alignBaseline="@id/bookingDetailsServiceLabelTextView"
+        android:layout_marginStart="8dp"
+        tools:text="service_123" />
+
+    <TextView
+        android:id="@+id/bookingDetailsDoctorLabelTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Doctor ID:"
+        android:textSize="18sp"
+        android:layout_below="@id/bookingDetailsServiceLabelTextView"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/bookingDoctorIdTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_toEndOf="@id/bookingDetailsDoctorLabelTextView"
+        android:layout_alignBaseline="@id/bookingDetailsDoctorLabelTextView"
+        android:layout_marginStart="8dp"
+        tools:text="doctor_abc" />
+
+    <TextView
+        android:id="@+id/bookingDetailsDateLabelTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Date:"
+        android:textSize="18sp"
+        android:layout_below="@id/bookingDetailsDoctorLabelTextView"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/bookingDateTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_toEndOf="@id/bookingDetailsDateLabelTextView"
+        android:layout_alignBaseline="@id/bookingDetailsDateLabelTextView"
+        android:layout_marginStart="8dp"
+        tools:text="2024-12-25" />
+
+    <TextView
+        android:id="@+id/bookingDetailsTimeLabelTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Time:"
+        android:textSize="18sp"
+        android:layout_below="@id/bookingDetailsDateLabelTextView"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/bookingTimeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_toEndOf="@id/bookingDetailsTimeLabelTextView"
+        android:layout_alignBaseline="@id/bookingDetailsTimeLabelTextView"
+        android:layout_marginStart="8dp"
+        tools:text="10:00 - 11:00" />
+
+    <EditText
+        android:id="@+id/patientNameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bookingTimeTextView"
+        android:layout_marginTop="20dp"
+        android:hint="Enter Your Name (for booking)"
+        android:inputType="textPersonName" />
+
+    <Button
+        android:id="@+id/confirmBookingButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Confirm Booking"
+        android:layout_below="@id/patientNameEditText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"/>
+
+</RelativeLayout>

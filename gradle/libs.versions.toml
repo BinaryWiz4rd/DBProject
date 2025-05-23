@@ -17,6 +17,8 @@ firebaseFirestoreKtx = "25.1.2"
 materialVersion = "1.1.0"
 firebaseInappmessagingKtx = "21.0.2"
 carUiLib = "2.6.0"
+navigationFragmentKtx = "2.9.0"
+navigationUiKtx = "2.9.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,6 +39,8 @@ firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-fires
 material-v110 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 firebase-inappmessaging-ktx = { group = "com.google.firebase", name = "firebase-inappmessaging-ktx", version.ref = "firebaseInappmessagingKtx" }
 car-ui-lib = { group = "com.android.car.ui", name = "car-ui-lib", version.ref = "carUiLib" }
+androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
+androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

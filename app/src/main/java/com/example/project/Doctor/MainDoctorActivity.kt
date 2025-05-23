@@ -1,4 +1,4 @@
-package com.example.project.Doctor
+package com.example.project.doctor.ui
 
 import android.app.AlertDialog
 import android.content.Intent
@@ -11,8 +11,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import com.example.project.doctor.DoctorCalendarFragment
+import com.example.project.doctor.DoctorChatFragment
+import com.example.project.doctor.DoctorHomeFragment
+import com.example.project.doctor.DoctorScheduleFragment
 import com.example.project.Menu.LogIn
 import com.example.project.R
+import com.example.project.doctor.ui.DoctorServicesFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
@@ -49,6 +54,10 @@ class MainDoctorActivity : AppCompatActivity() {
                 }
                 R.id.calendar -> {
                     loadFragment(DoctorCalendarFragment())
+                    true
+                }
+                R.id.services -> {
+                    loadFragment(DoctorServicesFragment())
                     true
                 }
                 else -> false
@@ -210,6 +219,7 @@ class MainDoctorActivity : AppCompatActivity() {
 
         buttonLogout.setOnClickListener {
             auth.signOut()
+            alertDialog.dismiss() // Dismiss dialog before finishing activity
             Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show()
             finish()
             startActivity(Intent(this, LogIn::class.java))

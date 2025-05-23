@@ -1,37 +1,59 @@
-package com.example.project.Doctor
+package com.example.project.doctor
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.example.project.R
 
-// Changed to use AppointmentCalendar
 class AppointmentAdapter(
-    context: Context,
-    private val appointments: List<AppointmentCalendar> // <-- Change here
-) : ArrayAdapter<AppointmentCalendar>(context, 0, appointments) { // <-- Change here
+    private val context: Context,
+    private val appointments: List<AppointmentCalendar>,
+    private val highlightedTime: String? = null,
+    private val onItemClick: ((AppointmentCalendar) -> Unit)? = null
+) : RecyclerView.Adapter<AppointmentAdapter.ViewHolder>() {
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        var itemView = convertView
-        if (itemView == null) {
-            itemView = LayoutInflater.from(context).inflate(R.layout.activity_item_appointment, parent, false)
-        }
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val timeTextView: TextView = view.findViewById(R.id.timeTextView)
+        val patientNameTextView: TextView = view.findViewById(R.id.patientNameTextView)
+        val serviceTextView: TextView = view.findViewById(R.id.serviceTextView)
+        val notesTextView: TextView = view.findViewById(R.id.notesTextView)
+    }
 
-        // appointment is now of type AppointmentCalendar
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(context)
+            .inflate(R.layout.activity_item_appointment, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val appointment = appointments[position]
 
-        val timeTextView = itemView!!.findViewById<TextView>(R.id.timeTextView)
-        val patientNameTextView = itemView.findViewById<TextView>(R.id.patientNameTextView)
-        val notesTextView = itemView.findViewById<TextView>(R.id.notesTextView)
+        holder.timeTextView.text = "${appointment.timeSlot} - ${appointment.endTime}"
+        holder.patientNameTextView.text = appointment.patientName
+        
+        // Display service information
+        val serviceInfo = "${appointment.serviceName} ($${appointment.servicePrice}, ${appointment.serviceDuration} min)"
+        holder.serviceTextView.text = serviceInfo
+        
+        holder.notesTextView.text = if (appointment.notes.isNotEmpty()) appointment.notes else "No notes"
+        
+        // Highlight the appointment if it matches the highlighted time
+        if (highlightedTime != null && appointment.timeSlot == highlightedTime) {
+            // Set background color to highlight this appointment
+            holder.itemView.setBackgroundResource(R.color.highlight_background)
+        } else {
+            // Reset background for other items
+            holder.itemView.setBackgroundResource(android.R.color.transparent)
+        }
 
-        // These properties exist in AppointmentCalendar
-        timeTextView.text = appointment.timeSlot
-        patientNameTextView.text = appointment.patientName
-        notesTextView.text = if (appointment.notes.isNotEmpty()) appointment.notes else "No notes"
-
-        return itemView
+        // Set click listener for the entire item
+        holder.itemView.setOnClickListener {
+            onItemClick?.invoke(appointment)
+        }
     }
+
+    override fun getItemCount() = appointments.size
 }

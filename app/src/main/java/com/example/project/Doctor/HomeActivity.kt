@@ -1,4 +1,4 @@
-package com.example.project.Doctor // Używam Twojej nazwy pakietu
+package com.example.project.doctor // Using correct lowercase package name
 // home
 import android.content.Context
 import android.os.Bundle
@@ -8,12 +8,12 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-// Importy dla Appointment i ScheduleAdapter muszą pasować do Twojej struktury projektu
-import com.example.project.Doctor.ScheduleAdapter // Corrected: Using ScheduleAdapter
-// Upewnij się, że plik layoutu nazywa się activity_doctor_home.xml
+// Imports for Appointment and ScheduleAdapter must match your project structure
+import com.example.project.doctor.ScheduleAdapter // Corrected: Using the right package
+// Make sure the layout file is named activity_doctor_home.xml
 import com.example.project.databinding.ActivityDoctorHomeBinding
-// Importy dla Doctor i Patient z ich pakietu
-import com.example.project.Admin.Doctor
+// Imports for Doctor and Patient from their package
+import com.example.project.doctor.model.Doctor
 import com.example.project.Admin.Patient
 import java.time.LocalDate
 import java.time.LocalTime
@@ -84,11 +84,13 @@ class HomeActivity : AppCompatActivity() {
 
         // --- Example data matching the data class definitions ---
         val thisDoctor = Doctor(
-            email = "jan.kowalski@example.com",
+            uid = "1",
             firstName = "Jan",
             lastName = "Kowalski",
-            pwz = "1234567",
-            specialization = "Kardiolog"
+            email = "jan.kowalski@example.com",
+            specialization = "Kardiolog",
+            pwzNumber = "1234567",
+            phoneNumber = "123456789"
         )
         val patient1 = Patient(
             email = "anna.nowak@example.com",

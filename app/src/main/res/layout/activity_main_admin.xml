@@ -1,187 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    android:orientation="vertical"
     tools:context=".Admin.MainAdminActivity">
 
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/admin_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/admin_bottom_navigation" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/admin_bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/search_view"
-        android:background="#FFFFFF"
-        android:elevation="2dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="16dp">
+        android:layout_alignParentBottom="true"
+        android:background="?android:attr/windowBackground"
+        app:menu="@menu/admin_bottom_nav_menu" />
 
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/main_search_view"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:background="@drawable/search_background"
-            android:iconifiedByDefault="false" />
-
-    </LinearLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp">
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/type_filter_chip_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            app:chipSpacingHorizontal="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:selectionRequired="true"
-            app:singleLine="true"
-            app:singleSelection="true">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_doctors"
-                style="@style/Widget.MaterialComponents.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="DOCTORS"
-                android:textColor="#673AB7"
-                android:textStyle="bold"
-                app:checkedIconVisible="true"
-                app:chipBackgroundColor="@drawable/chip_background_color"
-                app:chipStartPadding="12dp"
-                app:chipEndPadding="12dp"
-                app:chipStrokeColor="#673AB7"
-                app:chipStrokeWidth="1dp" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_patients"
-                style="@style/Widget.MaterialComponents.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="PATIENTS"
-                android:textColor="#673AB7"
-                android:textStyle="bold"
-                app:checkedIconVisible="true"
-                app:chipBackgroundColor="@drawable/chip_background_color"
-                app:chipStartPadding="12dp"
-                app:chipEndPadding="12dp"
-                app:chipStrokeColor="#673AB7"
-                app:chipStrokeWidth="1dp" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_admins"
-                style="@style/Widget.MaterialComponents.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ADMINS"
-                android:textColor="#673AB7"
-                android:textStyle="bold"
-                app:checkedIconVisible="true"
-                app:chipBackgroundColor="@drawable/chip_background_color"
-                app:chipStartPadding="12dp"
-                app:chipEndPadding="12dp"
-                app:chipStrokeColor="#673AB7"
-                app:chipStrokeWidth="1dp" />
-        </com.google.android.material.chip.ChipGroup>
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/action_filter_chip_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            app:chipSpacingHorizontal="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/type_filter_chip_group"
-            app:selectionRequired="false"
-            app:singleLine="true">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/filter_add"
-                style="@style/Widget.MaterialComponents.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="48dp"
-                android:minHeight="48dp"
-                android:text="New"
-                android:textColor="#4CAF50"
-                app:chipBackgroundColor="@color/light_green"
-                app:chipIcon="@drawable/person_add"
-                app:chipIconSize="24dp"
-                app:chipIconVisible="true"
-                app:chipStartPadding="12dp"
-                app:chipEndPadding="12dp"
-                app:textStartPadding="8dp" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/filter_edit"
-                style="@style/Widget.MaterialComponents.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="48dp"
-                android:minHeight="48dp"
-                android:text="Edit"
-                android:textColor="#FF9800"
-                app:chipBackgroundColor="@color/light_orange"
-                app:chipIcon="@drawable/person_edit"
-                app:chipIconSize="24dp"
-                app:chipIconVisible="true"
-                app:chipStartPadding="12dp"
-                app:chipEndPadding="12dp"
-                app:textStartPadding="8dp" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/filter_delete"
-                style="@style/Widget.MaterialComponents.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="48dp"
-                android:minHeight="48dp"
-                android:text="Delete"
-                android:textColor="#F44336"
-                app:chipBackgroundColor="@color/light_red"
-                app:chipIcon="@drawable/person_delete"
-                app:chipIconSize="24dp"
-                app:chipIconVisible="true"
-                app:chipStartPadding="12dp"
-                app:chipEndPadding="12dp"
-                app:textStartPadding="8dp" />
-
-        </com.google.android.material.chip.ChipGroup>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
-        android:text="User List"
-        android:textColor="#212121"
-        android:textSize="20sp"
-        android:textStyle="bold" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:padding="8dp"
-        android:scrollbars="vertical" />
-
-</LinearLayout>
+</RelativeLayout>

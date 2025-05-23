@@ -8,8 +8,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.project.Admin.MainAdminActivity
-import com.example.project.Doctor.MainDoctorActivity
 import com.example.project.Patient.MainPatientActivity
+import com.example.project.doctor.ui.MainDoctorActivity
 import com.example.project.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

@@ -1,142 +1,452 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/colorBackground"
+    android:background="@android:color/white"
     tools:context=".Doctor.DoctorHomeFragment">
 
-    <TextView
-        android:id="@+id/textViewGreeting"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginHorizontal="16dp"
-        android:text="Witaj!"
-        android:textAppearance="?attr/textAppearanceHeadline5"
-        android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+    <!-- Background gradient for the top section -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        android:background="@drawable/gradient_blue_background" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/topSectionContainer"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginHorizontal="16dp"
-        app:layout_constraintTop_toBottomOf="@id/textViewGreeting"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:overScrollMode="never">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputLayoutSearch"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:hint="Wyszukaj pacjenta..."
-            app:boxCornerRadiusTopStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:startIconDrawable="@drawable/baseline_chat_bubble_24">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="24dp">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTextSearch"
+            <!-- Doctor greeting section -->
+            <TextView
+                android:id="@+id/textViewGreeting"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginHorizontal="16dp"
+                android:text="Hello, Doctor!"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="#1976D2"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+
+            <TextView
+                android:id="@+id/textViewTodayDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                tools:text="May 10, 2025"
+                android:textSize="16sp"
+                android:textColor="#757575"
+                app:layout_constraintTop_toBottomOf="@id/textViewGreeting"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- Dashboard summary cards -->
+            <LinearLayout
+                android:id="@+id/dashboardStatsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:maxLines="1" />
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:layout_marginHorizontal="16dp"
+                app:layout_constraintTop_toBottomOf="@id/textViewTodayDate">
 
-        </com.google.android.material.textfield.TextInputLayout>
+                <!-- Today's appointments stat -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp"
+                    app:cardBackgroundColor="#E3F2FD">
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardWidget"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardElevation="4dp"
-            app:cardCornerRadius="12dp"
-            app:layout_constraintTop_toBottomOf="@id/textInputLayoutSearch"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="12dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+                        <TextView
+                            android:id="@+id/textViewTodayAppointmentsCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="0"
+                            android:textSize="32sp"
+                            android:textStyle="bold"
+                            android:textColor="#1976D2" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Today"
+                            android:textSize="14sp"
+                            android:textColor="#757575" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Weekly appointments stat -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="4dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp"
+                    app:cardBackgroundColor="#E0F7FA">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:id="@+id/textViewWeekAppointmentsCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="0"
+                            android:textSize="32sp"
+                            android:textStyle="bold"
+                            android:textColor="#00ACC1" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="This Week"
+                            android:textSize="14sp"
+                            android:textColor="#757575" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- New patients stat -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp"
+                    app:cardBackgroundColor="#E8F5E9">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:id="@+id/textViewNewPatientsCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="0"
+                            android:textSize="32sp"
+                            android:textStyle="bold"
+                            android:textColor="#43A047" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="New Patients"
+                            android:textSize="14sp"
+                            android:textColor="#757575" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+            <!-- Search bar with Material Search appearance -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/searchCardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp">
+                android:layout_marginTop="16dp"
+                android:layout_marginHorizontal="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp"
+                app:layout_constraintTop_toBottomOf="@id/dashboardStatsContainer">
 
-                <ImageView
-                    android:id="@+id/imageViewWidgetIcon"
-                    android:layout_width="wrap_content"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutSearch"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/chat_bubble_received"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/textViewWidgetTitle"
-                    app:layout_constraintBottom_toBottomOf="@id/textViewWidgetTitle"
-                    app:tint="?attr/colorPrimary"
-                    android:contentDescription="Ikona widgetu" />
+                    android:hint="Search patients or appointments"
+                    app:boxCornerRadiusTopStart="8dp"
+                    app:boxCornerRadiusTopEnd="8dp"
+                    app:boxCornerRadiusBottomStart="8dp"
+                    app:boxCornerRadiusBottomEnd="8dp"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
+                    app:startIconDrawable="@android:drawable/ic_menu_search"
+                    app:startIconTint="#1976D2"
+                    app:endIconMode="clear_text"
+                    app:endIconTint="#757575">
 
-                <TextView
-                    android:id="@+id/textViewWidgetTitle"
-                    android:layout_width="0dp"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextSearch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionSearch"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:background="@null"
+                        android:padding="16dp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Next appointment card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardWidget"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginHorizontal="16dp"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="#E0E0E0"
+                app:strokeWidth="1dp"
+                app:layout_constraintTop_toBottomOf="@id/searchCardView">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="Następna wizyta"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toEndOf="@id/imageViewWidgetIcon"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
+                    android:padding="16dp">
 
-                <TextView
-                    android:id="@+id/textViewWidgetContent"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Brak zaplanowanych wizyt"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="?android:attr/textColorSecondary"
-                    app:layout_constraintStart_toStartOf="@id/textViewWidgetTitle"
-                    app:layout_constraintTop_toBottomOf="@id/textViewWidgetTitle"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    <ImageView
+                        android:id="@+id/imageViewWidgetIcon"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@android:drawable/ic_menu_my_calendar"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="#1976D2"
+                        android:contentDescription="Next appointment icon" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    <TextView
+                        android:id="@+id/textViewWidgetTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:text="Next Appointment"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#212121"
+                        app:layout_constraintStart_toEndOf="@id/imageViewWidgetIcon"
+                        app:layout_constraintTop_toTopOf="@id/imageViewWidgetIcon"
+                        app:layout_constraintEnd_toEndOf="parent" />
 
-        </com.google.android.material.card.MaterialCardView>
+                    <TextView
+                        android:id="@+id/textViewWidgetContent"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        tools:text="Widget content here"
+                        android:textSize="16sp"
+                        android:textColor="#212121"
+                        app:layout_constraintStart_toStartOf="@id/textViewWidgetTitle"
+                        app:layout_constraintTop_toBottomOf="@id/textViewWidgetTitle"
+                        android:layout_marginTop="8dp"
+                        app:layout_constraintEnd_toEndOf="parent"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                    <TextView
+                        android:id="@+id/textViewWidgetSubtitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        tools:text="Today at 10:30 AM"
+                        android:textSize="14sp"
+                        android:textColor="#1976D2"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                        app:layout_constraintStart_toStartOf="@id/textViewWidgetTitle"
+                        app:layout_constraintTop_toBottomOf="@id/textViewWidgetTitle"
+                        app:layout_constraintEnd_toEndOf="parent" />
 
-    <TextView
-        android:id="@+id/textViewScheduleTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginHorizontal="16dp"
-        android:text="Plan na dziś"
-        android:textAppearance="?attr/textAppearanceHeadline6"
-        app:layout_constraintTop_toBottomOf="@id/topSectionContainer"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+                    <View
+                        android:id="@+id/divider"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#E0E0E0"
+                        android:layout_marginTop="16dp"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                        app:layout_constraintTop_toBottomOf="@id/textViewWidgetSubtitle" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewSchedule"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:paddingHorizontal="12dp"
-        android:clipToPadding="false"
-        android:paddingBottom="16dp"
-        app:layout_constraintTop_toBottomOf="@id/textViewScheduleTitle"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:listitem="@layout/activity_doctor_list_item_appointment" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                    <TextView
+                        android:id="@+id/textViewPatientNameLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Patient:"
+                        android:textSize="14sp"
+                        android:textColor="#757575"
+                        android:layout_marginTop="16dp"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/divider" />
+
+                    <TextView
+                        android:id="@+id/textViewPatientName"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        tools:text="John Smith"
+                        android:textSize="16sp"
+                        android:textColor="#212121"
+                        android:layout_marginStart="8dp"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                        app:layout_constraintStart_toEndOf="@id/textViewPatientNameLabel"
+                        app:layout_constraintTop_toTopOf="@id/textViewPatientNameLabel"
+                        app:layout_constraintBottom_toBottomOf="@id/textViewPatientNameLabel"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                    <TextView
+                        android:id="@+id/textViewServiceLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Service:"
+                        android:textSize="14sp"
+                        android:textColor="#757575"
+                        android:layout_marginTop="8dp"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/textViewPatientNameLabel" />
+
+
+                    <TextView
+                        android:id="@+id/textViewService"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        tools:text="General Consultation"
+                        android:textSize="16sp"
+                        android:textColor="#212121"
+                        android:layout_marginStart="8dp"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                        app:layout_constraintStart_toEndOf="@id/textViewServiceLabel"
+                        app:layout_constraintTop_toTopOf="@id/textViewServiceLabel"
+                        app:layout_constraintBottom_toBottomOf="@id/textViewServiceLabel"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonViewDetails"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="View Details"
+                        android:textAllCaps="false"
+                        android:textColor="#1976D2"
+                        android:layout_marginTop="8dp"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/textViewServiceLabel" />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Today's Schedule Section -->
+            <TextView
+                android:id="@+id/textViewScheduleTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginHorizontal="16dp"
+                android:text="Today's Schedule"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#212121"
+                app:layout_constraintTop_toBottomOf="@id/cardWidget"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/scheduleCardView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginHorizontal="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp"
+                app:layout_constraintTop_toBottomOf="@id/textViewScheduleTitle">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- Left timeline bar -->
+                    <View
+                        android:id="@+id/timelineIndicator"
+                        android:layout_width="4dp"
+                        android:layout_height="0dp"
+                        android:background="#1976D2"
+                        android:layout_marginStart="16dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerViewSchedule"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="150dp"
+                        android:paddingVertical="8dp"
+                        android:clipToPadding="false"
+                        android:overScrollMode="never"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        tools:listitem="@layout/activity_doctor_list_item_appointment" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- View Full Schedule button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonViewFullSchedule"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="View Full Schedule"
+                android:textAllCaps="false"
+                android:layout_marginTop="16dp"
+                android:layout_marginHorizontal="16dp"
+                app:strokeColor="#1976D2"
+                app:rippleColor="#1976D2"
+                app:layout_constraintTop_toBottomOf="@id/scheduleCardView" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

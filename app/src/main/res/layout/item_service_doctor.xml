@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="#E0E0E0">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Color accent bar at the top -->
+        <View
+            android:id="@+id/colorAccentBar"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:background="#1976D2"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Service icon in circle -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/iconContainer"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#E3F2FD"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/colorAccentBar">
+
+            <ImageView
+                android:id="@+id/serviceIconImageView"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@android:drawable/ic_menu_manage"
+                app:tint="#1976D2" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Service name -->
+        <TextView
+            android:id="@+id/serviceNameTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="16dp"
+            android:text="Service Name"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#212121"
+            android:maxLines="2"
+            android:ellipsize="end"
+            app:layout_constraintStart_toEndOf="@id/iconContainer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/iconContainer"
+            app:layout_constraintBottom_toBottomOf="@id/iconContainer" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="#E0E0E0"
+            app:layout_constraintTop_toBottomOf="@id/iconContainer" />
+
+        <!-- Service details section -->
+        <LinearLayout
+            android:id="@+id/detailsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            app:layout_constraintTop_toBottomOf="@id/divider">
+
+            <!-- Price detail -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@android:drawable/ic_menu_info_details"
+                    app:tint="#757575" />
+
+                <TextView
+                    android:id="@+id/servicePriceTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="$100"
+                    android:textSize="16sp"
+                    android:textColor="#1976D2"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- Duration detail -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@android:drawable/ic_menu_recent_history"
+                    app:tint="#757575" />
+
+                <TextView
+                    android:id="@+id/serviceDurationTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="30 minutes"
+                    android:textSize="14sp"
+                    android:textColor="#757575" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Action buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:paddingHorizontal="8dp"
+            android:paddingBottom="8dp"
+            app:layout_constraintTop_toBottomOf="@id/detailsContainer">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/editServiceButton"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Edit"
+                android:textAllCaps="false"
+                android:minWidth="0dp"
+                android:minHeight="36dp"
+                android:textSize="12sp"
+                android:paddingHorizontal="8dp"
+                android:textColor="#1976D2"
+                app:icon="@android:drawable/ic_menu_edit"
+                app:iconSize="16dp"
+                app:iconTint="#1976D2"
+                app:iconPadding="4dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/deleteServiceButton"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delete"
+                android:textAllCaps="false"
+                android:minWidth="0dp"
+                android:minHeight="36dp"
+                android:textSize="12sp"
+                android:paddingHorizontal="8dp"
+                android:textColor="#F44336"
+                app:icon="@android:drawable/ic_menu_delete"
+                app:iconSize="16dp"
+                app:iconTint="#F44336"
+                app:iconPadding="4dp" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

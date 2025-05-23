@@ -1,113 +1,232 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Doctor.DoctorCalendarFragment">
 
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:background="@color/lightPurple">
+        android:layout_height="wrap_content"
+        android:background="@drawable/gradient_blue_background">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Organize your schedule"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_gravity="center"
-            android:layout_marginBottom="16dp" />
-
-        <!-- Working Hours Section -->
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp">
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:titleEnabled="false">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="12dp">
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <TextView
-                    android:id="@+id/workingHoursTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Working Hours: 8:00 - 14:00"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/editWorkingHoursButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Edit Hours"
-                    android:backgroundTint="@color/purple"
-                    android:textColor="@color/white" />
+                    android:text="My Calendar"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Organize your appointments and working hours"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:alpha="0.8"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Working Hours Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="8dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/ic_menu_recent_history"
+                            app:tint="@color/primary"
+                            android:layout_marginEnd="16dp" />
+
+                        <TextView
+                            android:id="@+id/workingHoursTextView"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Working Hours: 8:00 - 14:00"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_primary"
+                            android:textStyle="bold" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/editWorkingHoursButton"
+                            style="@style/Widget.App.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Edit"
+                            android:textColor="@color/primary"
+                            app:icon="@android:drawable/ic_menu_edit"
+                            app:iconTint="@color/primary"
+                            app:iconGravity="textStart" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
-        <!-- Calendar Section -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="8dp"
-            android:background="@drawable/rounded_frame_background">
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <CalendarView
-                android:id="@+id/calendarView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:dateTextAppearance="@android:style/TextAppearance.Material.Medium"
-                android:weekDayTextAppearance="@android:style/TextAppearance.Material.Medium"
-                android:showWeekNumber="false" />
-        </androidx.cardview.widget.CardView>
-
-        <!-- Appointments Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="8dp">
+            android:orientation="vertical">
 
-            <TextView
-                android:layout_width="0dp"
+            <!-- Calendar Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Appointments"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:layout_margin="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
 
-            <Button
-                android:id="@+id/addAppointmentButton"
-                android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Select Date"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:layout_margin="16dp" />
+
+                    <CalendarView
+                        android:id="@+id/calendarView"
+                        android:layout_width="match_parent"
+                        android:layout_height="320dp"
+                        android:dateTextAppearance="@android:style/TextAppearance.Material.Medium"
+                        android:weekDayTextAppearance="@android:style/TextAppearance.Material.Medium"
+                        android:showWeekNumber="false"
+                        android:selectedDateVerticalBar="@color/primary"
+                        android:unfocusedMonthDateColor="@color/text_hint" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Appointments Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Add Appointment"
-                android:backgroundTint="@color/purple"
-                android:textColor="@color/white" />
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:id="@+id/selectedDateTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Today's Appointments"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/addAppointmentButton"
+                        style="@style/Widget.App.Button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Add"
+                        app:icon="@android:drawable/ic_menu_add"
+                        app:iconGravity="textStart" />
+                </LinearLayout>
+
+                <!-- Empty state for no appointments -->
+                <LinearLayout
+                    android:id="@+id/emptyAppointmentsView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="32dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@android:drawable/ic_menu_day"
+                        app:tint="@color/text_hint"
+                        android:alpha="0.5" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No appointments for this day"
+                        android:textSize="16sp"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginTop="16dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/addFirstAppointmentButton"
+                        style="@style/Widget.App.Button.Outlined"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Add your first appointment"
+                        android:layout_marginTop="16dp"
+                        app:icon="@android:drawable/ic_menu_add"
+                        app:iconGravity="textStart" />
+                </LinearLayout>
+
+                <!-- RecyclerView instead of ListView for better performance and more flexibility -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/appointmentsRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="200dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/activity_doctor_list_item_appointment" />
+            </LinearLayout>
         </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
-        <!-- Appointments List -->
-        <ListView
-            android:id="@+id/appointmentsListView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:divider="@android:color/darker_gray"
-            android:dividerHeight="1dp" />
+    <!-- Quick action FAB for adding appointments -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabQuickAdd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:contentDescription="Quick add appointment"
+        app:srcCompat="@android:drawable/ic_input_add"
+        app:tint="@color/white"
+        app:backgroundTint="@color/primary" />
 
-    </LinearLayout>
-</FrameLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

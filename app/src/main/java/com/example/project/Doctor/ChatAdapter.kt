@@ -1,4 +1,4 @@
-package com.example.project.Doctor // Dostosuj pakiet
+package com.example.project.doctor
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,8 +7,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.project.Doctor.ChatMessage
-import com.example.project.Doctor.MessageType
+import com.example.project.doctor.ChatMessage
+import com.example.project.doctor.MessageType
 import com.example.project.R
 import java.text.SimpleDateFormat
 import java.util.Date

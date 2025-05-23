@@ -5,13 +5,20 @@
         android:id="@+id/home"
         android:title="Home"
         android:icon="@drawable/home"/>
+    
     <item
         android:id="@+id/schedule"
         android:title="Schedule"
         android:icon="@drawable/schedule"/>
+    
     <item
         android:id="@+id/calendar"
         android:title="Calendar"
         android:icon="@drawable/calendar"/>
+    
+    <item
+        android:id="@+id/services"
+        android:title="Services"
+        android:icon="@drawable/service"/>
 
 </menu>

@@ -1,14 +1,25 @@
-package com.example.project.Doctor
+package com.example.project.doctor
 
 import android.app.AlertDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.project.Admin.Patient
 import com.example.project.R
+import com.example.project.Service
+import com.example.project.util.FirestoreHelper
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
+import com.google.firebase.firestore.*
+import com.example.project.doctor.AppointmentAdapter
+import com.example.project.doctor.AppointmentCalendar
+import com.example.project.doctor.WorkingHours
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -16,27 +27,30 @@ class DoctorCalendarFragment : Fragment() {
 
     private lateinit var calendarView: CalendarView
     private lateinit var addAppointmentButton: Button
-    private lateinit var appointmentsListView: ListView
+    private lateinit var appointmentsRecyclerView: RecyclerView 
     private lateinit var workingHoursTextView: TextView
     private lateinit var editWorkingHoursButton: Button
+    private lateinit var emptyAppointmentsView: View
 
-    // Firebase references
-    private lateinit var database: DatabaseReference
-    private lateinit var appointmentsRef: DatabaseReference
-    private lateinit var workingHoursRef: DatabaseReference
+    private lateinit var firestoreHelper: FirestoreHelper
+    private lateinit var appointmentsListener: ListenerRegistration
+    private lateinit var workingHoursListener: ListenerRegistration
     private val auth = FirebaseAuth.getInstance()
+    private var doctorName: String = "Doctor"
 
-    // Working hours
     private var startHour = 8
     private var endHour = 14
 
-    // Selected date
     private var selectedDate = ""
     private val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
-    // Appointments list - Changed to AppointmentCalendar
     private val appointmentsList = mutableListOf<AppointmentCalendar>()
-    private lateinit var appointmentAdapter: AppointmentAdapter // Adapter should be using AppointmentCalendar now
+    private lateinit var appointmentAdapter: AppointmentAdapter
+
+    private var doctorServices = mutableListOf<Service>()
+    private var filteredPatients = mutableListOf<Patient>()
+
+    private val TAG = "DoctorCalendarFragment"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,238 +58,474 @@ class DoctorCalendarFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_doctor_calendar, container, false)
 
-        // Initialize Firebase
-        val doctorId = auth.currentUser?.uid ?: "unknown_doctor" // Handle potential null UID
-        database = FirebaseDatabase.getInstance().reference
-        appointmentsRef = database.child("doctors").child(doctorId).child("appointments")
-        workingHoursRef = database.child("doctors").child(doctorId).child("workingHours")
-
-        // Initialize views
+        firestoreHelper = FirestoreHelper()
+        
         calendarView = view.findViewById(R.id.calendarView)
         addAppointmentButton = view.findViewById(R.id.addAppointmentButton)
-        appointmentsListView = view.findViewById(R.id.appointmentsListView)
+        appointmentsRecyclerView = view.findViewById(R.id.appointmentsRecyclerView) 
         workingHoursTextView = view.findViewById(R.id.workingHoursTextView)
         editWorkingHoursButton = view.findViewById(R.id.editWorkingHoursButton)
+        emptyAppointmentsView = view.findViewById(R.id.emptyAppointmentsView)
 
-        // Initialize adapter with the correct list type
-        appointmentAdapter = AppointmentAdapter(requireContext(), appointmentsList)
-        appointmentsListView.adapter = appointmentAdapter
-
-        // Set initial date
-        selectedDate = dateFormatter.format(Date(calendarView.date))
+        arguments?.getString("selected_date")?.let { selectedDateArg ->
+            selectedDate = selectedDateArg
+            try {
+                val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val date = sdf.parse(selectedDateArg)
+                if (date != null) {
+                    calendarView.date = date.time
+                    Log.d(TAG, "Setting calendar to date: $selectedDateArg")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error setting selected date: ${e.message}", e)
+                selectedDate = dateFormatter.format(Date(calendarView.date))
+            }
+        } ?: run {
+            selectedDate = dateFormatter.format(Date(calendarView.date))
+        }
 
         setupListeners()
-        loadWorkingHours()
-        loadAppointments() // Load appointments for the initial date
+
+        if (activity != null && isAdded) {
+            appointmentsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+            val highlightedTime = arguments?.getString("selected_time")
+
+            appointmentAdapter = AppointmentAdapter(
+                requireContext(),
+                appointmentsList,
+                highlightedTime
+            ) { appointment ->
+                showAppointmentOptions(appointment)
+            }
+            appointmentsRecyclerView.adapter = appointmentAdapter
+        }
+
+        if (isAdded) {
+            loadDoctorDetails()
+            loadServices()
+            loadWorkingHours()
+            loadAppointments()
+        }
 
         return view
     }
 
     private fun setupListeners() {
         calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
-            // Calendar month is 0-based, so add 1
             selectedDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
-            // Load appointments for the newly selected date
             loadAppointments()
         }
 
         addAppointmentButton.setOnClickListener {
-            showAddAppointmentDialog()
+            if (isAdded) {
+                showAddAppointmentDialog()
+            }
         }
 
         editWorkingHoursButton.setOnClickListener {
-            showEditWorkingHoursDialog()
+            if (isAdded) {
+                showEditWorkingHoursDialog()
+            }
         }
+    }
 
-        // Use the correct type (AppointmentCalendar) for the item
-        appointmentsListView.setOnItemLongClickListener { _, _, position, _ ->
-            val appointment = appointmentsList[position] // Type is AppointmentCalendar
-            showAppointmentOptionsDialog(appointment)
-            true // Indicate that the click was handled
-        }
+    private fun loadDoctorDetails() {
+        val doctorId = auth.currentUser?.uid ?: return
+        
+        firestoreHelper.getDoctorById(doctorId)
+            .addOnSuccessListener { document ->
+                if (!isAdded) return@addOnSuccessListener
+                
+                if (document.exists()) {
+                    val firstName = document.getString("firstName") ?: ""
+                    val lastName = document.getString("lastName") ?: ""
+                    doctorName = "Dr. $firstName $lastName"
+
+                    if (isAdded) {
+                        loadWorkingHours()
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error loading doctor details", e)
+            }
+    }
+
+    private fun loadServices() {
+        val doctorId = auth.currentUser?.uid ?: return
+
+        firestoreHelper.createSampleServiceIfNeeded(doctorId)
+            .addOnCompleteListener {
+                firestoreHelper.getServicesForDoctor(doctorId)
+                    .addOnSuccessListener { result ->
+                        doctorServices.clear()
+                        for (document in result) {
+                            val service = document.toObject(Service::class.java).copy(id = document.id)
+                            doctorServices.add(service)
+                        }
+
+                        doctorServices.sortBy { it.name }
+                        
+                        Log.d(TAG, "Loaded ${doctorServices.size} services")
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e(TAG, "Error loading services", e)
+                    }
+            }
     }
 
     private fun loadWorkingHours() {
-        workingHoursRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    // Make sure WorkingHours class matches the data structure in Firebase
-                    val workingHours = snapshot.getValue(WorkingHours::class.java)
-                    if (workingHours != null) {
-                        startHour = workingHours.startHour
-                        endHour = workingHours.endHour
+        val doctorId = auth.currentUser?.uid ?: return
+
+        if (::workingHoursListener.isInitialized) {
+            workingHoursListener.remove()
+        }
+
+        val workingHoursRef = firestoreHelper.getDbInstance()
+            .collection("doctorSettings")
+            .document(doctorId)
+
+        workingHoursListener = workingHoursRef.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                Log.w(TAG, "Listen for working hours failed", e)
+                if (context != null && isAdded) {
+                    Toast.makeText(context, "Failed to load working hours: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+                return@addSnapshotListener
+            }
+            
+            if (snapshot != null && snapshot.exists()) {
+                val workingHours = snapshot.toObject(WorkingHours::class.java)
+                if (workingHours != null) {
+                    startHour = workingHours.startHour
+                    endHour = workingHours.endHour
+                    if (isAdded) {
                         updateWorkingHoursDisplay()
-                        // Reload appointments in case working hours changed which might affect available slots display
                         loadAppointments()
-                    } else {
-                        // Data exists but couldn't be parsed, maybe log an error
-                        saveWorkingHours(startHour, endHour) // Optionally save defaults
-                        updateWorkingHoursDisplay()
                     }
                 } else {
-                    // Node doesn't exist, set default working hours and save them
                     saveWorkingHours(startHour, endHour)
+                    if (isAdded) {
+                        updateWorkingHoursDisplay()
+                    }
+                }
+            } else {
+                saveWorkingHours(startHour, endHour)
+                if (isAdded) {
                     updateWorkingHoursDisplay()
                 }
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                if (context != null) {
-                    Toast.makeText(context, "Failed to load working hours: ${error.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        })
+        }
     }
 
     private fun updateWorkingHoursDisplay() {
-        workingHoursTextView.text = getString(R.string.working_hours_format, startHour, endHour) // Use string resource
-        // Example string resource: <string name="working_hours_format">Working Hours: %d:00 - %d:00</string>
+        if (!isAdded) return
+        
+        try {
+            workingHoursTextView.text = "$doctorName: ${getString(R.string.working_hours_format, startHour, endHour)}"
+        } catch (e: IllegalStateException) {
+            Log.e(TAG, "Fragment not attached, cannot update working hours display", e)
+        }
     }
 
     private fun loadAppointments() {
-        // Remove previous listener to avoid multiple listeners on date change
-        appointmentsRef.child(selectedDate).removeEventListener(appointmentValueListener)
-        // Add new listener for the selected date
-        appointmentsRef.child(selectedDate).addValueEventListener(appointmentValueListener)
-    }
+        val doctorId = auth.currentUser?.uid ?: return
 
-    // Define the listener separately to easily remove it
-    private val appointmentValueListener = object : ValueEventListener {
-        override fun onDataChange(snapshot: DataSnapshot) {
+        if (::appointmentsListener.isInitialized) {
+            appointmentsListener.remove()
+        }
+
+        val appointmentsRef = firestoreHelper.getDbInstance()
+            .collection("doctorCalendars")
+            .document(doctorId)
+            .collection("dates")
+            .document(selectedDate)
+            .collection("appointments")
+
+        appointmentsListener = appointmentsRef.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                Log.w(TAG, "Listen for appointments failed", e)
+                if (context != null && isAdded) {
+                    Toast.makeText(context, "Failed to load appointments: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+                return@addSnapshotListener
+            }
+            
             appointmentsList.clear()
-            for (appointmentSnapshot in snapshot.children) {
-                // Deserialize as AppointmentCalendar
-                val appointment = appointmentSnapshot.getValue(AppointmentCalendar::class.java)
-                if (appointment != null) {
-                    // Assign the Firebase key as the ID
-                    appointment.id = appointmentSnapshot.key ?: ""
-                    appointmentsList.add(appointment)
+            
+            if (snapshot != null && !snapshot.isEmpty) {
+                for (document in snapshot.documents) {
+                    val appointment = document.toObject(AppointmentCalendar::class.java)
+                    if (appointment != null) {
+                        appointment.id = document.id
+                        appointmentsList.add(appointment)
+                    }
+                }
+                appointmentsList.sortBy { it.timeSlot }
+            }
+
+            if (isAdded && activity != null) {
+                safelyRunOnUiThread {
+                    val highlightedTime = arguments?.getString("selected_time")
+
+                    appointmentAdapter = AppointmentAdapter(
+                        requireContext(),
+                        appointmentsList,
+                        highlightedTime
+                    ) { appointment ->
+                        showAppointmentOptions(appointment)
+                    }
+                    appointmentsRecyclerView.adapter = appointmentAdapter
+
+                    if (appointmentsList.isEmpty()) {
+                        appointmentsRecyclerView.visibility = View.GONE
+                        emptyAppointmentsView.visibility = View.VISIBLE
+                    } else {
+                        appointmentsRecyclerView.visibility = View.VISIBLE
+                        emptyAppointmentsView.visibility = View.GONE
+                        
+
+                        if (arguments?.containsKey("selected_time") == true) {
+                            val timeToHighlight = arguments?.getString("selected_time")
+                            val appointmentIndex = appointmentsList.indexOfFirst { it.timeSlot == timeToHighlight }
+                            if (appointmentIndex >= 0) {
+                            (appointmentsRecyclerView.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(appointmentIndex, 20)
+
+                            Log.d(TAG, "Scrolling to appointment at time: $timeToHighlight (index: $appointmentIndex)")
+                        }
+                    }
+                }
                 }
             }
-
-            // Sort appointments by timeSlot (assuming it's like "HH:mm")
-            appointmentsList.sortBy { it.timeSlot }
-            // Notify the adapter that the data has changed
-            appointmentAdapter.notifyDataSetChanged()
-            // Update visibility based on whether the list is empty
-            if (appointmentsList.isEmpty()) {
-                appointmentsListView.visibility = View.GONE
-                // Optionally show a TextView saying "No appointments"
-            } else {
-                appointmentsListView.visibility = View.VISIBLE
-            }
-        }
-
-        override fun onCancelled(error: DatabaseError) {
-            if (context != null) {
-                Toast.makeText(context, "Failed to load appointments: ${error.message}", Toast.LENGTH_SHORT).show()
-            }
         }
     }
 
-
     private fun showAddAppointmentDialog() {
-        // Get available time slots
-        val availableTimeSlots = getAvailableTimeSlots()
-
-        if (availableTimeSlots.isEmpty()) {
-            if (context != null) {
-                Toast.makeText(context, "No available time slots for this day.", Toast.LENGTH_SHORT).show()
-            }
+        if (!isAdded || context == null) {
+            Log.e(TAG, "Fragment not attached, cannot show dialog")
             return
         }
 
-        val dialogView = layoutInflater.inflate(R.layout.activity_dialog_add_appointment, null) // Ensure layout name matches
-        val patientNameEditText = dialogView.findViewById<EditText>(R.id.patientNameEditText)
+        val availableTimeSlots = getAvailableTimeSlots()
+
+        if (availableTimeSlots.isEmpty()) {
+            Toast.makeText(requireContext(), "No available time slots for this day.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_appointment_with_search, null)
+
+        val patientSearchEditText = dialogView.findViewById<EditText>(R.id.patientSearchEditText)
+        val patientsRecyclerView = dialogView.findViewById<RecyclerView>(R.id.patientsRecyclerView)
+        val selectedPatientNameTextView = dialogView.findViewById<TextView>(R.id.selectedPatientNameTextView)
+        val serviceSpinner = dialogView.findViewById<Spinner>(R.id.serviceSpinner)
         val timeSlotSpinner = dialogView.findViewById<Spinner>(R.id.timeSlotSpinner)
         val notesEditText = dialogView.findViewById<EditText>(R.id.notesEditText)
+        val patientsAdapter = PatientSearchAdapter { patient ->
+            selectedPatientNameTextView.text = "${patient.firstName} ${patient.lastName}"
+            selectedPatientNameTextView.tag = patient // Store the patient object
+            patientSearchEditText.setText("") // Clear search
+            patientsRecyclerView.visibility = View.GONE
+        }
+        
+        patientsRecyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = patientsAdapter
+        }
 
-        // Set up spinner
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, availableTimeSlots)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        timeSlotSpinner.adapter = adapter
+        patientSearchEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val query = s.toString().trim()
+                if (query.length >= 2) {
+                    searchPatients(query) { patients ->
+                        filteredPatients = patients
+                        patientsAdapter.submitList(filteredPatients)
+                        patientsRecyclerView.visibility = if (patients.isNotEmpty()) View.VISIBLE else View.GONE
+                    }
+                } else {
+                    patientsRecyclerView.visibility = View.GONE
+                }
+            }
+            
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        val serviceAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            doctorServices.map { it.name }
+        )
+        serviceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        serviceSpinner.adapter = serviceAdapter
+
+        val timeSlotAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            availableTimeSlots
+        )
+        timeSlotAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        timeSlotSpinner.adapter = timeSlotAdapter
 
         AlertDialog.Builder(requireContext())
             .setTitle("Add New Appointment")
             .setView(dialogView)
             .setPositiveButton("Add") { _, _ ->
-                val patientName = patientNameEditText.text.toString().trim()
+                val selectedPatient = selectedPatientNameTextView.tag as? Patient
+                
+                if (selectedPatient == null) {
+                    Toast.makeText(requireContext(), "Please select a patient", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                
+                val servicePosition = serviceSpinner.selectedItemPosition
+                if (servicePosition < 0 || servicePosition >= doctorServices.size) {
+                    Toast.makeText(requireContext(), "Please select a service", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                
+                val selectedService = doctorServices[servicePosition]
                 val timeSlot = timeSlotSpinner.selectedItem.toString()
                 val notes = notesEditText.text.toString().trim()
 
-                if (patientName.isEmpty()) {
-                    if (context != null) {
-                        Toast.makeText(context, "Patient name cannot be empty", Toast.LENGTH_SHORT).show()
-                    }
-                    // Don't dismiss the dialog - consider keeping it open or showing error differently
-                    // For simplicity, we just return here. Re-showing dialog requires more complex setup.
-                    return@setPositiveButton
-                }
-
-                addAppointment(patientName, timeSlot, notes)
+                addAppointment(selectedPatient, selectedService, timeSlot, notes)
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
+    private fun searchPatients(query: String, callback: (MutableList<Patient>) -> Unit) {
+        firestoreHelper.getDbInstance()
+            .collection("patients")
+            .orderBy("firstName")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val patients = mutableListOf<Patient>()
+                val lowerCaseQuery = query.lowercase(Locale.getDefault())
+                for (document in snapshot.documents) {
+                    val patient = document.toObject(Patient::class.java)
+                    if (patient != null) {
+                        val fullName = "${patient.firstName} ${patient.lastName}".lowercase(Locale.getDefault())
+                        val email = patient.email?.lowercase(Locale.getDefault()) ?: ""
+                        
+                        if (fullName.contains(lowerCaseQuery) || 
+                            patient.firstName.lowercase(Locale.getDefault()).startsWith(lowerCaseQuery) ||
+                            patient.lastName.lowercase(Locale.getDefault()).startsWith(lowerCaseQuery) ||
+                            email.contains(lowerCaseQuery)) {
+                            patients.add(patient)
+                        }
+                    }
+                }
+                callback(patients)
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error searching patients", e)
+                callback(mutableListOf())
+            }
+    }
+
     private fun getAvailableTimeSlots(): List<String> {
         val allTimeSlots = mutableListOf<String>()
-        // Use timeSlot from AppointmentCalendar
-        val bookedTimeSlots = appointmentsList.map { it.timeSlot }.toSet() // Use Set for efficient lookup
+        val bookedTimeSlots = appointmentsList.map { it.timeSlot }
 
-        // Generate all possible 30-minute time slots based on working hours
         for (hour in startHour until endHour) {
             val slot1 = String.format(Locale.US, "%02d:00", hour)
             val slot2 = String.format(Locale.US, "%02d:30", hour)
-            if (!bookedTimeSlots.contains(slot1)) {
+            if (slot1 !in bookedTimeSlots) {
                 allTimeSlots.add(slot1)
             }
-            if (!bookedTimeSlots.contains(slot2)) {
+            if (slot2 !in bookedTimeSlots) {
                 allTimeSlots.add(slot2)
             }
         }
 
-        return allTimeSlots // Already filtered
+        return allTimeSlots
     }
 
-    private fun addAppointment(patientName: String, timeSlot: String, notes: String) {
-        // Create an AppointmentCalendar object
-        // Check the AppointmentCalendar definition for 'time' vs 'timeSlot'
-        // Assuming 'timeSlot' holds the "HH:mm" string and 'time' might be redundant or for timestamp
+    private fun addAppointment(patient: Patient, service: Service, timeSlot: String, notes: String) {
+        val doctorId = auth.currentUser?.uid ?: return
+
+        val endTimeSlot = calculateEndTime(timeSlot, service.duration_minutes)
+        
         val appointment = AppointmentCalendar(
-            id = "", // ID will be generated by Firebase push()
-            patientName = patientName,
+            id = "",
+            patientName = "${patient.firstName} ${patient.lastName}",
+            patientId = patient.email,
             date = selectedDate,
-            timeSlot = timeSlot, // Use the correct field
+            timeSlot = timeSlot,
             notes = notes,
-            time = timeSlot // If 'time' should store the same as 'timeSlot' or a timestamp? Using timeSlot for now.
+            time = timeSlot,
+            endTime = endTimeSlot,
+            serviceId = service.id,
+            serviceName = service.name,
+            servicePrice = service.price,
+            serviceDuration = service.duration_minutes
         )
+        val appointmentsRef = firestoreHelper.getDbInstance()
+            .collection("doctorCalendars")
+            .document(doctorId)
+            .collection("dates")
+            .document(selectedDate)
+            .collection("appointments")
 
-        // Get a unique key for the new appointment under the selected date
-        val appointmentKey = appointmentsRef.child(selectedDate).push().key
-        if (appointmentKey != null) {
-            // Set the generated key as the ID in the object before saving
-            appointment.id = appointmentKey
-            appointmentsRef.child(selectedDate).child(appointmentKey).setValue(appointment)
-                .addOnSuccessListener {
-                    if (context != null) {
-                        Toast.makeText(context, "Appointment added successfully", Toast.LENGTH_SHORT).show()
-                    }
+        appointmentsRef.add(appointment)
+            .addOnSuccessListener {
+                if (isAdded && context != null) {
+                    Toast.makeText(context, "Appointment added successfully", Toast.LENGTH_SHORT).show()
                 }
-                .addOnFailureListener { e ->
-                    if (context != null) {
-                        Toast.makeText(context, "Error adding appointment: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
-                }
-        } else {
-            if (context != null) {
-                Toast.makeText(context, "Error generating appointment key", Toast.LENGTH_SHORT).show()
+
+                createBookingFromAppointment(patient, service, appointment)
             }
-        }
+            .addOnFailureListener { e ->
+                if (isAdded && context != null) {
+                    Toast.makeText(context, "Error adding appointment: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+    
+    private fun createBookingFromAppointment(patient: Patient, service: Service, appointment: AppointmentCalendar) {
+        val doctorId = auth.currentUser?.uid ?: return
+        
+        val booking = com.example.project.Booking(
+            id = "",
+            doctor_id = doctorId,
+            service_id = service.id,
+            patient_name = patient.email,
+            date = appointment.date,
+            start_time = appointment.timeSlot,
+            end_time = appointment.endTime,
+            status = "confirmed"
+        )
+        
+        firestoreHelper.addBooking(booking)
+            .addOnSuccessListener {
+                Log.d(TAG, "Booking created successfully")
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error creating booking", e)
+            }
+    }
+    
+    private fun calculateEndTime(startTime: String, durationMinutes: Int): String {
+        val parts = startTime.split(":")
+        val hour = parts[0].toInt()
+        val minute = parts[1].toInt()
+        
+        val totalMinutes = hour * 60 + minute + durationMinutes
+        val newHour = totalMinutes / 60
+        val newMinute = totalMinutes % 60
+        
+        return String.format(Locale.US, "%02d:%02d", newHour, newMinute)
     }
 
-    // Parameter type changed to AppointmentCalendar
     private fun showAppointmentOptionsDialog(appointment: AppointmentCalendar) {
+        if (!isAdded || context == null) {
+            Log.e(TAG, "Fragment not attached, cannot show dialog")
+            return
+        }
+        
         val options = arrayOf("Edit", "Delete")
 
         AlertDialog.Builder(requireContext())
@@ -286,34 +536,52 @@ class DoctorCalendarFragment : Fragment() {
                     1 -> showDeleteConfirmationDialog(appointment)
                 }
             }
-            .setNegativeButton("Cancel", null) // Add a cancel button
+            .setNegativeButton("Cancel", null)
             .show()
     }
 
-    // Parameter type changed to AppointmentCalendar
     private fun showEditAppointmentDialog(appointment: AppointmentCalendar) {
-        val dialogView = layoutInflater.inflate(R.layout.activity_dialog_edit_appointment, null) // Ensure layout name matches
-        val patientNameEditText = dialogView.findViewById<EditText>(R.id.patientNameEditText)
-        val timeSlotSpinner = dialogView.findViewById<Spinner>(R.id.timeSlotSpinner)
+        if (!isAdded || context == null) {
+            Log.e(TAG, "Fragment not attached, cannot show dialog")
+            return
+        }
+        
+        val dialogView = layoutInflater.inflate(R.layout.dialog_edit_appointment_with_service, null)
+        val patientNameTextView = dialogView.findViewById<TextView>(R.id.patientNameTextView)
+        val serviceSpinner = dialogView.findViewById<Spinner>(R.id.serviceSpinner)
+        var timeSlotSpinner = dialogView.findViewById<Spinner>(R.id.timeSlotSpinner)
         val notesEditText = dialogView.findViewById<EditText>(R.id.notesEditText)
 
-        // Set current values using properties from AppointmentCalendar
-        patientNameEditText.setText(appointment.patientName)
+        patientNameTextView.text = appointment.patientName
         notesEditText.setText(appointment.notes)
 
-        // Get available time slots including the current one
-        val availableTimeSlots = getAvailableTimeSlots().toMutableList()
-        // Add the current appointment's time slot back to the list if it wasn't already available
-        if (!availableTimeSlots.contains(appointment.timeSlot)) {
-            availableTimeSlots.add(appointment.timeSlot)
-        }
-        availableTimeSlots.sort() // Sort the list alphabetically/numerically
+        val serviceAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            doctorServices.map { it.name }
+        )
+        serviceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        serviceSpinner.adapter = serviceAdapter
 
-        // Set up spinner
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, availableTimeSlots)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        timeSlotSpinner.adapter = adapter
-        // Set the spinner to the appointment's current time slot
+        val servicePosition = doctorServices.indexOfFirst { it.id == appointment.serviceId }
+        if (servicePosition >= 0) {
+            serviceSpinner.setSelection(servicePosition)
+        }
+
+        val availableTimeSlots = getAvailableTimeSlots().toMutableList()
+        if (appointment.timeSlot !in availableTimeSlots) {
+            availableTimeSlots.add(appointment.timeSlot)
+            availableTimeSlots.sort()
+        }
+
+        val timeSlotAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            availableTimeSlots
+        )
+        timeSlotAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        timeSlotSpinner.adapter = timeSlotAdapter
+
         val currentPosition = availableTimeSlots.indexOf(appointment.timeSlot)
         if (currentPosition >= 0) {
             timeSlotSpinner.setSelection(currentPosition)
@@ -323,87 +591,201 @@ class DoctorCalendarFragment : Fragment() {
             .setTitle("Edit Appointment")
             .setView(dialogView)
             .setPositiveButton("Save") { _, _ ->
-                val patientName = patientNameEditText.text.toString().trim()
+                val servicePosition = serviceSpinner.selectedItemPosition
+                if (servicePosition < 0 || servicePosition >= doctorServices.size) {
+                    Toast.makeText(requireContext(), "Please select a service", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                
+                val selectedService = doctorServices[servicePosition]
                 val timeSlot = timeSlotSpinner.selectedItem.toString()
                 val notes = notesEditText.text.toString().trim()
 
-                if (patientName.isEmpty()) {
-                    if (context != null) {
-                        Toast.makeText(context, "Patient name cannot be empty", Toast.LENGTH_SHORT).show()
-                    }
-                    return@setPositiveButton // Stay in dialog
-                }
-
-                // Use the correct properties from AppointmentCalendar
-                updateAppointment(appointment.id, patientName, timeSlot, notes)
+                updateAppointment(appointment.id, appointment.patientName, appointment.patientId, 
+                    selectedService, timeSlot, notes)
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
-    private fun updateAppointment(id: String, patientName: String, timeSlot: String, notes: String) {
-        // Create an AppointmentCalendar object for the update
+    private fun updateAppointment(id: String, patientName: String, patientId: String, 
+                                service: Service, timeSlot: String, notes: String) {
+        val doctorId = auth.currentUser?.uid ?: return
+
+        val endTimeSlot = calculateEndTime(timeSlot, service.duration_minutes)
+        
         val updatedAppointment = AppointmentCalendar(
-            id = id, // Keep the original ID
+            id = id,
             patientName = patientName,
-            date = selectedDate, // Date remains the same for this update
-            timeSlot = timeSlot, // Use the correct field
+            patientId = patientId,
+            date = selectedDate,
+            timeSlot = timeSlot,
             notes = notes,
-            time = timeSlot // Again, assuming time holds same value as timeSlot or similar
+            time = timeSlot,
+            endTime = endTimeSlot,
+            serviceId = service.id,
+            serviceName = service.name,
+            servicePrice = service.price,
+            serviceDuration = service.duration_minutes
         )
 
-        // Update the specific appointment using its ID under the selected date
-        appointmentsRef.child(selectedDate).child(id).setValue(updatedAppointment)
+        val appointmentRef = firestoreHelper.getDbInstance()
+            .collection("doctorCalendars")
+            .document(doctorId)
+            .collection("dates")
+            .document(selectedDate)
+            .collection("appointments")
+            .document(id)
+
+        appointmentRef.set(updatedAppointment)
             .addOnSuccessListener {
-                if (context != null) {
+                if (isAdded && context != null) {
                     Toast.makeText(context, "Appointment updated successfully", Toast.LENGTH_SHORT).show()
                 }
+
+                updateBookingFromAppointment(updatedAppointment)
             }
             .addOnFailureListener { e ->
-                if (context != null) {
+                if (isAdded && context != null) {
                     Toast.makeText(context, "Error updating appointment: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
     }
+    
+    private fun updateBookingFromAppointment(updatedAppointment: AppointmentCalendar) {
+        val doctorId = auth.currentUser?.uid ?: return
 
-    // Parameter type changed to AppointmentCalendar
+        firestoreHelper.getDbInstance()
+            .collection("bookings")
+            .whereEqualTo("doctor_id", doctorId)
+            .whereEqualTo("date", updatedAppointment.date)
+            .whereEqualTo("patient_name", updatedAppointment.patientId)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    for (document in querySnapshot.documents) {
+                        // Update this booking
+                        document.reference.update(
+                            mapOf(
+                                "service_id" to updatedAppointment.serviceId,
+                                "start_time" to updatedAppointment.timeSlot,
+                                "end_time" to updatedAppointment.endTime
+                            )
+                        ).addOnSuccessListener {
+                            Log.d(TAG, "Booking updated successfully")
+                        }.addOnFailureListener { e ->
+                            Log.e(TAG, "Error updating booking", e)
+                        }
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error finding booking to update", e)
+            }
+    }
+
     private fun showDeleteConfirmationDialog(appointment: AppointmentCalendar) {
+        if (!isAdded || context == null) {
+            Log.e(TAG, "Fragment not attached, cannot show dialog")
+            return
+        }
+        
         AlertDialog.Builder(requireContext())
             .setTitle("Delete Appointment")
-            .setMessage("Are you sure you want to delete the appointment for ${appointment.patientName} at ${appointment.timeSlot}?") // More informative message
+            .setMessage("Are you sure you want to delete the appointment for ${appointment.patientName} at ${appointment.timeSlot}?")
             .setPositiveButton("Yes, Delete") { _, _ ->
-                // Use the correct ID property from AppointmentCalendar
-                deleteAppointment(appointment.id)
+                deleteAppointment(appointment)
             }
             .setNegativeButton("No, Cancel", null)
             .show()
     }
 
-    private fun deleteAppointment(id: String) {
-        // Remove the specific appointment using its ID under the selected date
-        appointmentsRef.child(selectedDate).child(id).removeValue()
+    private fun deleteAppointment(appointment: AppointmentCalendar) {
+        val doctorId = auth.currentUser?.uid ?: return
+        
+        // Reference to the specific appointment document
+        val appointmentRef = firestoreHelper.getDbInstance()
+            .collection("doctorCalendars")
+            .document(doctorId)
+            .collection("dates")
+            .document(selectedDate)
+            .collection("appointments")
+            .document(appointment.id)
+
+        appointmentRef.delete()
             .addOnSuccessListener {
-                if (context != null) {
-                    Toast.makeText(context, "Appointment deleted successfully", Toast.LENGTH_SHORT).show()
+                if (isAdded && context != null) {
+                    safelyShowToast("Appointment deleted successfully")
                 }
-                // The ValueEventListener will automatically update the list
+
+                deleteBookingFromAppointment(appointment)
             }
             .addOnFailureListener { e ->
-                if (context != null) {
-                    Toast.makeText(context, "Error deleting appointment: ${e.message}", Toast.LENGTH_SHORT).show()
+                if (isAdded && context != null) {
+                    safelyShowToast("Error deleting appointment: ${e.message}")
                 }
+            }
+    }
+    
+    private fun deleteBookingFromAppointment(appointment: AppointmentCalendar) {
+        val doctorId = auth.currentUser?.uid ?: return
+
+        firestoreHelper.getDbInstance()
+            .collection("bookings")
+            .whereEqualTo("doctor_id", doctorId)
+            .whereEqualTo("date", appointment.date)
+            .whereEqualTo("patient_name", appointment.patientId)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val totalBookings = querySnapshot.size()
+                    var completedDeletions = 0
+                    
+                    for (document in querySnapshot.documents) {
+                        document.reference.delete()
+                            .addOnSuccessListener {
+                                completedDeletions++
+                                Log.d(TAG, "Booking deleted successfully ($completedDeletions of $totalBookings)")
+                                
+
+                                if (completedDeletions == totalBookings) {
+                                    if (activity != null && isAdded) {
+                                        activity?.runOnUiThread {
+                                            Log.d(TAG, "All bookings deleted, UI refreshed")
+                                        }
+                                    }
+                                }
+                            }
+                            .addOnFailureListener { e ->
+                                completedDeletions++
+                                Log.e(TAG, "Error deleting booking", e)
+
+                                if (completedDeletions == totalBookings) {
+                                    if (activity != null && isAdded) {
+                                        activity?.runOnUiThread {
+                                            Log.d(TAG, "All booking deletions attempted, UI refreshed")
+                                        }
+                                    }
+                                }
+                            }
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error finding booking to delete", e)
             }
     }
 
     private fun showEditWorkingHoursDialog() {
-        // Check context before showing dialog
-        if (context == null) return
+        if (!isAdded || context == null) {
+            Log.e(TAG, "Fragment not attached, cannot show dialog")
+            return
+        }
 
-        val dialogView = layoutInflater.inflate(R.layout.activity_dialog_edit_working_hours, null) // Ensure layout name matches
+        val dialogView = layoutInflater.inflate(R.layout.activity_dialog_edit_working_hours, null)
         val startTimeButton = dialogView.findViewById<Button>(R.id.startTimeButton)
         val endTimeButton = dialogView.findViewById<Button>(R.id.endTimeButton)
 
-        // Display current hours
         startTimeButton.text = String.format(Locale.US, "%d:00", startHour)
         endTimeButton.text = String.format(Locale.US, "%d:00", endHour)
 
@@ -411,29 +793,32 @@ class DoctorCalendarFragment : Fragment() {
         var tempEndHour = endHour
 
         startTimeButton.setOnClickListener {
+            if (!isAdded) return@setOnClickListener
+            
             TimePickerDialog(
-                context, // Use context directly
-                { _, hourOfDay, _ -> // Minute is ignored (set to 0)
+                requireContext(),
+                { _, hourOfDay, _ ->
                     tempStartHour = hourOfDay
                     startTimeButton.text = String.format(Locale.US, "%d:00", tempStartHour)
-                    // Basic validation inside picker if possible, or check on save
                 },
-                tempStartHour, // Initial hour
-                0, // Initial minute (always 0 for simplicity)
-                true // 24-hour format
+                tempStartHour,
+                0,
+                true
             ).show()
         }
 
         endTimeButton.setOnClickListener {
+            if (!isAdded) return@setOnClickListener
+            
             TimePickerDialog(
-                context, // Use context directly
-                { _, hourOfDay, _ -> // Minute is ignored
+                requireContext(),
+                { _, hourOfDay, _ ->
                     tempEndHour = hourOfDay
                     endTimeButton.text = String.format(Locale.US, "%d:00", tempEndHour)
                 },
-                tempEndHour, // Initial hour
-                0, // Initial minute
-                true // 24-hour format
+                tempEndHour,
+                0,
+                true
             ).show()
         }
 
@@ -441,15 +826,12 @@ class DoctorCalendarFragment : Fragment() {
             .setTitle("Edit Working Hours")
             .setView(dialogView)
             .setPositiveButton("Save") { _, _ ->
-                // Validate hours before saving
                 if (tempStartHour >= tempEndHour) {
-                    if (context != null) {
+                    if (isAdded) {
                         Toast.makeText(context, "End time must be after start time", Toast.LENGTH_SHORT).show()
                     }
-                    // Don't save, maybe re-show dialog or handle error differently
                     return@setPositiveButton
                 }
-                // Save the temporary hours to the actual variables and Firebase
                 startHour = tempStartHour
                 endHour = tempEndHour
                 saveWorkingHours(startHour, endHour)
@@ -459,24 +841,163 @@ class DoctorCalendarFragment : Fragment() {
     }
 
     private fun saveWorkingHours(start: Int, end: Int) {
+        val doctorId = auth.currentUser?.uid ?: return
+        
         val workingHours = WorkingHours(startHour = start, endHour = end)
-        workingHoursRef.setValue(workingHours)
+
+        val workingHoursRef = firestoreHelper.getDbInstance()
+            .collection("doctorSettings")
+            .document(doctorId)
+
+        workingHoursRef.set(workingHours)
             .addOnSuccessListener {
-                if (context != null) {
-                    Toast.makeText(context, "Working hours updated successfully", Toast.LENGTH_SHORT).show()
+                if (isAdded && context != null) {
+                    safelyShowToast("Working hours updated successfully")
                 }
-                // ValueEventListener on workingHoursRef will update the display
             }
             .addOnFailureListener { e ->
-                if (context != null) {
-                    Toast.makeText(context, "Error updating working hours: ${e.message}", Toast.LENGTH_SHORT).show()
+                if (isAdded && context != null) {
+                    safelyShowToast("Error updating working hours: ${e.message}")
                 }
             }
     }
 
     override fun onDestroyView() {
-        // Clean up the listener when the view is destroyed to prevent memory leaks
-        appointmentsRef.child(selectedDate).removeEventListener(appointmentValueListener)
+        if (::appointmentsListener.isInitialized) {
+            appointmentsListener.remove()
+        }
+        if (::workingHoursListener.isInitialized) {
+            workingHoursListener.remove()
+        }
         super.onDestroyView()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (::appointmentsListener.isInitialized) {
+            appointmentsListener.remove()
+        }
+        if (::workingHoursListener.isInitialized) {
+            workingHoursListener.remove()
+        }
+    }
+    
+    override fun onResume() {
+        super.onResume()
+        if (isAdded && activity != null) {
+            loadWorkingHours()
+            loadAppointments()
+        }
+    }
+
+    private fun safelyRunOnUiThread(action: () -> Unit) {
+        if (isAdded && activity != null) {
+            try {
+                activity?.runOnUiThread {
+                    if (isAdded && !isDetached) {
+                        action()
+                    }
+                }
+            } catch (e: IllegalStateException) {
+                Log.e(TAG, "Fragment not attached to activity", e)
+            }
+        }
+    }
+
+    private fun safelyShowToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
+        if (isAdded && context != null && !isDetached) {
+            try {
+                Toast.makeText(context, message, duration).show()
+            } catch (e: IllegalStateException) {
+                Log.e(TAG, "Cannot show toast: $message", e)
+            }
+        } else {
+            Log.d(TAG, "Skipped showing toast because fragment not attached: $message")
+        }
+    }
+
+    private fun showAppointmentOptions(appointment: AppointmentCalendar) {
+        if (!isAdded || context == null) {
+            Log.e(TAG, "Fragment not attached, cannot show dialog")
+            return
+        }
+        
+        val options = arrayOf("View Details", "Edit Appointment", "Delete Appointment")
+        
+        AlertDialog.Builder(requireContext())
+            .setTitle("Appointment Options")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> showAppointmentDetails(appointment)
+                    1 -> showEditAppointmentDialog(appointment)
+                    2 -> showDeleteConfirmationDialog(appointment)
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+    
+    private fun showAppointmentDetails(appointment: AppointmentCalendar) {
+        if (!isAdded || context == null) {
+            Log.e(TAG, "Fragment not attached, cannot show dialog")
+            return
+        }
+
+        val timeRange = "${appointment.timeSlot} - ${appointment.endTime}"
+        val currencyFormat = java.text.NumberFormat.getCurrencyInstance(Locale.US)
+        val formattedPrice = currencyFormat.format(appointment.servicePrice)
+        
+        val message = """
+            Patient: ${appointment.patientName}
+            Time: $timeRange
+            Service: ${appointment.serviceName}
+            Duration: ${appointment.serviceDuration} minutes
+            Price: $formattedPrice
+            
+            ${if (appointment.notes.isNotEmpty()) "Notes: ${appointment.notes}" else "No notes provided"}
+        """.trimIndent()
+        
+        AlertDialog.Builder(requireContext())
+            .setTitle("Appointment Details")
+            .setMessage(message)
+            .setPositiveButton("Close", null)
+            .show()
+    }
+}
+
+class PatientSearchAdapter(private val onPatientSelected: (Patient) -> Unit) : 
+    RecyclerView.Adapter<PatientSearchAdapter.PatientViewHolder>() {
+    
+    private var patients = listOf<Patient>()
+    
+    fun submitList(list: List<Patient>) {
+        patients = list
+        notifyDataSetChanged()
+    }
+    
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_patient_search, parent, false)
+        return PatientViewHolder(view)
+    }
+    
+    override fun onBindViewHolder(holder: PatientViewHolder, position: Int) {
+        holder.bind(patients[position])
+    }
+    
+    override fun getItemCount() = patients.size
+    
+    inner class PatientViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val patientNameTextView: TextView = itemView.findViewById(R.id.patientNameTextView)
+        private val patientEmailTextView: TextView = itemView.findViewById(R.id.patientEmailTextView)
+        
+        fun bind(patient: Patient) {
+            patientNameTextView.text = "${patient.firstName} ${patient.lastName}"
+            patientEmailTextView.text = patient.email
+            
+            itemView.setOnClickListener {
+                onPatientSelected(patient)
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.project.Doctor // Dostosuj pakiet
+package com.example.project.doctor
 
 import android.net.Uri
 import android.os.Bundle
@@ -9,9 +9,6 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.project.Doctor.ChatMessage
-import com.example.project.Doctor.MessageType
-import com.example.project.Doctor.ChatAdapter
 import com.example.project.databinding.ActivityDoctorChatMessageBinding
 
 class ChatActivity : AppCompatActivity() {

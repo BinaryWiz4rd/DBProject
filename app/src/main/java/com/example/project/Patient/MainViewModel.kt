@@ -3,14 +3,14 @@ package com.example.project.Patient
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 
-class MainViewModel() : ViewModel() {
+class MainViewModel : ViewModel() {
 
-    private val firebaseDatabase = FirebaseDatabase.getInstance()
+    private val db = FirebaseFirestore.getInstance()
+    private var categoryListener: ListenerRegistration? = null
+    private var doctorsListener: ListenerRegistration? = null
 
     private val _category = MutableLiveData<MutableList<CategoryModel>>()
     private val _doctors = MutableLiveData<MutableList<DoctorsModel>>()
@@ -18,48 +18,60 @@ class MainViewModel() : ViewModel() {
     val category: LiveData<MutableList<CategoryModel>> = _category
     val doctors: LiveData<MutableList<DoctorsModel>> = _doctors
 
-
     fun loadCategory() {
-        val Ref = firebaseDatabase.getReference("Category")
-        Ref.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val lists = mutableListOf<CategoryModel>()
-                for (childSnapshot in snapshot.children) {
-                    val list = childSnapshot.getValue(CategoryModel::class.java)
-                    if (list != null) {
-                        lists.add(list)
-                    }
+        // Remove any existing listener
+        categoryListener?.remove()
+        
+        // Create a new listener for the categories collection
+        categoryListener = db.collection("categories")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    // Handle error
+                    return@addSnapshotListener
                 }
-                _category.value = lists
+                
+                if (snapshot != null) {
+                    val lists = mutableListOf<CategoryModel>()
+                    for (document in snapshot.documents) {
+                        val category = document.toObject(CategoryModel::class.java)
+                        if (category != null) {
+                            lists.add(category)
+                        }
+                    }
+                    _category.value = lists
+                }
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-
-        })
     }
 
     fun loadDoctors() {
-        val Ref = firebaseDatabase.getReference("Doctors")
-        Ref.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val lists = mutableListOf<DoctorsModel>()
-
-                for (childSnapshot in snapshot.children) {
-                    val list = childSnapshot.getValue(DoctorsModel::class.java)
-
-                    if (list != null) {
-                        lists.add(list)
-                    }
+        // Remove any existing listener
+        doctorsListener?.remove()
+        
+        // Create a new listener for the doctors collection
+        doctorsListener = db.collection("doctors")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    // Handle error
+                    return@addSnapshotListener
                 }
-                _doctors.value = lists
+                
+                if (snapshot != null) {
+                    val lists = mutableListOf<DoctorsModel>()
+                    for (document in snapshot.documents) {
+                        val doctor = document.toObject(DoctorsModel::class.java)
+                        if (doctor != null) {
+                            lists.add(doctor)
+                        }
+                    }
+                    _doctors.value = lists
+                }
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-
-        })
+    }
+    
+    override fun onCleared() {
+        super.onCleared()
+        // Remove listeners when ViewModel is cleared
+        categoryListener?.remove()
+        doctorsListener?.remove()
     }
 }

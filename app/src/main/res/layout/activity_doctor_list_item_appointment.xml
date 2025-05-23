@@ -1,32 +1,185 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:paddingVertical="8dp"
-    android:paddingHorizontal="4dp"
-    android:gravity="center_vertical">
+    android:paddingVertical="12dp"
+    android:paddingHorizontal="16dp"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
+    <!-- Time marker -->
     <TextView
         android:id="@+id/textViewTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minWidth="50dp"
         android:text="09:00"
-        android:textAppearance="?attr/textAppearanceBodyLarge"
-        android:textStyle="bold" />
+        android:textSize="16sp"
+        android:textColor="@color/text_primary"
+        android:textStyle="bold"
+        android:paddingEnd="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/textViewPatientName"
+    <!-- Time marker dot -->
+    <View
+        android:id="@+id/timelineDot"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:background="@drawable/status_pending_background"
+        android:layout_marginStart="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/appointmentCardView"
+        app:layout_constraintBottom_toBottomOf="@id/appointmentCardView" />
+
+    <!-- Appointment card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/appointmentCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_marginStart="12dp"
-        android:text="Jan Kowalski"
-        android:textAppearance="?attr/textAppearanceBodyMedium" />
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="8dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="1dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="@color/divider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textViewTime">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_chevron_right" />
-</LinearLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp">
+
+            <!-- Patient status indicator -->
+            <TextView
+                android:id="@+id/textViewStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Confirmed"
+                android:textSize="12sp"
+                android:textColor="@color/text_on_primary"
+                android:background="@drawable/status_confirmed_background"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- Patient avatar placeholder -->
+            <ImageView
+                android:id="@+id/imageViewPatient"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_profile_placeholder"
+                android:background="@color/primary_light"
+                android:padding="8dp"
+                app:tint="@color/primary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Patient name -->
+            <TextView
+                android:id="@+id/textViewPatientName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Jan Kowalski"
+                android:textSize="16sp"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintStart_toEndOf="@id/imageViewPatient"
+                app:layout_constraintEnd_toStartOf="@id/textViewStatus"
+                app:layout_constraintTop_toTopOf="@id/imageViewPatient" />
+
+            <!-- Service type -->
+            <TextView
+                android:id="@+id/textViewServiceType"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="General Consultation"
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary"
+                android:maxLines="1"
+                android:ellipsize="end"
+                app:layout_constraintStart_toStartOf="@id/textViewPatientName"
+                app:layout_constraintEnd_toEndOf="@id/textViewPatientName"
+                app:layout_constraintTop_toBottomOf="@id/textViewPatientName" />
+
+            <!-- Additional info divider -->
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/imageViewPatient" />
+
+            <!-- Notes preview if any -->
+            <TextView
+                android:id="@+id/textViewNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Patient notes: First visit, allergic to penicillin"
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/divider"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- Action buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/textViewNotes"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/buttonReschedule"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="Reschedule"
+                    android:textAllCaps="false"
+                    android:textSize="12sp"
+                    android:paddingHorizontal="8dp"
+                    android:minWidth="0dp"
+                    android:textColor="@color/primary"
+                    app:icon="@android:drawable/ic_menu_my_calendar"
+                    app:iconSize="16dp"
+                    app:iconTint="@color/primary"
+                    app:iconPadding="4dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/buttonCancel"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="Cancel"
+                    android:textAllCaps="false"
+                    android:textSize="12sp"
+                    android:paddingHorizontal="8dp"
+                    android:minWidth="0dp"
+                    android:textColor="@color/error"
+                    app:icon="@android:drawable/ic_menu_close_clear_cancel"
+                    app:iconSize="16dp"
+                    app:iconTint="@color/error"
+                    app:iconPadding="4dp" />
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -22,41 +22,43 @@
                 android:id="@+id/timeTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="10:00"
+                android:text="10:00 - 10:30"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@color/purple" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" - "
-                android:textSize="18sp" />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
             <TextView
                 android:id="@+id/patientNameTextView"
-                android:layout_width="0dp"  android:layout_weight="1" android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="Anna Nowak"
                 android:textSize="18sp"
                 android:textColor="@android:color/black" />
         </LinearLayout>
 
         <TextView
-            android:id="@+id/doctorNameTextView"
+            android:id="@+id/serviceTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Dr. Kowalski"
+            android:text="Cardiac Checkup ($100, 30 min)"
             android:textSize="16sp"
-            android:textColor="@android:color/darker_gray"/> <TextView
-        android:id="@+id/notesTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Patient notes here"
-        android:textSize="14sp"
-        android:textStyle="italic"
-        android:textColor="@android:color/darker_gray" />
+            android:textColor="@android:color/darker_gray"/>
+
+        <TextView
+            android:id="@+id/notesTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Patient notes here"
+            android:textSize="14sp"
+            android:textStyle="italic"
+            android:textColor="@android:color/darker_gray" />
 
         <TextView
             android:layout_width="match_parent"

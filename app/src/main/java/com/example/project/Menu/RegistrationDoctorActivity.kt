@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.example.project.Doctor.MainDoctorActivity
+import com.example.project.doctor.ui.MainDoctorActivity
 import com.example.project.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

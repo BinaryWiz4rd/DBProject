@@ -1,4 +1,4 @@
-package com.example.project.Doctor// Dostosuj pakiet
+package com.example.project.doctor
 
 import android.net.Uri
 import java.util.Date
