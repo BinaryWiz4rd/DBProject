@@ -3,6 +3,7 @@ package com.example.project.doctor.ui
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.EditText
@@ -22,6 +23,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 
 class MainDoctorActivity : AppCompatActivity() {
 
@@ -41,6 +43,13 @@ class MainDoctorActivity : AppCompatActivity() {
         bottomNavigationView = findViewById(R.id.bottomNavigationView)
         floatingActionButton = findViewById(R.id.floatingActionButton)
         profileButton = findViewById(R.id.profileButton)
+
+        FirebaseMessaging.getInstance().subscribeToTopic("doctor_${auth.currentUser?.uid}")
+            .addOnCompleteListener { task ->
+                val msg = if (task.isSuccessful) "Subscribed to notifications" else "Subscription failed"
+                Log.d("FCM", msg)
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+            }
 
         bottomNavigationView.setOnNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
