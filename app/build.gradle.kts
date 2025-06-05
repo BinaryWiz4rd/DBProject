@@ -70,7 +70,12 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
 
-    //do bottom menu
+    //for FCM
+    implementation("com.google.firebase:firebase-messaging")
+    //implementation 'com.google.firebase:firebase-messaging-ktx:23.0.0'
+    implementation("com.google.firebase:firebase-analytics")
+
+    //for bottom menu
     implementation(libs.material.v110)
     implementation(libs.glide)
 }
