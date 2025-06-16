@@ -5,25 +5,29 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.media.RingtoneManager
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.example.project.R
-import com.example.project.doctor.ui.MainDoctorActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.example.project.R
+import com.example.project.doctor.ui.MainDoctorActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
-class FirebaseCloudMessaging: FirebaseMessagingService() {
+class FirebaseCloudMessaging : FirebaseMessagingService() {
 
     companion object {
-        private const val CHANNEL_ID="appointment_notifications"
+        private const val CHANNEL_ID = "appointment_notifications_channel"
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        remoteMessage.notification?.let {
-            sendNotification(it.title ?: "Notification", it.body ?: "")
+        remoteMessage.notification?.let { notification ->
+            val title = notification.title ?: "Default Title" // potem zmienie
+            val body = notification.body ?: "Default message body" //na razie tak
+            sendNotification(title, body)
         }
     }
 
@@ -33,18 +37,15 @@ class FirebaseCloudMessaging: FirebaseMessagingService() {
         }
         val pendingIntent = PendingIntent.getActivity(
             this, 0, intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT
+            PendingIntent.FLAG_IMMUTABLE
         )
-
-        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.bg_circle_button) // potem trzeba zmienic na ikone apki
+            .setSmallIcon(R.drawable.bg_circle_button)
             .setContentTitle(title)
             .setContentText(messageBody)
             .setAutoCancel(true)
-            .setSound(defaultSoundUri)
             .setContentIntent(pendingIntent)
-            .setPriority(NotificationCompat.PRIORITY_HIGH) //wysoki priorytet czyli nawet jak telefon uspiony to wysle powiadomienie
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -56,7 +57,23 @@ class FirebaseCloudMessaging: FirebaseMessagingService() {
             )
             notificationManager.createNotificationChannel(channel)
         }
-
         notificationManager.notify(System.currentTimeMillis().toInt(), notificationBuilder.build())
+    }
+
+    override fun onNewToken(token: String) {
+        super.onNewToken(token)
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+        if (currentUserId != null) {
+            FirebaseFirestore.getInstance()
+                .collection("doctors")
+                .document(currentUserId)
+                .update("fcmToken", token)
+                .addOnSuccessListener {
+                    Log.d("FCM", "new token updated successfully")
+                }
+                .addOnFailureListener { e ->
+                    Log.e("FCM", "failed to update new token", e)
+                }
+        }
     }
 }

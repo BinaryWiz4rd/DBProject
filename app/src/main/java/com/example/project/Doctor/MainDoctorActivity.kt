@@ -40,13 +40,35 @@ class MainDoctorActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
+        //this is to retrieve FCM token and save it in Firestore
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                val currentUserId = auth.currentUser?.uid
+                if (currentUserId != null && token != null) {
+                    db.collection("doctors")
+                        .document(currentUserId)
+                        .update("fcmToken", token)
+                        .addOnSuccessListener {
+                            Log.d("FCM", "token updated successfully")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("FCM", "failed to update token", e)
+
+                        }
+                }
+            } else {
+                Log.w("FCM", "fetching FCM token failed", task.exception)
+            }
+        }
+
         bottomNavigationView = findViewById(R.id.bottomNavigationView)
         floatingActionButton = findViewById(R.id.floatingActionButton)
         profileButton = findViewById(R.id.profileButton)
 
         FirebaseMessaging.getInstance().subscribeToTopic("doctor_${auth.currentUser?.uid}")
             .addOnCompleteListener { task ->
-                val msg = if (task.isSuccessful) "Subscribed to notifications" else "Subscription failed"
+                val msg = if (task.isSuccessful) "subscribed to notifications" else "subscription failed"
                 Log.d("FCM", msg)
                 Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
             }
