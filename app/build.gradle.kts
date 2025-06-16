@@ -71,8 +71,13 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
 
     //for FCM
-    implementation("com.google.firebase:firebase-messaging")
+    //implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-messaging:24.1.1")
     //implementation 'com.google.firebase:firebase-messaging-ktx:23.0.0'
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
+    //those two above are for conversation with backend
+
     implementation("com.google.firebase:firebase-analytics")
 
     //for bottom menu
