@@ -25,8 +25,8 @@ class FirebaseCloudMessaging : FirebaseMessagingService() {
         super.onMessageReceived(remoteMessage)
 
         remoteMessage.notification?.let { notification ->
-            val title = notification.title ?: "Default Title" // potem zmienie
-            val body = notification.body ?: "Default message body" //na razie tak
+            val title = notification.title ?: "default title"
+            val body = notification.body ?: "default message body"
             sendNotification(title, body)
         }
     }
@@ -35,10 +35,14 @@ class FirebaseCloudMessaging : FirebaseMessagingService() {
         val intent = Intent(this, MainDoctorActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
+
         val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent,
-            PendingIntent.FLAG_IMMUTABLE
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE //for API 31+
         )
+
         val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.bg_circle_button)
             .setContentTitle(title)
@@ -57,12 +61,14 @@ class FirebaseCloudMessaging : FirebaseMessagingService() {
             )
             notificationManager.createNotificationChannel(channel)
         }
+
         notificationManager.notify(System.currentTimeMillis().toInt(), notificationBuilder.build())
     }
 
+
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+        val currentUserId = FirebaseAuth.getInstance().currentUser ?.uid
         if (currentUserId != null) {
             FirebaseFirestore.getInstance()
                 .collection("doctors")
