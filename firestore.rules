@@ -1,0 +1,79 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow users to read and update their own patient profiles
+    match /patients/{patientId} {
+      allow read, write: if request.auth != null && request.auth.uid == patientId;
+    }
+    
+    // Allow doctors to read and update their own doctor profiles
+    match /doctors/{doctorId} {
+      allow read, write: if request.auth != null && request.auth.uid == doctorId;
+    }
+    
+    // Allow doctors to manage their own settings (including working hours)
+    match /doctorSettings/{doctorId} {
+      allow read, write: if request.auth != null && request.auth.uid == doctorId;
+    }
+    
+    // Allow doctors to manage their own calendar
+    match /doctorCalendars/{doctorId} {
+      allow read, write: if request.auth != null && request.auth.uid == doctorId;
+    }
+    
+    // Allow access to specific date collections within doctorCalendars
+    match /doctorCalendars/{doctorId}/dates/{dateId} {
+      allow read, write: if request.auth != null && request.auth.uid == doctorId;
+    }
+    
+    // Allow access to appointments within specific dates
+    match /doctorCalendars/{doctorId}/dates/{dateId}/appointments/{appointmentId} {
+      allow read, write: if request.auth != null && request.auth.uid == doctorId;
+    }
+    
+    // Allow access to categories
+    match /categories/{categoryId} {
+      allow read: if request.auth != null;
+    }
+    
+    // Allow admins to read and write all data
+    match /{document=**} {
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    // Allow users to read and update their own patient profiles
+    match /patients/{patientId} {
+      allow read, write: if request.auth != null && request.auth.uid == patientId;
+    }
+    // Allow doctors to read patient data for scheduling purposes
+    match /patients/{patientId} {
+      allow read: if request.auth != null && 
+        exists(/databases/$(database)/documents/doctors/$(request.auth.uid));
+    }
+    // Allow everyone to read services
+    match /services/{serviceId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        exists(/databases/$(database)/documents/doctors/$(request.auth.uid));
+    }
+    
+    // Allow availability to be read by patients and managed by the relevant doctor
+    match /availability/{availId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        request.resource.data.doctor_id == request.auth.uid;
+    }
+    
+    // Allow bookings to be read by the relevant doctor and patient
+    // and created/updated by patients
+    match /bookings/{bookingId} {
+      allow read: if request.auth != null && 
+        (resource.data.doctor_id == request.auth.uid || 
+         resource.data.patient_name == request.auth.uid);
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && 
+        (resource.data.doctor_id == request.auth.uid || 
+         resource.data.patient_name == request.auth.uid);
+    }
+  }
+}

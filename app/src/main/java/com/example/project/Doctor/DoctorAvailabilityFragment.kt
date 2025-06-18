@@ -44,10 +44,10 @@ class DoctorAvailabilityFragment : Fragment() {
         fabAddAvailability = view.findViewById(R.id.fabAddAvailability)
 
         firestoreHelper = FirestoreHelper()
-        
+
         // Initialize the RecyclerView with layout manager
         availabilityRecyclerView.layoutManager = LinearLayoutManager(context)
-        
+
         // Create adapter for the RecyclerView
         adapter = AvailabilityAdapter(availabilityList) { availability ->
             // Item click listener
@@ -85,7 +85,7 @@ class DoctorAvailabilityFragment : Fragment() {
         // In a real app, you might want to filter by date range or show upcoming availability.
         firestoreHelper.getAllAvailabilityForDoctor(currentDoctorId) // Changed to use the new method
             .get()
-            .addOnSuccessListener { result -> 
+            .addOnSuccessListener { result ->
                 val newAvailabilityList = mutableListOf<Availability>()
                 for (document in result) {
                     val availability = document.toObject(Availability::class.java).copy(id = document.id)
@@ -105,7 +105,7 @@ class DoctorAvailabilityFragment : Fragment() {
     private fun updateDisplayList(availabilities: List<Availability>, emptyMessage: String) {
         availabilityList.clear()
         availabilityList.addAll(availabilities)
-        
+
         // Check if the list is empty to show empty state view
         if (availabilities.isEmpty()) {
             view?.findViewById<View>(R.id.emptyAvailabilityView)?.visibility = View.VISIBLE
@@ -114,7 +114,7 @@ class DoctorAvailabilityFragment : Fragment() {
             view?.findViewById<View>(R.id.emptyAvailabilityView)?.visibility = View.GONE
             availabilityRecyclerView.visibility = View.VISIBLE
         }
-        
+
         adapter.notifyDataSetChanged()
     }
 
@@ -132,7 +132,7 @@ class DoctorAvailabilityFragment : Fragment() {
         dateEditText.isFocusable = false
         dateEditText.setOnClickListener {
             DatePickerDialog(requireContext(), {
-                _, year, month, dayOfMonth ->
+                    _, year, month, dayOfMonth ->
                 calendar.set(Calendar.YEAR, year)
                 calendar.set(Calendar.MONTH, month)
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
@@ -254,12 +254,12 @@ class DoctorAvailabilityFragment : Fragment() {
         private val items: List<Availability>,
         private val onItemClick: (Availability) -> Unit
     ) : RecyclerView.Adapter<AvailabilityAdapter.ViewHolder>() {
-    
+
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             // TODO: Find and bind views from item_availability_day layout
             private val dateTextView: TextView = view.findViewById(R.id.availabilityDateTextView)
             private val timeRangeTextView: TextView = view.findViewById(R.id.availabilityTimeRangeTextView)
-            
+
             fun bind(availability: Availability) {
                 // TODO: Bind data to views
                 dateTextView.text = availability.date
@@ -267,17 +267,17 @@ class DoctorAvailabilityFragment : Fragment() {
                 itemView.setOnClickListener { onItemClick(availability) }
             }
         }
-        
+
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_availability_day, parent, false)
             return ViewHolder(view)
         }
-        
+
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.bind(items[position])
         }
-        
+
         override fun getItemCount() = items.size
     }
 }
