@@ -1,70 +1,74 @@
-const functions = require("firebase-functions");
+const {onSchedule} = require("firebase-functions/v2/scheduler");
 const admin = require("firebase-admin");
-
 admin.initializeApp();
-
-exports.sendHardcodedNotification = functions.https.onRequest(
-  async (req, res) => {
-    console.log("Function called - sendHardcodedNotification");
-    console.log("Request method:", req.method);
-    console.log("Request headers:", req.headers);
+exports.sendAppointmentReminders = onSchedule({
+  schedule: "every 5 minutes",
+  timeZone: "Europe/Warsaw"
+}, async () => {
+  const db = admin.firestore();
+  const now = admin.firestore.Timestamp.now();
+  const fifteenMinutesFromNow = new Date(now.toMillis() + 15 * 60 * 1000);
+  console.log("Current time:", now.toDate());
+  console.log("Fifteen minutes from now:", fifteenMinutesFromNow);
+  try {
+    const currentDateString = now.toDate().toISOString().split("T")[0];
+    const currentTime = now.toDate();
+    const currentTimeHM = currentTime.getHours().toString().padStart(2, "0") + 
+      ":" + currentTime.getMinutes().toString().padStart(2, "0");
+    const fifteenMinTime = new Date(currentTime.getTime() + 15 * 60 * 1000);
+    const fifteenMinTimeHM = fifteenMinTime.getHours().toString()
+      .padStart(2, "0") + ":" + fifteenMinTime.getMinutes().toString()
+      .padStart(2, "0");
     
-    // Validate that admin is initialized
-    console.log("Firebase Admin initialized:", !!admin.app());
-    console.log("Messaging available:", !!admin.messaging);
-
-    const fcmToken = "eXGh9kjgQAmSRTikLE2jlE:APA91bF5I8yxm8ml7dwMv-ErpuXfgF"+
-      "AHu7q7Z25D1ejLGtuaV10t6BbpQOnT7_iB_o-C2Ei3X-bDtmApTWev7Z9o2bwouDw51v"+
-      "amN4GZbBTQKYdU_LH-3-0";
+    console.log("Current time (HH:MM):", currentTimeHM);
+    console.log("Fifteen minutes from now (HH:MM):", fifteenMinTimeHM);
     
-    console.log("FCM Token (first 20 chars):", fcmToken.substring(0, 20));
-    console.log("FCM Token length:", fcmToken.length);
-
-    const message = {
-      notification: {
-        title: "Test Notification",
-        body: "This is a hardcoded notification for testing purposes."
-      },
-      token: fcmToken,
-      // Add android-specific config for default notifications
-      android: {
-        notification: {
-          channelId: "default",
-          defaultSound: true,
-          defaultVibrateTimings: true,
-          defaultLightSettings: true,
-          priority: "high"
-        }
-      },
-      // Add iOS-specific config for default notifications
-      apns: {
-        payload: {
-          aps: {
-            alert: {
-              title: "Test Notification",
-              body: "This is a hardcoded notification for testing purposes."
-            },
-            sound: "default",
-            badge: 1
-          }
-        }
+    // Query only by date first, then filter by time in memory
+    const bookingsSnapshot = await db.collection("bookings")
+      .where("date", "==", currentDateString)
+      .get();
+    
+    // Filter bookings within the time range
+    const upcomingBookings = [];
+    bookingsSnapshot.forEach(doc => {
+      const booking = doc.data();
+      const startTime = booking.start_time; // This is in "HH:MM" format
+      if (startTime >= currentTimeHM && startTime <= fifteenMinTimeHM) {
+        upcomingBookings.push({id: doc.id, ...booking});
       }
-    };
-
-    console.log("Message payload:", JSON.stringify(message, null, 2));
-    console.log("Attempting to send notification...");
-
-    try {
-      const response = await admin.messaging().send(message);
-      console.log("Successfully sent message:", response);
-      console.log("Message ID:", response);
-      res.status(200).send("Notification sent successfully!");
-    } catch (error) {
-      console.error("Error sending message:", error);
-      console.error("Error code:", error.code);
-      console.error("Error message:", error.message);
-      console.error("Error details:", error.details);
-      res.status(500).send("Error sending notification: " + error.message);
+    });
+    
+    console.log("Found " + upcomingBookings.length + " upcoming appointments.");
+    if (upcomingBookings.length === 0) {
+      console.log("No upcoming appointments found.");
+      return null;
     }
+    const notifications = [];
+    for (const booking of upcomingBookings) {
+      console.log("Processing booking:", booking);
+      const doctorId = booking.doctor_id;
+      const doctorSnapshot = await db.collection("doctors").doc(doctorId)
+        .get();
+      if (!doctorSnapshot.exists) {
+        console.log("Doctor with ID " + doctorId + " not found.");
+        continue;
+      }
+      const doctorData = doctorSnapshot.data();
+      const fcmToken = doctorData.fcmToken;
+      console.log("Found FCM token for doctor " + doctorId + ": " + fcmToken);
+      const message = {
+        notification: {
+          title: "Appointment Reminder",
+          body: "You have an appointment scheduled in 15 minutes with " +
+            booking.patient_name + "."
+        },
+        token: fcmToken
+      };
+      notifications.push(admin.messaging().send(message));
+    }
+    const responses = await Promise.all(notifications);
+    console.log("Notifications sent successfully:", responses);
+  } catch (error) {
+    console.error("Error sending notifications:", error);
   }
-);
+});
