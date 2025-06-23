@@ -1,12 +1,16 @@
 package com.example.project.doctor
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.project.R
+import com.example.project.chat.ChatActivity
+import com.google.firebase.auth.FirebaseAuth
 
 class AppointmentAdapter(
     private val context: Context,
@@ -20,6 +24,7 @@ class AppointmentAdapter(
         val patientNameTextView: TextView = view.findViewById(R.id.patientNameTextView)
         val serviceTextView: TextView = view.findViewById(R.id.serviceTextView)
         val notesTextView: TextView = view.findViewById(R.id.notesTextView)
+        val chatButton: Button = view.findViewById(R.id.btnChat)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -40,6 +45,21 @@ class AppointmentAdapter(
         
         holder.notesTextView.text = if (appointment.notes.isNotEmpty()) appointment.notes else "No notes"
         
+        holder.chatButton.setOnClickListener {
+            val doctorId = FirebaseAuth.getInstance().currentUser?.uid
+            val doctorName = FirebaseAuth.getInstance().currentUser?.displayName ?: "Doctor"
+            if (doctorId != null) {
+                val intent = Intent(context, ChatActivity::class.java).apply {
+                    putExtra("patientId", appointment.patientId)
+                    putExtra("doctorId", doctorId)
+                    putExtra("patientName", appointment.patientName)
+                    putExtra("doctorName", doctorName)
+                    putExtra("chatTitle", "Chat with ${appointment.patientName}")
+                }
+                context.startActivity(intent)
+            }
+        }
+
         // Highlight the appointment if it matches the highlighted time
         if (highlightedTime != null && appointment.timeSlot == highlightedTime) {
             // Set background color to highlight this appointment

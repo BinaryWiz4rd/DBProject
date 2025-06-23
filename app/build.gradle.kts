@@ -100,4 +100,7 @@ dependencies {
     //for bottom menu
     implementation(libs.material.v110) // Your material from libs.toml
     implementation(libs.glide)
+    
+    // SwipeRefreshLayout
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 }

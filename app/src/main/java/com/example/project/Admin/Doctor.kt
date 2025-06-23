@@ -10,5 +10,6 @@ data class Doctor(
     val role: String = "doctor",
     val add: Boolean? = false,
     val delete: Boolean? = false,
-    val edit: Boolean? = false
+    val edit: Boolean? = false,
+    val fcmToken: String = ""
 )

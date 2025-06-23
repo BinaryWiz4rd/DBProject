@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="16dp"
     tools:context=".Patient.PatientServiceAvailabilityFragment">
 
@@ -10,22 +11,42 @@
         android:id="@+id/availabilityTitleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Available Slots"
+        android:text="Select Date and Time"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:textColor="@color/black"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginBottom="20dp" />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp" />
 
-    <ListView
-        android:id="@+id/patientAvailabilityListView"
+    <CalendarView
+        android:id="@+id/calendarView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/availabilityTitleTextView"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="1dp"
-        android:background="@android:color/white"
-        android:padding="8dp" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"/>
 
-</RelativeLayout>
+    <TextView
+        android:id="@+id/selectedDateTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="8dp"
+        tools:text="Selected Date: 2024-07-30"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/timeSlotsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        tools:listitem="@android:layout/simple_list_item_1"/>
+
+    <TextView
+        android:id="@+id/noSlotsTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No available slots for this day."
+        android:gravity="center"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
+</LinearLayout>

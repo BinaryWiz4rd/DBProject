@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import com.example.project.doctor.AppointmentAdapter
 import com.example.project.doctor.AppointmentCalendar
+import com.example.project.Booking
 import com.example.project.doctor.WorkingHours
 import java.text.SimpleDateFormat
 import java.util.*
@@ -232,72 +233,71 @@ class DoctorCalendarFragment : Fragment() {
     private fun loadAppointments() {
         val doctorId = auth.currentUser?.uid ?: return
 
-        if (::appointmentsListener.isInitialized) {
-            appointmentsListener.remove()
-        }
-
-        val appointmentsRef = firestoreHelper.getDbInstance()
-            .collection("doctorCalendars")
-            .document(doctorId)
-            .collection("dates")
-            .document(selectedDate)
-            .collection("appointments")
-
-        appointmentsListener = appointmentsRef.addSnapshotListener { snapshot, e ->
-            if (e != null) {
-                Log.w(TAG, "Listen for appointments failed", e)
-                if (context != null && isAdded) {
-                    Toast.makeText(context, "Failed to load appointments: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-                return@addSnapshotListener
-            }
-            
-            appointmentsList.clear()
-            
-            if (snapshot != null && !snapshot.isEmpty) {
-                for (document in snapshot.documents) {
-                    val appointment = document.toObject(AppointmentCalendar::class.java)
-                    if (appointment != null) {
-                        appointment.id = document.id
+        firestoreHelper.getBookingsForDoctor(doctorId, selectedDate)
+            .addOnSuccessListener { snapshot ->
+                if (!isAdded) return@addOnSuccessListener
+                appointmentsList.clear()
+                if (snapshot != null && !snapshot.isEmpty) {
+                    for (document in snapshot.documents) {
+                        val booking = document.toObject(Booking::class.java) ?: continue
+                        val appointment = AppointmentCalendar(
+                            id = document.id,
+                            patientName = booking.patient_name,
+                            patientId = booking.patient_id,
+                            date = booking.date,
+                            timeSlot = booking.start_time,
+                            endTime = booking.end_time,
+                            serviceId = booking.service_id,
+                            // You might need to fetch service details separately if they're not in the booking
+                            serviceName = "Loading...", 
+                            notes = booking.notes
+                        )
                         appointmentsList.add(appointment)
                     }
+                    appointmentsList.sortBy { it.timeSlot }
+                    fetchServiceDetailsForAppointments()
                 }
-                appointmentsList.sortBy { it.timeSlot }
+                updateAppointmentsUI()
             }
+            .addOnFailureListener { e ->
+                if (!isAdded) return@addOnFailureListener
+                Log.w(TAG, "Listen for appointments failed", e)
+                Toast.makeText(context, "Failed to load appointments: ${e.message}", Toast.LENGTH_SHORT).show()
+                updateAppointmentsUI()
+            }
+    }
 
-            if (isAdded && activity != null) {
-                safelyRunOnUiThread {
-                    val highlightedTime = arguments?.getString("selected_time")
-
-                    appointmentAdapter = AppointmentAdapter(
-                        requireContext(),
-                        appointmentsList,
-                        highlightedTime
-                    ) { appointment ->
-                        showAppointmentOptions(appointment)
+    private fun fetchServiceDetailsForAppointments() {
+        if (!isAdded) return
+        val serviceIds = appointmentsList.map { it.serviceId }.distinct()
+        for (serviceId in serviceIds) {
+            if (serviceId.isEmpty()) continue
+            firestoreHelper.getServiceById(serviceId).addOnSuccessListener { serviceDoc ->
+                if (!isAdded) return@addOnSuccessListener
+                if (serviceDoc.exists()) {
+                    val serviceName = serviceDoc.getString("name") ?: "Unknown"
+                    val servicePrice = serviceDoc.getLong("price")?.toInt() ?: 0
+                    val serviceDuration = serviceDoc.getLong("duration_minutes")?.toInt() ?: 0
+                    appointmentsList.filter { it.serviceId == serviceId }.forEach {
+                        it.serviceName = serviceName
+                        it.servicePrice = servicePrice
+                        it.serviceDuration = serviceDuration
                     }
-                    appointmentsRecyclerView.adapter = appointmentAdapter
-
-                    if (appointmentsList.isEmpty()) {
-                        appointmentsRecyclerView.visibility = View.GONE
-                        emptyAppointmentsView.visibility = View.VISIBLE
-                    } else {
-                        appointmentsRecyclerView.visibility = View.VISIBLE
-                        emptyAppointmentsView.visibility = View.GONE
-                        
-
-                        if (arguments?.containsKey("selected_time") == true) {
-                            val timeToHighlight = arguments?.getString("selected_time")
-                            val appointmentIndex = appointmentsList.indexOfFirst { it.timeSlot == timeToHighlight }
-                            if (appointmentIndex >= 0) {
-                            (appointmentsRecyclerView.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(appointmentIndex, 20)
-
-                            Log.d(TAG, "Scrolling to appointment at time: $timeToHighlight (index: $appointmentIndex)")
-                        }
-                    }
-                }
+                    appointmentAdapter.notifyDataSetChanged()
                 }
             }
+        }
+    }
+
+    private fun updateAppointmentsUI() {
+        if (!isAdded) return
+        appointmentAdapter.notifyDataSetChanged()
+        if (appointmentsList.isEmpty()) {
+            emptyAppointmentsView.visibility = View.VISIBLE
+            appointmentsRecyclerView.visibility = View.GONE
+        } else {
+            emptyAppointmentsView.visibility = View.GONE
+            appointmentsRecyclerView.visibility = View.VISIBLE
         }
     }
 
@@ -446,66 +446,37 @@ class DoctorCalendarFragment : Fragment() {
 
     private fun addAppointment(patient: Patient, service: Service, timeSlot: String, notes: String) {
         val doctorId = auth.currentUser?.uid ?: return
-
         val endTimeSlot = calculateEndTime(timeSlot, service.duration_minutes)
-        
-        val appointment = AppointmentCalendar(
-            id = "",
-            patientName = "${patient.firstName} ${patient.lastName}",
-            patientId = patient.email,
+
+        val booking = Booking(
+            doctor_id = doctorId,
+            patient_id = patient.uid,
+            patient_name = "${patient.firstName} ${patient.lastName}",
+            service_id = service.id,
             date = selectedDate,
-            timeSlot = timeSlot,
-            notes = notes,
-            time = timeSlot,
-            endTime = endTimeSlot,
-            serviceId = service.id,
-            serviceName = service.name,
-            servicePrice = service.price,
-            serviceDuration = service.duration_minutes
+            start_time = timeSlot,
+            end_time = endTimeSlot,
+            status = "confirmed",
+            notes = notes
         )
-        val appointmentsRef = firestoreHelper.getDbInstance()
-            .collection("doctorCalendars")
-            .document(doctorId)
-            .collection("dates")
-            .document(selectedDate)
-            .collection("appointments")
 
-        appointmentsRef.add(appointment)
+        firestoreHelper.addBooking(booking)
             .addOnSuccessListener {
-                if (isAdded && context != null) {
+                if (isAdded) {
                     Toast.makeText(context, "Appointment added successfully", Toast.LENGTH_SHORT).show()
+                    loadAppointments() // Refresh the list
                 }
-
-                createBookingFromAppointment(patient, service, appointment)
             }
             .addOnFailureListener { e ->
-                if (isAdded && context != null) {
+                if (isAdded) {
                     Toast.makeText(context, "Error adding appointment: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
     }
     
     private fun createBookingFromAppointment(patient: Patient, service: Service, appointment: AppointmentCalendar) {
-        val doctorId = auth.currentUser?.uid ?: return
-        
-        val booking = com.example.project.Booking(
-            id = "",
-            doctor_id = doctorId,
-            service_id = service.id,
-            patient_name = patient.email,
-            date = appointment.date,
-            start_time = appointment.timeSlot,
-            end_time = appointment.endTime,
-            status = "confirmed"
-        )
-        
-        firestoreHelper.addBooking(booking)
-            .addOnSuccessListener {
-                Log.d(TAG, "Booking created successfully")
-            }
-            .addOnFailureListener { e ->
-                Log.e(TAG, "Error creating booking", e)
-            }
+        // This function is now redundant and can be removed.
+        // The logic is handled directly in addAppointment.
     }
     
     private fun calculateEndTime(startTime: String, durationMinutes: Int): String {
@@ -643,7 +614,7 @@ class DoctorCalendarFragment : Fragment() {
                     Toast.makeText(context, "Appointment updated successfully", Toast.LENGTH_SHORT).show()
                 }
 
-                updateBookingFromAppointment(updatedAppointment)
+                updateAppointmentInFirestore(updatedAppointment)
             }
             .addOnFailureListener { e ->
                 if (isAdded && context != null) {
@@ -652,36 +623,34 @@ class DoctorCalendarFragment : Fragment() {
             }
     }
     
-    private fun updateBookingFromAppointment(updatedAppointment: AppointmentCalendar) {
+    private fun updateAppointmentInFirestore(updatedAppointment: AppointmentCalendar) {
         val doctorId = auth.currentUser?.uid ?: return
 
-        firestoreHelper.getDbInstance()
-            .collection("bookings")
-            .whereEqualTo("doctor_id", doctorId)
-            .whereEqualTo("date", updatedAppointment.date)
-            .whereEqualTo("patient_name", updatedAppointment.patientId)
-            .get()
-            .addOnSuccessListener { querySnapshot ->
-                if (!querySnapshot.isEmpty) {
-                    for (document in querySnapshot.documents) {
-                        // Update this booking
-                        document.reference.update(
-                            mapOf(
-                                "service_id" to updatedAppointment.serviceId,
-                                "start_time" to updatedAppointment.timeSlot,
-                                "end_time" to updatedAppointment.endTime
-                            )
-                        ).addOnSuccessListener {
-                            Log.d(TAG, "Booking updated successfully")
-                        }.addOnFailureListener { e ->
-                            Log.e(TAG, "Error updating booking", e)
-                        }
-                    }
+        val bookingUpdate = mapOf(
+            "service_id" to updatedAppointment.serviceId,
+            "start_time" to updatedAppointment.timeSlot,
+            "end_time" to updatedAppointment.endTime,
+            "notes" to updatedAppointment.notes
+            // Note: patient and doctor details are generally not editable from this dialog
+        )
+
+        firestoreHelper.getDbInstance().collection("bookings").document(updatedAppointment.id)
+            .update(bookingUpdate)
+            .addOnSuccessListener {
+                if (isAdded) {
+                    Toast.makeText(context, "Appointment updated successfully.", Toast.LENGTH_SHORT).show()
+                    loadAppointments()
                 }
             }
             .addOnFailureListener { e ->
-                Log.e(TAG, "Error finding booking to update", e)
+                if (isAdded) {
+                    Toast.makeText(context, "Error updating appointment: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
             }
+    }
+    
+    private fun updateBookingFromAppointment(updatedAppointment: AppointmentCalendar) {
+        // This function is redundant now.
     }
 
     private fun showDeleteConfirmationDialog(appointment: AppointmentCalendar) {
@@ -701,79 +670,22 @@ class DoctorCalendarFragment : Fragment() {
     }
 
     private fun deleteAppointment(appointment: AppointmentCalendar) {
-        val doctorId = auth.currentUser?.uid ?: return
-        
-        // Reference to the specific appointment document
-        val appointmentRef = firestoreHelper.getDbInstance()
-            .collection("doctorCalendars")
-            .document(doctorId)
-            .collection("dates")
-            .document(selectedDate)
-            .collection("appointments")
-            .document(appointment.id)
-
-        appointmentRef.delete()
+        firestoreHelper.getDbInstance().collection("bookings").document(appointment.id).delete()
             .addOnSuccessListener {
-                if (isAdded && context != null) {
-                    safelyShowToast("Appointment deleted successfully")
+                if (isAdded) {
+                    Toast.makeText(context, "Appointment deleted successfully", Toast.LENGTH_SHORT).show()
+                    loadAppointments()
                 }
-
-                deleteBookingFromAppointment(appointment)
             }
             .addOnFailureListener { e ->
-                if (isAdded && context != null) {
-                    safelyShowToast("Error deleting appointment: ${e.message}")
+                if (isAdded) {
+                    Toast.makeText(context, "Error deleting appointment: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
     }
     
     private fun deleteBookingFromAppointment(appointment: AppointmentCalendar) {
-        val doctorId = auth.currentUser?.uid ?: return
-
-        firestoreHelper.getDbInstance()
-            .collection("bookings")
-            .whereEqualTo("doctor_id", doctorId)
-            .whereEqualTo("date", appointment.date)
-            .whereEqualTo("patient_name", appointment.patientId)
-            .get()
-            .addOnSuccessListener { querySnapshot ->
-                if (!querySnapshot.isEmpty) {
-                    val totalBookings = querySnapshot.size()
-                    var completedDeletions = 0
-                    
-                    for (document in querySnapshot.documents) {
-                        document.reference.delete()
-                            .addOnSuccessListener {
-                                completedDeletions++
-                                Log.d(TAG, "Booking deleted successfully ($completedDeletions of $totalBookings)")
-                                
-
-                                if (completedDeletions == totalBookings) {
-                                    if (activity != null && isAdded) {
-                                        activity?.runOnUiThread {
-                                            Log.d(TAG, "All bookings deleted, UI refreshed")
-                                        }
-                                    }
-                                }
-                            }
-                            .addOnFailureListener { e ->
-                                completedDeletions++
-                                Log.e(TAG, "Error deleting booking", e)
-
-                                if (completedDeletions == totalBookings) {
-                                    if (activity != null && isAdded) {
-                                        activity?.runOnUiThread {
-                                            Log.d(TAG, "All booking deletions attempted, UI refreshed")
-                                        }
-                                    }
-                                }
-                            }
-                    }
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.e(TAG, "Error finding booking to delete", e)
-            }
+        // This is now redundant.
     }
 
     private fun showEditWorkingHoursDialog() {
@@ -904,15 +816,9 @@ class DoctorCalendarFragment : Fragment() {
         }
     }
 
-    private fun safelyShowToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
-        if (isAdded && context != null && !isDetached) {
-            try {
-                Toast.makeText(context, message, duration).show()
-            } catch (e: IllegalStateException) {
-                Log.e(TAG, "Cannot show toast: $message", e)
-            }
-        } else {
-            Log.d(TAG, "Skipped showing toast because fragment not attached: $message")
+    private fun safelyShowToast(message: String) {
+        if (isAdded && context != null) {
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
     }
 

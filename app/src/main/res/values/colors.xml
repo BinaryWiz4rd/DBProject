@@ -58,4 +58,12 @@
     <color name="status_pending">#FFA000</color>
     <color name="status_cancelled">#F44336</color>
     <color name="status_completed">#1976D2</color>
+    
+    <!-- Additional colors for patient UI -->
+    <color name="blue">#1976D2</color>
+    <color name="green">#43A047</color>
+    <color name="red">#F44336</color>
+    <color name="orange">#FF9800</color>
+    <color name="bottom_nav_color">#1976D2</color>
+    
 </resources>

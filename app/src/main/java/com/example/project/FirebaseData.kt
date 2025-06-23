@@ -23,6 +23,8 @@ data class Booking(
     val date: String = "",
     val start_time: String = "",
     val end_time: String = "",
+    val patient_id: String = "",
     val patient_name: String = "",
-    val status: String = ""
+    val status: String = "",
+    val notes: String = "" // Added notes field to match Firestore documents
 )

@@ -60,6 +60,15 @@
             android:textStyle="italic"
             android:textColor="@android:color/darker_gray" />
 
+        <Button
+            android:id="@+id/btnChat"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="Chat with Patient"
+            app:icon="@drawable/baseline_chat_bubble_24" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -15,7 +15,7 @@ data class AppointmentCalendar(
     val time: String = "",
     val endTime: String = "",
     val serviceId: String = "",
-    val serviceName: String = "",
-    val servicePrice: Int = 0,
-    val serviceDuration: Int = 0
+    var serviceName: String = "",
+    var servicePrice: Int = 0,
+    var serviceDuration: Int = 0
 )
