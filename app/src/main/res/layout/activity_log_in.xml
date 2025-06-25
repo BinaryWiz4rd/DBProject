@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/darkPurple"
+    android:background="#856735A4"
     tools:context=".Menu.LogIn">
 
     <LinearLayout
@@ -16,11 +16,11 @@
 
         <ImageView
             android:id="@+id/appLogo"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="136dp"
+            android:layout_height="110dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="24dp"
-            android:src="@drawable/hospital" />
+            android:src="@drawable/aura_removebg_preview" />
 
         <TextView
             android:layout_width="wrap_content"

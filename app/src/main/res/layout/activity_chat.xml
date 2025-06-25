@@ -29,6 +29,16 @@
         android:orientation="horizontal"
         android:padding="8dp">
 
+        <ImageButton
+            android:id="@+id/attachButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_attachment"
+            android:contentDescription="Attach file"
+            android:layout_marginEnd="8dp" />
+
         <EditText
             android:id="@+id/messageEditText"
             android:layout_width="0dp"

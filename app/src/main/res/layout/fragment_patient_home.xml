@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:fitsSystemWindows="true"
+    android:background="#856735A4"
     android:fillViewport="true">
 
     <LinearLayout
@@ -42,7 +41,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="How are you feeling today?"
-                    android:textColor="@color/grey"
+                    android:textColor="@color/black"
                     android:textSize="14sp" />
 
             </LinearLayout>
@@ -253,18 +252,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:layout_marginHorizontal="16dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Categories"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-        </LinearLayout>
+            android:orientation="horizontal"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/viewCategory"

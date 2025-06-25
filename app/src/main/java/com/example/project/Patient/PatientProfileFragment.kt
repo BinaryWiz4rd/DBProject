@@ -66,14 +66,6 @@ class PatientProfileFragment : Fragment() {
             showDeleteAccountConfirmation()
         }
 
-        binding.settingsButton.setOnClickListener {
-            Toast.makeText(requireContext(), "Settings coming soon", Toast.LENGTH_SHORT).show()
-        }
-
-        binding.helpButton.setOnClickListener {
-            Toast.makeText(requireContext(), "Help & Support coming soon", Toast.LENGTH_SHORT).show()
-        }
-
         binding.loginButton.setOnClickListener {
             showLoginScreen()
         }

@@ -20,8 +20,7 @@
             android:layout_marginEnd="16dp"
             android:background="@drawable/doctor_avatar"
             android:contentDescription="Doctor Image"
-            android:scaleType="centerCrop"
-            android:src="@drawable/doctor" />
+            android:scaleType="centerCrop" />
 
         <LinearLayout
             android:layout_width="0dp"

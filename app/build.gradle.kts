@@ -88,6 +88,9 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging:24.1.1") // Your active FCM line
     //implementation 'com.google.firebase:firebase-messaging-ktx:23.0.0' // Your commented out ktx line
 
+    // Firebase Storage for file uploads
+    implementation("com.google.firebase:firebase-storage:21.0.0")
+
     //those two above are for conversation with backend
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
