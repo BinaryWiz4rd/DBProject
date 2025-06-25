@@ -25,6 +25,10 @@ import com.google.firebase.firestore.Query
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * A [Fragment] that displays and manages appointments for administrators.
+ * It allows admins to view, filter, sort, edit, and delete appointments.
+ */
 class AdminAppointmentsFragment : Fragment() {
 
     private val TAG = "AdminAppointmentsFragment"
@@ -56,11 +60,16 @@ class AdminAppointmentsFragment : Fragment() {
     private var selectedStatus: String? = null
     private var currentSortOption = SortOption.DATE_ASC
 
-    // Sort options enum
+    /**
+     * Enum class representing the available sorting options for the appointments list.
+     */
     private enum class SortOption {
         DATE_ASC, DATE_DESC, PATIENT_NAME, DOCTOR_NAME, STATUS
     }
 
+    /**
+     * Inflates the layout for this fragment.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -68,6 +77,9 @@ class AdminAppointmentsFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_admin_appointments, container, false)
     }
 
+    /**
+     * Initializes the views, sets up listeners, and loads initial data.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
@@ -113,6 +125,9 @@ class AdminAppointmentsFragment : Fragment() {
         }
     }
     
+    /**
+     * Sets up the spinner for filtering appointments by status.
+     */
     private fun setupStatusSpinner() {
         val statusOptions = arrayOf("All Statuses", "Confirmed", "Pending", "Cancelled")
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, statusOptions)
@@ -134,6 +149,9 @@ class AdminAppointmentsFragment : Fragment() {
         }
     }
     
+    /**
+     * Sets up the spinner for sorting the appointments list.
+     */
     private fun setupSortSpinner() {
         val sortOptions = arrayOf("Date (Ascending)", "Date (Descending)", "Patient Name", "Doctor Name", "Status")
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, sortOptions)
@@ -159,12 +177,18 @@ class AdminAppointmentsFragment : Fragment() {
         }
     }
     
+    /**
+     * Sets up the click listener for the date filter button.
+     */
     private fun setupDateFilter() {
         dateFilterButton.setOnClickListener {
             showDateRangePickerDialog()
         }
     }
     
+    /**
+     * Sets up the click listener for the clear filters button.
+     */
     private fun setupClearFilters() {
         clearFiltersButton.setOnClickListener {
             // Reset filters
@@ -182,6 +206,9 @@ class AdminAppointmentsFragment : Fragment() {
         }
     }
     
+    /**
+     * Shows a date range picker dialog to allow the admin to select a start and end date for filtering appointments.
+     */
     private fun showDateRangePickerDialog() {
         val calendar = Calendar.getInstance()
         
@@ -231,6 +258,11 @@ class AdminAppointmentsFragment : Fragment() {
         ).show()
     }
     
+    /**
+     * Loads the list of doctors from Firestore and populates the [doctorMap].
+     *
+     * @param onComplete A callback function to be invoked when the doctors have been loaded.
+     */
     private fun loadDoctors(onComplete: () -> Unit) {
         db.collection("doctors")
             .get()
@@ -252,6 +284,11 @@ class AdminAppointmentsFragment : Fragment() {
             }
     }
     
+    /**
+     * Loads the list of patients from Firestore and populates the [patientMap].
+     *
+     * @param onComplete A callback function to be invoked when the patients have been loaded.
+     */
     private fun loadPatients(onComplete: () -> Unit) {
         db.collection("patients")
             .get()
@@ -274,6 +311,11 @@ class AdminAppointmentsFragment : Fragment() {
             }
     }
     
+    /**
+     * Loads the list of services from Firestore and populates the [serviceMap].
+     *
+     * @param onComplete A callback function to be invoked when the services have been loaded.
+     */
     private fun loadServices(onComplete: () -> Unit) {
         db.collection("services")
             .get()
@@ -305,6 +347,10 @@ class AdminAppointmentsFragment : Fragment() {
             }
     }
     
+    /**
+     * Loads all appointments from the "bookings" collection in Firestore,
+     * maps them to [AdminAppointmentItem] objects, and populates the [allAppointments] list.
+     */
     private fun loadAppointments() {
         showLoading(true)
         
@@ -375,6 +421,10 @@ class AdminAppointmentsFragment : Fragment() {
             }
     }
     
+    /**
+     * Applies the selected filters (status and date range) and sorting option to the appointments list
+     * and updates the RecyclerView.
+     */
     private fun applyFilters() {
         val filteredList = allAppointments.filter { appointment ->
             var matches = true
@@ -426,12 +476,23 @@ class AdminAppointmentsFragment : Fragment() {
         showEmptyState(appointmentList.isEmpty())
     }
     
+    /**
+     * Shows or hides the empty state message.
+     *
+     * @param show `true` to show the empty state, `false` to hide it.
+     * @param message The message to display in the empty state.
+     */
     private fun showEmptyState(show: Boolean, message: String = "No appointments found") {
         emptyStateTextView.text = message
         emptyStateTextView.visibility = if (show) View.VISIBLE else View.GONE
         appointmentsRecyclerView.visibility = if (show) View.GONE else View.VISIBLE
     }
     
+    /**
+     * Shows or hides the loading indicator.
+     *
+     * @param show `true` to show the loading indicator, `false` to hide it.
+     */
     private fun showLoading(show: Boolean) {
         loadingIndicator.visibility = if (show) View.VISIBLE else View.GONE
         if (show) {
@@ -440,6 +501,11 @@ class AdminAppointmentsFragment : Fragment() {
         }
     }
     
+    /**
+     * Shows a dialog for editing an appointment's details.
+     *
+     * @param appointment The [AdminAppointmentItem] to be edited.
+     */
     private fun showEditAppointmentDialog(appointment: AdminAppointmentItem) {
         val dialogView = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_edit_appointment, null)
@@ -620,6 +686,11 @@ class AdminAppointmentsFragment : Fragment() {
             .show()
     }
     
+    /**
+     * Updates an appointment in Firestore and refreshes the list.
+     *
+     * @param appointment The [AdminAppointmentItem] with updated information.
+     */
     private fun updateAppointment(appointment: AdminAppointmentItem) {
         // Update in Firestore
         db.collection("bookings")
@@ -651,6 +722,12 @@ class AdminAppointmentsFragment : Fragment() {
             }
     }
     
+    /**
+     * Updates the corresponding appointment in the doctor's calendar.
+     * If the appointment does not exist, it creates a new one (unless the status is "cancelled").
+     *
+     * @param appointment The [AdminAppointmentItem] to update in the calendar.
+     */
     private fun updateAppointmentInDoctorCalendar(appointment: AdminAppointmentItem) {
         // First, check if there is an existing appointment in the doctor's calendar
         db.collection("doctorCalendars")
@@ -709,6 +786,11 @@ class AdminAppointmentsFragment : Fragment() {
             }
     }
     
+    /**
+     * Shows a confirmation dialog before deleting an appointment.
+     *
+     * @param appointment The [AdminAppointmentItem] to be deleted.
+     */
     private fun showDeleteConfirmationDialog(appointment: AdminAppointmentItem) {
         AlertDialog.Builder(requireContext())
             .setTitle("Delete Appointment")
@@ -721,6 +803,11 @@ class AdminAppointmentsFragment : Fragment() {
             .show()
     }
     
+    /**
+     * Deletes an appointment from Firestore and the local list.
+     *
+     * @param appointment The [AdminAppointmentItem] to be deleted.
+     */
     private fun deleteAppointment(appointment: AdminAppointmentItem) {
         // Delete from bookings collection
         db.collection("bookings")

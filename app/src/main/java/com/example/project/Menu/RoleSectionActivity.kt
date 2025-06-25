@@ -13,6 +13,11 @@ import com.example.project.Menu.RegistrationPatientActivity
 
 class RoleSectionActivity : AppCompatActivity() {
 
+    /**
+     * Initializes the role selection screen and sets up button listeners for different user roles.
+     *
+     * @param savedInstanceState The saved instance state bundle.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_role_section)
@@ -37,6 +42,11 @@ class RoleSectionActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Navigates to the registration activity based on the selected role.
+     *
+     * @param role The user role to register ("doctor", "admin", or "patient").
+     */
     private fun navigateToAuth(role: String) {
         // Wybierz docelową Aktywność na podstawie roli
         val targetActivity = when (role) {

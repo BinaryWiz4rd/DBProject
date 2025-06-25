@@ -19,6 +19,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
 
+/**
+ * A [Fragment] for administrators to create new doctor accounts.
+ * This fragment provides a form for entering doctor details and handles
+ * the registration process with Firebase Authentication and Firestore.
+ */
 class AdminCreateDoctorFragment : Fragment() {
 
     private val TAG = "AdminCreateDoctorFrag"
@@ -49,6 +54,9 @@ class AdminCreateDoctorFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
 
+    /**
+     * Inflates the layout for this fragment.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -56,6 +64,9 @@ class AdminCreateDoctorFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_admin_create_doctor, container, false)
     }
 
+    /**
+     * Initializes the views and sets up the click listener for the create button.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -74,6 +85,10 @@ class AdminCreateDoctorFragment : Fragment() {
         }
     }
 
+    /**
+     * Initializes all the UI components from the view.
+     * @param view The fragment's root view.
+     */
     private fun initializeViews(view: View) {
         // EditTexts
         firstNameEditText = view.findViewById(R.id.firstNameEditText)
@@ -100,6 +115,10 @@ class AdminCreateDoctorFragment : Fragment() {
         progressIndicator = view.findViewById(R.id.progressIndicator)
     }
 
+    /**
+     * Validates all the input fields in the form.
+     * @return `true` if all inputs are valid, `false` otherwise.
+     */
     private fun validateInputs(): Boolean {
         // Reset errors
         firstNameLayout.error = null
@@ -180,6 +199,10 @@ class AdminCreateDoctorFragment : Fragment() {
         return true
     }
 
+    /**
+     * Handles the doctor registration process. It creates a new user in
+     * Firebase Authentication and then saves the doctor's details to Firestore.
+     */
     private fun registerDoctor() {
         // Show progress and disable button
         progressIndicator.visibility = View.VISIBLE
@@ -208,6 +231,10 @@ class AdminCreateDoctorFragment : Fragment() {
             }
     }
 
+    /**
+     * Saves the new doctor's data to the "users" collection in Firestore.
+     * @param userId The unique ID of the user from Firebase Authentication.
+     */
     private fun saveUserToFirestore(userId: String) {
         val firstName = firstNameEditText.text.toString().trim()
         val lastName = lastNameEditText.text.toString().trim()
@@ -241,15 +268,25 @@ class AdminCreateDoctorFragment : Fragment() {
             }
     }
 
+    /**
+     * Hides the progress indicator and re-enables the create button.
+     */
     private fun hideProgress() {
         progressIndicator.visibility = View.GONE
         createDoctorButton.isEnabled = true
     }
 
+    /**
+     * Displays a short toast message.
+     * @param message The message to be displayed.
+     */
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
+    /**
+     * Clears all the input fields in the form.
+     */
     private fun clearFields() {
         firstNameEditText.setText("")
         lastNameEditText.setText("")

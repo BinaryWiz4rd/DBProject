@@ -1,3 +1,8 @@
+/**
+ * Helper class for Firestore database operations, including CRUD for services, availability, bookings, doctors, patients, and chats.
+ * Provides methods to interact with Firestore collections and documents.
+ */
+
 package com.example.project.util
 
 import com.example.project.Admin.Doctor
@@ -29,41 +34,93 @@ class FirestoreHelper {
     private val doctorSettingsCollection = db.collection("doctorSettings")
     private val chatsCollection = db.collection("chats")
 
+    /**
+     * Retrieves the Firestore database instance.
+     *
+     * @return FirebaseFirestore instance.
+     */
     // Getter for db if direct access is preferred for flexibility, though specific methods are safer.
     fun getDbInstance(): FirebaseFirestore {
         return db
     }
 
     // Service-related functions
+    /**
+     * Adds a service to the Firestore database.
+     *
+     * @param service The service object to be added.
+     * @return Task<Void> representing the asynchronous operation.
+     */
     fun addService(service: Service): Task<Void> {
         return servicesCollection.document().set(service)
     }
 
+    /**
+     * Retrieves a service from the Firestore database by its ID.
+     *
+     * @param serviceId The ID of the service to retrieve.
+     * @return Task<DocumentSnapshot> representing the asynchronous operation.
+     */
     fun getService(serviceId: String): Task<DocumentSnapshot> {
         return servicesCollection.document(serviceId).get()
     }
 
+    /**
+     * Retrieves a service from the Firestore database by its ID.
+     *
+     * @param serviceId The ID of the service to retrieve.
+     * @return Task<DocumentSnapshot> representing the asynchronous operation.
+     */
     fun getServiceById(serviceId: String): Task<DocumentSnapshot> {
         return servicesCollection.document(serviceId).get()
     }
 
-    fun getServicesForDoctor(doctorId: String): Task<QuerySnapshot> {
-        return servicesCollection.whereEqualTo("doctor_id", doctorId).get()
-    }
-
+    /**
+     * Retrieves all services from the Firestore database.
+     *
+     * @return Task<QuerySnapshot> representing the asynchronous operation.
+     */
     fun getAllServices(): Task<QuerySnapshot> {
         return servicesCollection.get()
     }
 
+    /**
+     * Updates a service in the Firestore database.
+     *
+     * @param serviceId The ID of the service to update.
+     * @param serviceData A map containing the updated service data.
+     * @return Task<Void> representing the asynchronous operation.
+     */
     fun updateService(serviceId: String, serviceData: Map<String, Any>): Task<Void> {
         return servicesCollection.document(serviceId).update(serviceData)
     }
 
+    /**
+     * Deletes a service from the Firestore database by its ID.
+     *
+     * @param serviceId The ID of the service to delete.
+     * @return Task<Void> representing the asynchronous operation.
+     */
     fun deleteService(serviceId: String): Task<Void> {
         return servicesCollection.document(serviceId).delete()
     }
 
-    // Utility method to create a sample service for a doctor
+    /**
+     * Retrieves all services for a specific doctor.
+     *
+     * @param doctorId The ID of the doctor.
+     * @return Task<QuerySnapshot> representing the asynchronous operation.
+     */
+    fun getServicesForDoctor(doctorId: String): Task<QuerySnapshot> {
+        return servicesCollection.whereEqualTo("doctor_id", doctorId).get()
+    }
+
+    /**
+     * Creates a sample service for a doctor if no services exist.
+     *
+     * @param doctorId The ID of the doctor.
+     * @return Task<Void> representing the asynchronous operation.
+     */
     fun createSampleServiceIfNeeded(doctorId: String): Task<Void> {
         return getServicesForDoctor(doctorId)
             .continueWithTask { task ->
@@ -84,10 +141,23 @@ class FirestoreHelper {
     }
 
     // Availability-related functions
+    /**
+     * Adds availability for a doctor to the Firestore database.
+     *
+     * @param availability The availability object to be added.
+     * @return Task<Void> representing the asynchronous operation.
+     */
     fun addAvailability(availability: Availability): Task<Void> {
         return availabilityCollection.document().set(availability)
     }
 
+    /**
+     * Retrieves availability for a doctor on a specific date.
+     *
+     * @param doctorId The ID of the doctor.
+     * @param date The date for which availability is to be retrieved.
+     * @return Task<QuerySnapshot> representing the asynchronous operation.
+     */
     fun getAvailabilityForDoctorByDate(doctorId: String, date: String): Task<QuerySnapshot> {
         return availabilityCollection
             .whereEqualTo("doctor_id", doctorId)
@@ -95,6 +165,12 @@ class FirestoreHelper {
             .get()
     }
 
+    /**
+     * Retrieves all availability for a doctor.
+     *
+     * @param doctorId The ID of the doctor.
+     * @return Query representing the availability query.
+     */
     fun getAllAvailabilityForDoctor(doctorId: String): Query {
         return availabilityCollection
             .whereEqualTo("doctor_id", doctorId)
@@ -102,6 +178,14 @@ class FirestoreHelper {
             .orderBy("start_time")
     }
 
+    /**
+     * Retrieves availability for a doctor within a specific date range.
+     *
+     * @param doctorId The ID of the doctor.
+     * @param startDate The start date of the range.
+     * @param endDate The end date of the range.
+     * @return Task<QuerySnapshot> representing the asynchronous operation.
+     */
     fun getAvailabilityForDateRange(doctorId: String, startDate: String, endDate: String): Task<QuerySnapshot> {
         return availabilityCollection
             .whereEqualTo("doctor_id", doctorId)
@@ -112,23 +196,55 @@ class FirestoreHelper {
             .get()
     }
 
+    /**
+     * Updates availability in the Firestore database.
+     *
+     * @param availabilityId The ID of the availability to update.
+     * @param availabilityData A map containing the updated availability data.
+     * @return Task<Void> representing the asynchronous operation.
+     */
     fun updateAvailability(availabilityId: String, availabilityData: Map<String, Any>): Task<Void> {
         return availabilityCollection.document(availabilityId).update(availabilityData)
     }
 
+    /**
+     * Deletes availability from the Firestore database.
+     *
+     * @param availabilityId The ID of the availability to delete.
+     * @return Task<Void> representing the asynchronous operation.
+     */
     fun deleteAvailability(availabilityId: String): Task<Void> {
         return availabilityCollection.document(availabilityId).delete()
     }
 
     // Booking-related functions
+    /**
+     * Adds a booking to the Firestore database.
+     *
+     * @param booking The booking object to add.
+     * @return Task<Void> representing the asynchronous operation.
+     */
     fun addBooking(booking: Booking): Task<Void> {
         return bookingsCollection.document().set(booking)
     }
 
+    /**
+     * Retrieves a booking from the Firestore database by its ID.
+     *
+     * @param bookingId The ID of the booking to retrieve.
+     * @return Task<DocumentSnapshot> representing the asynchronous operation.
+     */
     fun getBooking(bookingId: String): Task<DocumentSnapshot> {
         return bookingsCollection.document(bookingId).get()
     }
 
+    /**
+     * Retrieves bookings for a doctor on a specific date.
+     *
+     * @param doctorId The ID of the doctor.
+     * @param date The date for the bookings.
+     * @return Task<QuerySnapshot> representing the asynchronous operation.
+     */
     fun getBookingsForDoctor(doctorId: String, date: String): Task<QuerySnapshot> {
         return bookingsCollection
             .whereEqualTo("doctor_id", doctorId)
@@ -136,6 +252,14 @@ class FirestoreHelper {
             .get()
     }
 
+    /**
+     * Retrieves bookings for a doctor within a date range.
+     *
+     * @param doctorId The ID of the doctor.
+     * @param startDate The start date of the range.
+     * @param endDate The end date of the range.
+     * @return Task<QuerySnapshot> representing the asynchronous operation.
+     */
     fun getBookingsForDoctorDateRange(doctorId: String, startDate: String, endDate: String): Task<QuerySnapshot> {
         return bookingsCollection
             .whereEqualTo("doctor_id", doctorId)
@@ -146,7 +270,13 @@ class FirestoreHelper {
             .get()
     }
 
-    // Enhanced booking functions
+    /**
+     * Retrieves bookings with their service details for a doctor on a specific date.
+     *
+     * @param doctorId The ID of the doctor.
+     * @param date The date for the bookings.
+     * @return Task<List<Pair<Booking, Service?>>> representing the asynchronous operation.
+     */
     fun getBookingsWithServiceDetails(doctorId: String, date: String): Task<List<Pair<Booking, Service?>>> {
         return getBookingsForDoctor(doctorId, date).continueWithTask { bookingsTask ->
             if (!bookingsTask.isSuccessful) {
@@ -184,6 +314,12 @@ class FirestoreHelper {
         }
     }
 
+    /**
+     * Retrieves bookings for a patient.
+     *
+     * @param patientId The ID of the patient.
+     * @return Task<QuerySnapshot> representing the asynchronous operation.
+     */
     fun getBookingsForPatient(patientId: String): Task<QuerySnapshot> {
         return bookingsCollection
             .whereEqualTo("patient_id", patientId)
@@ -192,6 +328,12 @@ class FirestoreHelper {
             .get()
     }
 
+    /**
+     * Retrieves upcoming bookings for a patient starting from today.
+     *
+     * @param patientId The ID of the patient.
+     * @return Task<QuerySnapshot> representing the asynchronous operation.
+     */
     fun getUpcomingBookingsForPatient(patientId: String): Task<QuerySnapshot> {
         val currentDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
         return bookingsCollection
@@ -202,28 +344,65 @@ class FirestoreHelper {
             .get()
     }
 
+    /**
+     * Updates the status of a booking in the Firestore database.
+     *
+     * @param bookingId The ID of the booking to update.
+     * @param status The new status value.
+     * @return Task<Void> representing the asynchronous operation.
+     */
     fun updateBookingStatus(bookingId: String, status: String): Task<Void> {
         return bookingsCollection.document(bookingId).update("status", status)
     }
 
+    /**
+     * Cancels a booking by setting its status to 'cancelled'.
+     *
+     * @param bookingId The ID of the booking to cancel.
+     * @return Task<Void> representing the asynchronous operation.
+     */
     fun cancelBooking(bookingId: String): Task<Void> {
         return bookingsCollection.document(bookingId).update("status", "cancelled")
     }
 
     // Patient-specific methods
+    /**
+     * Retrieves a patient document by ID.
+     *
+     * @param patientId The ID of the patient.
+     * @return Task<DocumentSnapshot> representing the asynchronous operation.
+     */
     fun getPatientById(patientId: String): Task<DocumentSnapshot> {
         return patientsCollection.document(patientId).get()
     }
 
+    /**
+     * Updates patient data in the Firestore database.
+     *
+     * @param patientId The ID of the patient.
+     * @param updates Map of fields and values to update.
+     * @return Task<Void> representing the asynchronous operation.
+     */
     fun updatePatient(patientId: String, updates: Map<String, Any>): Task<Void> {
         return patientsCollection.document(patientId).update(updates)
     }
 
     // Doctor discovery methods
+    /**
+     * Retrieves all doctors from the Firestore database.
+     *
+     * @return Task<QuerySnapshot> representing the asynchronous operation.
+     */
     fun getAllDoctors(): Task<QuerySnapshot> {
         return doctorsCollection.get()
     }
 
+    /**
+     * Searches doctors by first name prefix.
+     *
+     * @param searchTerm The search term prefix.
+     * @return Task<QuerySnapshot> representing the asynchronous operation.
+     */
     fun searchDoctors(searchTerm: String): Task<QuerySnapshot> {
         return doctorsCollection
             .orderBy("firstName")
@@ -232,19 +411,42 @@ class FirestoreHelper {
             .get()
     }
 
+    /**
+     * Retrieves doctors by specialization.
+     *
+     * @param specialization The specialization to filter by.
+     * @return Task<QuerySnapshot> representing the asynchronous operation.
+     */
     fun getDoctorsBySpecialization(specialization: String): Task<QuerySnapshot> {
         return doctorsCollection.whereEqualTo("specialization", specialization).get()
     }
 
+    /**
+     * Retrieves a doctor's document by ID.
+     *
+     * @param doctorId The ID of the doctor.
+     * @return Task<DocumentSnapshot> representing the asynchronous operation.
+     */
     fun getDoctorById(doctorId: String): Task<DocumentSnapshot> {
         return doctorsCollection.document(doctorId).get()
     }
-    
+
+    /**
+     * Retrieves doctor settings document by ID.
+     *
+     * @param doctorId The ID of the doctor.
+     * @return Task<DocumentSnapshot> representing the asynchronous operation.
+     */
     fun getDoctorSettings(doctorId: String): Task<DocumentSnapshot> {
         return doctorSettingsCollection.document(doctorId).get()
     }
 
-    // Enhanced booking methods
+    /**
+     * Validates a booking slot by checking for time conflicts.
+     *
+     * @param booking The booking to validate.
+     * @return Task<Boolean> indicating whether the slot is valid.
+     */
     fun validateBookingSlot(booking: Booking): Task<Boolean> {
         return bookingsCollection
             .whereEqualTo("doctor_id", booking.doctor_id)
@@ -260,6 +462,13 @@ class FirestoreHelper {
             }
     }
 
+    /**
+     * Checks for time conflicts between a new booking and existing bookings.
+     *
+     * @param newBooking The new booking to check.
+     * @param existingBookings List of existing booking snapshots.
+     * @return True if there is a conflict, false otherwise.
+     */
     private fun hasTimeConflict(newBooking: Booking, existingBookings: List<DocumentSnapshot>): Boolean {
         val newStart = parseTime(newBooking.start_time)
         val newEnd = parseTime(newBooking.end_time)
@@ -279,12 +488,24 @@ class FirestoreHelper {
         return false
     }
 
+    /**
+     * Parses a time string (HH:mm) into minutes since midnight.
+     *
+     * @param timeString Time string in HH:mm format.
+     * @return Minutes since midnight.
+     */
     private fun parseTime(timeString: String): Int {
         val parts = timeString.split(":")
         return parts[0].toInt() * 60 + parts[1].toInt()
     }
 
     // Callback-based methods for easier fragment integration
+    /**
+     * Retrieves a patient by ID using a callback.
+     *
+     * @param patientId The ID of the patient.
+     * @param callback Callback to receive the Patient object or null.
+     */
     fun getPatientById(patientId: String, callback: (com.example.project.Admin.Patient?) -> Unit) {
         patientsCollection.document(patientId).get()
             .addOnSuccessListener { document ->
@@ -300,6 +521,12 @@ class FirestoreHelper {
             }
     }
 
+    /**
+     * Retrieves upcoming patient bookings with details using a callback.
+     *
+     * @param patientId The ID of the patient.
+     * @param callback Callback to receive a list of appointment details.
+     */
     fun getUpcomingBookingsForPatient(patientId: String, callback: (List<com.example.project.Patient.PatientAppointmentDetails>) -> Unit) {
         getUpcomingBookingsForPatient(patientId)
             .addOnSuccessListener { querySnapshot ->
@@ -333,8 +560,14 @@ class FirestoreHelper {
             }
     }
     
+    /**
+     * Loads appointment details for a booking including doctor and service info.
+     *
+     * @param booking The booking object.
+     * @param callback Callback to receive PatientAppointmentDetails.
+     */
     private fun loadAppointmentDetails(
-        booking: Booking, 
+        booking: Booking,
         callback: (com.example.project.Patient.PatientAppointmentDetails) -> Unit
     ) {
         var doctorName = "Loading..."
@@ -394,6 +627,11 @@ class FirestoreHelper {
             }
     }
 
+    /**
+     * Retrieves all doctors with callback.
+     *
+     * @param callback Callback to receive a list of Doctor objects.
+     */
     fun getAllDoctors(callback: (List<com.example.project.Admin.Doctor>) -> Unit) {
         getAllDoctors()
             .addOnSuccessListener { querySnapshot ->
@@ -407,6 +645,12 @@ class FirestoreHelper {
             }
     }
 
+    /**
+     * Searches doctors by name with callback.
+     *
+     * @param searchTerm The search term.
+     * @param callback Callback to receive a list of Doctor objects.
+     */
     fun searchDoctors(searchTerm: String, callback: (List<com.example.project.Admin.Doctor>) -> Unit) {
         searchDoctors(searchTerm)
             .addOnSuccessListener { querySnapshot ->
@@ -420,6 +664,12 @@ class FirestoreHelper {
             }
     }
 
+    /**
+     * Retrieves completed bookings for a patient using a callback.
+     *
+     * @param patientName The name of the patient.
+     * @param callback Callback to receive a list of appointment details.
+     */
     fun getCompletedBookingsForPatient(patientName: String, callback: (List<PatientAppointmentDetails>) -> Unit) {
         val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
         
@@ -502,6 +752,12 @@ class FirestoreHelper {
             }
     }
 
+    /**
+     * Retrieves all bookings for a patient using a callback.
+     *
+     * @param patientName The name of the patient.
+     * @param callback Callback to receive a list of appointment details.
+     */
     fun getAllBookingsForPatient(patientName: String, callback: (List<PatientAppointmentDetails>) -> Unit) {
         bookingsCollection
             .whereEqualTo("patient_name", patientName)
@@ -583,6 +839,15 @@ class FirestoreHelper {
 
     // Chat-related functions
 
+    /**
+     * Gets or creates a chat for a patient and doctor.
+     *
+     * @param patientId The ID of the patient.
+     * @param doctorId The ID of the doctor.
+     * @param patientName Name of the patient.
+     * @param doctorName Name of the doctor.
+     * @return Task<String> representing the chat ID.
+     */
     fun getOrCreateChat(patientId: String, doctorId: String, patientName: String, doctorName: String): Task<String> {
         val participants = listOf(patientId, doctorId).sorted()
         val chatId = "${participants[0]}_${participants[1]}"
@@ -607,12 +872,25 @@ class FirestoreHelper {
         }
     }
 
+    /**
+     * Retrieves chat messages query for a given chat ID.
+     *
+     * @param chatId The ID of the chat.
+     * @return Query ordered by message timestamp.
+     */
     fun getChatMessages(chatId: String): Query {
         return chatsCollection.document(chatId)
             .collection("messages")
             .orderBy("timestamp")
     }
 
+    /**
+     * Sends a message by batching the message document and updating chat metadata.
+     *
+     * @param chatId The ID of the chat.
+     * @param message The message object to send.
+     * @return Task<Void> representing the asynchronous operation.
+     */
     fun sendMessage(chatId: String, message: Message): Task<Void> {
         val chatRef = chatsCollection.document(chatId)
         val messageRef = chatRef.collection("messages").document()
@@ -625,6 +903,12 @@ class FirestoreHelper {
         }
     }
 
+    /**
+     * Retrieves chats for a user ordered by last message timestamp.
+     *
+     * @param userId The ID of the user.
+     * @return Query representing the chats query.
+     */
     fun getChatsForUser(userId: String): Query {
         return chatsCollection.whereArrayContains("participants", userId)
             .orderBy("lastMessageTimestamp", Query.Direction.DESCENDING)

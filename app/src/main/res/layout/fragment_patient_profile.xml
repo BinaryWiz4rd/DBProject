@@ -25,7 +25,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#856735A4"
+                android:background="@color/blue"
                 android:orientation="vertical"
                 android:padding="24dp">
 
@@ -256,7 +256,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:background="@color/darkPurple"
+                        android:background="@drawable/blue_button_background"
                         android:text="Edit Profile"
                         android:textColor="@color/white" />
 
@@ -270,6 +270,26 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/settingsButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/grey_button_background"
+                    android:text="Settings"
+                    android:textColor="@color/black"
+                    android:drawableStart="@drawable/settings"
+                    android:drawablePadding="12dp" />                <Button
+                    android:id="@+id/helpButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/grey_button_background"
+                    android:text="Help &amp; Support"
+                    android:textColor="@color/black"
+                    android:drawableStart="@drawable/help"
+                    android:drawablePadding="12dp" />
 
                 <Button
                     android:id="@+id/logoutButton"

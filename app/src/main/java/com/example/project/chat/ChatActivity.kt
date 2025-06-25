@@ -21,6 +21,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ListenerRegistration
 import java.util.*
 
+/**
+ * An activity that displays a chat screen between two users.
+ * It handles sending and receiving text messages and file attachments.
+ */
 class ChatActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
@@ -39,6 +43,10 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var pickImageLauncher: ActivityResultLauncher<PickVisualMediaRequest>
     private lateinit var pickDocumentLauncher: ActivityResultLauncher<Array<String>>
 
+    /**
+     * Initializes the activity, sets up the toolbar, and initializes
+     * Firebase helpers, UI components, and listeners.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
@@ -62,6 +70,9 @@ class ChatActivity : AppCompatActivity() {
         initializeChat()
     }
 
+    /**
+     * Sets up the RecyclerView with a [LinearLayoutManager] and a [ChatAdapter].
+     */
     private fun setupRecyclerView() {
         val layoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = layoutManager
@@ -69,6 +80,9 @@ class ChatActivity : AppCompatActivity() {
         recyclerView.adapter = chatAdapter
     }
 
+    /**
+     * Initializes the activity result launchers for picking images and documents.
+     */
     private fun setupFilePickers() {
         // Image picker
         pickImageLauncher = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
@@ -90,6 +104,9 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Sets up the click listeners for the send and attach buttons.
+     */
     private fun setupClickListeners() {
         sendButton.setOnClickListener {
             val messageText = messageEditText.text.toString().trim()
@@ -104,6 +121,10 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Initializes the chat by getting or creating a a chat session between the patient and doctor.
+     * It retrieves user details from the intent extras.
+     */
     private fun initializeChat() {
         val patientId = intent.getStringExtra("patientId")
         val doctorId = intent.getStringExtra("doctorId")
@@ -125,6 +146,10 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Sends a text message to the current chat.
+     * @param messageText The text of the message to be sent.
+     */
     private fun sendTextMessage(messageText: String) {
         chatId?.let { chatId ->
             currentUserId?.let { senderId ->
@@ -146,6 +171,9 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Shows a dialog with options for attaching a file (Image or Document).
+     */
     private fun showAttachmentOptions() {
         val options = arrayOf("Image", "Document")
         
@@ -160,6 +188,12 @@ class ChatActivity : AppCompatActivity() {
             .show()
     }
 
+    /**
+     * Uploads a file to Firebase Storage and sends a corresponding message in the chat.
+     *
+     * @param fileUri The URI of the file to be uploaded.
+     * @param messageType The type of the message ([MessageType.IMAGE] or [MessageType.DOCUMENT]).
+     */
     private fun uploadFile(fileUri: Uri, messageType: MessageType) {
         chatId?.let { chatId ->
             currentUserId?.let { senderId ->
@@ -232,6 +266,10 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Sets up a Firestore snapshot listener to listen for new messages in the current chat
+     * and updates the RecyclerView adapter accordingly.
+     */
     private fun listenForMessages() {
         if (chatId != null) {
             messagesListener = firestoreHelper.getChatMessages(chatId!!)
@@ -251,11 +289,17 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Handles the "Up" button navigation.
+     */
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
     }
 
+    /**
+     * Cleans up resources, specifically removing the Firestore listener when the activity is destroyed.
+     */
     override fun onDestroy() {
         super.onDestroy()
         if (::messagesListener.isInitialized) {

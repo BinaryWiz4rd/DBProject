@@ -7,6 +7,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.project.R
 
+/**
+ * RecyclerView Adapter for displaying available time slots for appointments.
+ * Handles click events for selecting a time slot.
+ */
 class TimeSlotAdapter(
     private val timeSlots: List<String>,
     private val onTimeSlotClick: (String) -> Unit
@@ -33,4 +37,4 @@ class TimeSlotAdapter(
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val timeSlotTextView: TextView = view.findViewById(R.id.timeSlotTextView)
     }
-} 
+}

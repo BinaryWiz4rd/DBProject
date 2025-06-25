@@ -37,6 +37,10 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.Locale
 
+/**
+ * A [Fragment] that serves as the home screen for a doctor.
+ * It displays a greeting, dashboard stats, and today's schedule.
+ */
 class DoctorHomeFragment : Fragment() {
 
     private var _binding: FragmentDoctorHomeBinding? = null
@@ -59,6 +63,9 @@ class DoctorHomeFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     private var currentDoctor: Doctor? = null
 
+    /**
+     * Inflates the layout for this fragment.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -67,6 +74,9 @@ class DoctorHomeFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * Initializes UI components and loads the initial data.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -77,6 +87,9 @@ class DoctorHomeFragment : Fragment() {
         loadDoctorProfileAndInitialData()
     }
 
+    /**
+     * Loads the doctor's profile from Firestore and then loads the dashboard and schedule data.
+     */
     private fun loadDoctorProfileAndInitialData() {
         val userId = auth.currentUser?.uid
         if (userId == null) {
@@ -111,6 +124,9 @@ class DoctorHomeFragment : Fragment() {
         }
     }
 
+    /**
+     * Sets default values for the dashboard when data cannot be loaded.
+     */
     private fun setDefaultDashboardValues() {
         binding.textViewTodayDate.text = LocalDate.now().format(displayDateFormatter)
         binding.textViewTodayAppointmentsCount.text = "0"
@@ -119,12 +135,18 @@ class DoctorHomeFragment : Fragment() {
         updateScheduleUI(emptyList())
     }
 
+    /**
+     * Sets up the greeting message with the doctor's name.
+     */
     private fun setupGreeting() {
         val doctorFirstName = currentDoctor?.firstName ?: "Doctor"
         binding.textViewGreeting.text = "Hello, $doctorFirstName!"
         binding.textViewTodayDate.text = LocalDate.now().format(displayDateFormatter)
     }
 
+    /**
+     * Sets up the initial UI components, including the schedule RecyclerView and search functionality.
+     */
     private fun setupUI() {
         scheduleAdapter = ScheduleAdapter { appointment ->
             showAppointmentDetails(appointment)
@@ -157,6 +179,9 @@ class DoctorHomeFragment : Fragment() {
         binding.buttonViewDetails.visibility = View.GONE
     }
 
+    /**
+     * Loads the data for the dashboard and today's schedule.
+     */
     private fun loadDashboardAndScheduleData() {
         val doctorId = currentDoctor?.uid?.takeIf { it.isNotBlank() } ?: auth.currentUser?.uid
         if (doctorId == null) {
@@ -167,6 +192,9 @@ class DoctorHomeFragment : Fragment() {
         loadWeeklyStats(doctorId)
     }
 
+    /**
+     * Loads today's schedule of appointments for the doctor.
+     */
     private fun loadTodaysSchedule(doctorId: String) {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
@@ -217,6 +245,10 @@ class DoctorHomeFragment : Fragment() {
         }
     }
 
+    /**
+     * Updates the schedule UI with a list of appointments.
+     * @param appointments The list of appointments to display.
+     */
     private fun updateScheduleUI(appointments: List<Appointment>) {
         allAppointments = appointments.sortedBy {
             try { LocalTime.parse(it.time, timeFormatter) }
@@ -232,6 +264,10 @@ class DoctorHomeFragment : Fragment() {
         }
     }
 
+    /**
+     * Loads the statistics for the current week, including the number of appointments and new patients.
+     * @param doctorId The ID of the doctor.
+     */
     private fun loadWeeklyStats(doctorId: String) {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
@@ -263,6 +299,10 @@ class DoctorHomeFragment : Fragment() {
         }
     }
 
+    /**
+     * Performs a search on the list of appointments based on a query.
+     * @param query The search query.
+     */
     private fun performSearch(query: String) {
         if (query.isNotEmpty()) {
             val filteredAppointments = allAppointments.filter { appointment ->
@@ -275,6 +315,9 @@ class DoctorHomeFragment : Fragment() {
         }
     }
 
+    /**
+     * Sets up the "Next Appointment" widget with details of the next upcoming appointment.
+     */
     private fun setupWidget() {
         val now = LocalTime.now()
         val nextAppointment = allAppointments
@@ -326,6 +369,10 @@ class DoctorHomeFragment : Fragment() {
         }
     }
 
+    /**
+     * Shows a dialog with the details of a selected appointment.
+     * @param appointment The selected appointment.
+     */
     private fun showAppointmentDetails(appointment: Appointment) {
         if (!isAdded) return
 
@@ -403,6 +450,10 @@ class DoctorHomeFragment : Fragment() {
         dialog.show()
     }
 
+    /**
+     * Shows a dialog with the patient's appointment history.
+     * @param patient The patient whose history to show.
+     */
     private fun showPatientHistory(patient: Patient) {
         try {
             val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_patient_history, null)
@@ -455,6 +506,11 @@ class DoctorHomeFragment : Fragment() {
         }
     }
 
+    /**
+     * Loads the appointment history for a given patient.
+     * @param patientId The ID of the patient.
+     * @param callback A callback function to handle the list of history items.
+     */
     private fun loadPatientHistory(patientId: String?, callback: (List<String>) -> Unit) {
         if (patientId.isNullOrEmpty()) {
             callback(emptyList())
@@ -558,12 +614,23 @@ class DoctorHomeFragment : Fragment() {
             }
     }
 
+    /**
+     * A data class to hold information for a single item in the patient's history.
+     * @property date The date of the appointment.
+     * @property serviceName The name of the service.
+     * @property doctorName The name of the doctor.
+     */
     private data class HistoryItem(
         val date: String,
         val serviceName: String,
         val doctorName: String
     )
 
+    /**
+     * Creates a placeholder [Patient] object when a patient's details cannot be fully loaded.
+     * @param email The email of the patient.
+     * @return A placeholder [Patient] object.
+     */
     private fun createPlaceholderPatient(email: String): Patient {
         val displayName = email.substringBefore("@")
         return Patient(
@@ -575,6 +642,11 @@ class DoctorHomeFragment : Fragment() {
         )
     }
 
+    /**
+     * Navigates to the [DoctorCalendarFragment] with a specific date and optional time selected.
+     * @param dateString The date to select in the calendar.
+     * @param timeString An optional time to highlight.
+     */
     private fun navigateToCalendarWithDate(dateString: String, timeString: String = "") {
         try {
             val bundle = Bundle().apply {
@@ -604,6 +676,9 @@ class DoctorHomeFragment : Fragment() {
         }
     }
 
+    /**
+     * Clears the view binding when the view is destroyed.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

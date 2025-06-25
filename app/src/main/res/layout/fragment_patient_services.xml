@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#856735A4"
+    android:background="@color/white"
     android:fillViewport="true"
     android:fitsSystemWindows="true">
 
@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Browse available medical services and book appointments"
-            android:textColor="@color/black"
+            android:textColor="@color/grey"
             android:textSize="14sp" />
 
         <!-- Service Categories Card -->

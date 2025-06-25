@@ -7,7 +7,6 @@
     android:padding="16dp"
     android:paddingTop="24dp"
     android:fitsSystemWindows="true"
-    android:background="#856735A4"
     tools:context=".Patient.PatientServiceAvailabilityFragment">
 
     <TextView

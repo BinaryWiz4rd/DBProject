@@ -41,6 +41,14 @@ class AdminAppointmentsListFragment : Fragment() {
     private var userName: String = ""
 
     companion object {
+        /**
+         * Creates a new instance of this fragment with the given user details.
+         *
+         * @param userId The ID of the user (doctor or patient).
+         * @param userType The type of user ("doctor" or "patient").
+         * @param userName The name of the user.
+         * @return A new instance of [AdminAppointmentsListFragment].
+         */
         fun newInstance(userId: String, userType: String, userName: String): AdminAppointmentsListFragment {
             val fragment = AdminAppointmentsListFragment()
             val args = Bundle()
@@ -52,6 +60,9 @@ class AdminAppointmentsListFragment : Fragment() {
         }
     }
 
+    /**
+     * Initializes the fragment, retrieving arguments passed to it.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -61,6 +72,9 @@ class AdminAppointmentsListFragment : Fragment() {
         }
     }
 
+    /**
+     * Inflates the layout for this fragment.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -68,6 +82,9 @@ class AdminAppointmentsListFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_admin_appointments_list, container, false)
     }
 
+    /**
+     * Initializes the views, sets up the RecyclerView, and loads the appointments.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
@@ -114,6 +131,11 @@ class AdminAppointmentsListFragment : Fragment() {
         loadAppointments()
     }
     
+    /**
+     * Loads the appointments for the specified user from Firestore.
+     * It queries the "bookings" collection based on the [userType] and [userId].
+     * It then populates the RecyclerView with the retrieved appointments.
+     */
     private fun loadAppointments() {
         showLoading(true)
         
@@ -279,12 +301,23 @@ class AdminAppointmentsListFragment : Fragment() {
             }
     }
     
+    /**
+     * Shows or hides the empty state view.
+     *
+     * @param show True to show the empty state, false to hide it.
+     * @param message The message to display in the empty state view.
+     */
     private fun showEmptyState(show: Boolean, message: String = "No appointments found") {
         emptyStateTextView.text = message
         emptyStateTextView.visibility = if (show) View.VISIBLE else View.GONE
         appointmentsRecyclerView.visibility = if (show) View.GONE else View.VISIBLE
     }
     
+    /**
+     * Shows or hides the loading indicator.
+     *
+     * @param show True to show the loading indicator, false to hide it.
+     */
     private fun showLoading(show: Boolean) {
         loadingIndicator.visibility = if (show) View.VISIBLE else View.GONE
         if (show) {

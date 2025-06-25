@@ -6,6 +6,10 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project.databinding.ActivityTopDoctorsBinding
 
+/**
+ * Activity displaying a list of top doctors for patients.
+ * Uses a ViewModel to observe and display doctor data in a RecyclerView.
+ */
 class TopDoctorsActivity : BaseActivity() {
     private lateinit var binding: ActivityTopDoctorsBinding
     private val viewModel= MainViewModel()
@@ -18,6 +22,9 @@ class TopDoctorsActivity : BaseActivity() {
 
     }
 
+    /**
+     * Initializes the top doctors list and sets up the RecyclerView.
+     */
     private fun initTopDoctors() {
         binding.apply {
             progressBarTopDoctor.visibility= View.VISIBLE

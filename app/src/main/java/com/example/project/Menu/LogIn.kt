@@ -1,3 +1,8 @@
+/**
+ * Activity for user login, handling authentication and navigation based on user roles.
+ * Supports login for admin, patient, and doctor users.
+ */
+
 package com.example.project.Menu
 
 import android.content.Intent
@@ -52,6 +57,12 @@ class LogIn : AppCompatActivity() {
         }
     }
 
+    /**
+     * Handles user login functionality.
+     *
+     * @param email User's email address.
+     * @param password User's password.
+     */
     private fun loginUser(email: String, password: String) {
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
@@ -64,11 +75,14 @@ class LogIn : AppCompatActivity() {
                     Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
                     fetchUserDataAndNavigate()
                 } else {
-                    Toast.makeText(this, "Login Failed!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Login Failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
     }
 
+    /**
+     * Fetches user data from Firestore to determine role and navigates accordingly.
+     */
     private fun fetchUserDataAndNavigate() {
         val userId = auth.currentUser?.uid
         if (userId != null) {
@@ -111,18 +125,27 @@ class LogIn : AppCompatActivity() {
         }
     }
 
+    /**
+     * Navigates to the main patient activity after successful login.
+     */
     private fun navigateToMainPatientActivity() {
         val intent = Intent(this, MainPatientActivity::class.java)
         startActivity(intent)
         finish()
     }
 
+    /**
+     * Navigates to the main doctor activity after successful login.
+     */
     private fun navigateToMainDoctorActivity() {
         val intent = Intent(this, MainDoctorActivity::class.java)
         startActivity(intent)
         finish()
     }
 
+    /**
+     * Navigates to the main admin activity after successful login.
+     */
     private fun navigateToMainAdminActivity() {
         val intent = Intent(this, MainAdminActivity::class.java)
         startActivity(intent)

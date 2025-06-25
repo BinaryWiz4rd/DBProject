@@ -17,16 +17,24 @@ import com.example.project.util.FirestoreHelper
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 
+/**
+ * A [Fragment] for doctors to manage their services.
+ * It displays a list of services and allows adding, editing, and deleting them.
+ */
 class DoctorServicesFragment : Fragment() {
     private lateinit var servicesRecyclerView: RecyclerView
     private lateinit var fabAddService: FloatingActionButton // Keep for now, but its click listener will be removed
     private lateinit var emptyServicesTextView: TextView
-    private val servicesList = mutableListOf<com.example.project.Service>()
+    private val servicesList = mutableListOf<Service>()
     private lateinit var adapter: ServiceAdapter
     private lateinit var firestoreHelper: FirestoreHelper
     private lateinit var auth: FirebaseAuth
     private var currentDoctorId: String? = null
 
+    /**
+     * Inflates the layout, initializes UI components and Firebase, and sets up the RecyclerView adapter.
+     * It also loads the initial list of services.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -74,6 +82,9 @@ class DoctorServicesFragment : Fragment() {
         return view
     }
 
+    /**
+     * Loads the services for the current doctor from Firestore.
+     */
     private fun loadServices() {
         val doctorId = currentDoctorId
         if (doctorId.isNullOrBlank()) {
@@ -108,12 +119,19 @@ class DoctorServicesFragment : Fragment() {
             }
     }
 
+    /**
+     * Shows an empty state message when there are no services to display.
+     * @param message The message to be displayed.
+     */
     private fun showEmptyState(message: String) {
         servicesRecyclerView.visibility = View.GONE
         emptyServicesTextView.visibility = View.VISIBLE
         emptyServicesTextView.text = message
     }
 
+    /**
+     * Shows a dialog to add a new service.
+     */
     private fun showAddServiceDialog() {
         val doctorId = currentDoctorId ?: return // Should not be null if this function is called
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_service_doctor, null)
@@ -130,7 +148,7 @@ class DoctorServicesFragment : Fragment() {
                 val duration = serviceDurationEditText.text.toString().toIntOrNull()
 
                 if (name.isNotBlank() && price != null && duration != null) {
-                    val newService = com.example.project.Service(doctor_id = doctorId, name = name, price = price, duration_minutes = duration)
+                    val newService = Service(doctor_id = doctorId, name = name, price = price, duration_minutes = duration)
                     firestoreHelper.addService(newService)
                         .addOnSuccessListener {
                             Toast.makeText(context, "Service added", Toast.LENGTH_SHORT).show()
@@ -147,6 +165,10 @@ class DoctorServicesFragment : Fragment() {
             .show()
     }
 
+    /**
+     * Shows a dialog to edit or delete an existing service.
+     * @param service The service to be edited or deleted.
+     */
     private fun showEditDeleteServiceDialog(service: Service) {
         val serviceDocumentId = service.id
 

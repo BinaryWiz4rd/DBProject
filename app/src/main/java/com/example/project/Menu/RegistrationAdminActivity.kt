@@ -25,6 +25,11 @@ class RegistrationAdminActivity : AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
 
+    /**
+     * Initializes the admin registration form and sets the register button listener.
+     *
+     * @param savedInstanceState The saved instance state bundle.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -51,6 +56,13 @@ class RegistrationAdminActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Registers a new admin user.
+     *
+     * Validates input fields and creates a new admin account in Firebase Authentication.
+     * If the registration is successful, navigates to the MainAdminActivity.
+     * If there are any errors, displays appropriate messages to the user.
+     */
     private fun registerAdmin() {
         val firstName = etFirstName.text.toString().trim()
         val lastName = etLastName.text.toString().trim()
@@ -126,6 +138,10 @@ class RegistrationAdminActivity : AppCompatActivity() {
                 }
             }
     }
+
+    /**
+     * Navigates to the MainAdminActivity after successful registration.
+     */
     private fun navigateToMainAdminActivity() {
         val intent = Intent(this, MainAdminActivity::class.java)
         startActivity(intent)

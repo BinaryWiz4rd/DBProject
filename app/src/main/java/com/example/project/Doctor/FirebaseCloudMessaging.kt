@@ -15,12 +15,20 @@ import com.example.project.doctor.ui.MainDoctorActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
+/**
+ * A [FirebaseMessagingService] for handling Firebase Cloud Messaging (FCM) messages.
+ * This service is responsible for receiving notifications and new FCM tokens.
+ */
 class FirebaseCloudMessaging : FirebaseMessagingService() {
 
     companion object {
         private const val CHANNEL_ID = "appointment_notifications_channel"
     }
 
+    /**
+     * Called when a message is received.
+     * @param remoteMessage The remote message that was received.
+     */
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
@@ -31,6 +39,11 @@ class FirebaseCloudMessaging : FirebaseMessagingService() {
         }
     }
 
+    /**
+     * Creates and displays a notification.
+     * @param title The title of the notification.
+     * @param messageBody The body of the notification.
+     */
     private fun sendNotification(title: String, messageBody: String) {
         val intent = Intent(this, MainDoctorActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -66,6 +79,11 @@ class FirebaseCloudMessaging : FirebaseMessagingService() {
     }
 
 
+    /**
+     * Called when a new FCM token is generated.
+     * This token is saved to the doctor's profile in Firestore.
+     * @param token The new token.
+     */
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         val currentUserId = FirebaseAuth.getInstance().currentUser ?.uid

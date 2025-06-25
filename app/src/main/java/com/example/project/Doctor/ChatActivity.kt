@@ -11,6 +11,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.project.databinding.ActivityDoctorChatMessageBinding
 
+/**
+ * An activity for handling chat between a doctor and a patient.
+ * This activity is a work in progress and contains several TODOs.
+ */
 class ChatActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDoctorChatMessageBinding
@@ -24,6 +28,10 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var pickDocumentLauncher: ActivityResultLauncher<Array<String>>
 
 
+    /**
+     * Initializes the activity, sets up the toolbar, RecyclerView, input listeners,
+     * and file pickers. It also initiates loading the chat history and listening for new messages.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDoctorChatMessageBinding.inflate(layoutInflater)
@@ -42,16 +50,22 @@ class ChatActivity : AppCompatActivity() {
         listenForNewMessages() // Nasłuchuj na nowe wiadomości (TODO)
     }
 
+    /**
+     * Sets up the toolbar with a back button and a title.
+     * TODO: Set the title to the patient's name.
+     */
     private fun setupToolbar() {
         setSupportActionBar(binding.toolbarChat)
         supportActionBar?.setDisplayHomeAsUpEnabled(true) // Przycisk wstecz
         supportActionBar?.setDisplayShowHomeEnabled(true)
-        // TODO: Ustaw tytuł np. na imię pacjenta
         binding.toolbarChat.title = "Czat z Pacjentem ID: $otherUserId"
         binding.toolbarChat.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
     }
 
 
+    /**
+     * Sets up the RecyclerView with a [ChatAdapter] and a [LinearLayoutManager].
+     */
     private fun setupRecyclerView() {
         chatAdapter = ChatAdapter(currentUserId)
         binding.recyclerViewChat.apply {
@@ -62,6 +76,9 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Sets up the listeners for the send and attach buttons.
+     */
     private fun setupInputListeners() {
         binding.buttonSend.setOnClickListener {
             val messageText = binding.editTextMessage.text.toString().trim()
@@ -76,6 +93,9 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Registers the activity result launchers for picking media and documents.
+     */
     private fun registerFilePickers() {
         // Launcher dla zdjęć i wideo (nowoczesny sposób)
         pickMediaLauncher = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
@@ -102,6 +122,10 @@ class ChatActivity : AppCompatActivity() {
     }
 
 
+    /**
+     * Shows options for attaching files.
+     * TODO: Implement a proper dialog (AlertDialog or BottomSheet) for attachment options.
+     */
     private fun showAttachmentOptions() {
         // TODO: Implementacja okna dialogowego / BottomSheet z opcjami
         // Na razie uproszczone: Wybierz obraz, potem dokument (do testów)
@@ -116,6 +140,11 @@ class ChatActivity : AppCompatActivity() {
     }
 
 
+    /**
+     * Sends a text message.
+     * TODO: Implement sending the message to a backend service.
+     * @param text The text of the message to send.
+     */
     private fun sendMessage(text: String) {
         val message = ChatMessage(
             senderId = currentUserId,
@@ -131,6 +160,12 @@ class ChatActivity : AppCompatActivity() {
         addMessageToList(message)
     }
 
+    /**
+     * Uploads a file.
+     * TODO: Implement the file upload to a storage service and update the message accordingly.
+     * @param fileUri The URI of the file to upload.
+     * @param messageType The type of the message (IMAGE or DOCUMENT).
+     */
     private fun uploadFile(fileUri: Uri, messageType: MessageType) {
         // TODO: Implementacja uploadu pliku do storage (np. Firebase Storage)
         Log.d("ChatActivity", "Rozpoczęcie uploadu pliku: $fileUri, Typ: $messageType")
@@ -160,6 +195,10 @@ class ChatActivity : AppCompatActivity() {
     }
 
 
+    /**
+     * Loads the chat history.
+     * TODO: Implement fetching the chat history from a backend service.
+     */
     private fun loadChatHistory() {
         // TODO: Implementacja pobierania historii czatu z backendu
         Log.d("ChatActivity", "Ładowanie historii czatu...")
@@ -169,6 +208,10 @@ class ChatActivity : AppCompatActivity() {
         // binding.recyclerViewChat.scrollToPosition(chatAdapter.itemCount - 1) // Przewiń na dół
     }
 
+    /**
+     * Listens for new messages.
+     * TODO: Implement listening for new messages from a backend service (e.g., WebSocket, Firestore listener).
+     */
     private fun listenForNewMessages() {
         // TODO: Implementacja nasłuchiwania na nowe wiadomości (np. przez Firebase Listener, WebSocket)
         Log.d("ChatActivity", "Nasłuchiwanie na nowe wiadomości...")
@@ -177,7 +220,11 @@ class ChatActivity : AppCompatActivity() {
         // addMessageToList(newMessage)
     }
 
-    // Dodaje wiadomość do listy i odświeża adapter
+    /**
+     * Adds a message to the local list and updates the adapter.
+     * TODO: Consider handling duplicate messages if listening for changes.
+     * @param message The message to add.
+     */
     private fun addMessageToList(message: ChatMessage) {
         // TODO: Rozważ obsługę duplikatów, jeśli nasłuchujesz na zmiany
         chatMessages.add(message)
@@ -186,7 +233,11 @@ class ChatActivity : AppCompatActivity() {
         binding.recyclerViewChat.smoothScrollToPosition(chatAdapter.itemCount - 1)
     }
 
-    // Pomocnicza funkcja do pobrania nazwy pliku z URI (może wymagać ulepszenia)
+    /**
+     * A helper function to get the file name from a URI.
+     * @param uri The URI of the file.
+     * @return The file name, or null if it cannot be determined.
+     */
     private fun getFileName(uri: Uri): String? {
         var fileName: String? = null
         try {

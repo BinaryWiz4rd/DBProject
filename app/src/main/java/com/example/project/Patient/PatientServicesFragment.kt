@@ -8,11 +8,23 @@ import androidx.fragment.app.Fragment
 import com.example.project.R
 import com.example.project.databinding.FragmentPatientServicesBinding
 
+/**
+ * Fragment displaying available services for patients.
+ * Handles navigation to browse services and supports pre-selecting a doctor.
+ */
 class PatientServicesFragment : Fragment() {
     
     private var _binding: FragmentPatientServicesBinding? = null
     private val binding get() = _binding!!
     
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate views.
+     * @param container The parent view that the fragment's UI should attach to.
+     * @param savedInstanceState The saved instance state bundle.
+     * @return The root view for the fragment's UI.
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -21,7 +33,15 @@ class PatientServicesFragment : Fragment() {
         _binding = FragmentPatientServicesBinding.inflate(inflater, container, false)
         return binding.root
     }
-      override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+    /**
+     * Called when the fragment's view has been created.
+     * Sets up UI state and navigates if a doctor was pre-selected.
+     *
+     * @param view The view returned by onCreateView.
+     * @param savedInstanceState The saved instance state bundle.
+     */
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
         setupUI()
@@ -61,6 +81,9 @@ class PatientServicesFragment : Fragment() {
             .commit()
     }
     
+    /**
+     * Cleans up the binding when the view is destroyed to prevent memory leaks.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

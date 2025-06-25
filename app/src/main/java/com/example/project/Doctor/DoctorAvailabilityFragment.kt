@@ -23,6 +23,11 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
+/**
+ * A [Fragment] for doctors to manage their availability slots.
+ * It displays a list of existing availability slots and allows adding, editing, and deleting them.
+ * This fragment contains several TODOs.
+ */
 class DoctorAvailabilityFragment : Fragment() {
 
     private lateinit var availabilityRecyclerView: RecyclerView
@@ -34,6 +39,10 @@ class DoctorAvailabilityFragment : Fragment() {
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     private val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
 
+    /**
+     * Inflates the layout, initializes UI components and Firebase,
+     * and sets up the RecyclerView and FAB for managing availability.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -74,6 +83,9 @@ class DoctorAvailabilityFragment : Fragment() {
         return view
     }
 
+    /**
+     * Loads the availability slots for the current doctor from Firestore.
+     */
     private fun loadAvailability() {
         if (currentDoctorId.isBlank()) {
             Log.w("DoctorAvailability", "Doctor ID not set.")
@@ -102,6 +114,11 @@ class DoctorAvailabilityFragment : Fragment() {
             }
     }
 
+    /**
+     * Updates the RecyclerView with a new list of availability slots and shows an empty state message if needed.
+     * @param availabilities The list of availability slots to display.
+     * @param emptyMessage The message to show when the list is empty.
+     */
     private fun updateDisplayList(availabilities: List<Availability>, emptyMessage: String) {
         availabilityList.clear()
         availabilityList.addAll(availabilities)
@@ -118,6 +135,11 @@ class DoctorAvailabilityFragment : Fragment() {
         adapter.notifyDataSetChanged()
     }
 
+    /**
+     * Shows a dialog to add a new or edit an existing availability slot.
+     * TODO: Use a proper XML layout for the dialog instead of programmatic creation.
+     * @param existingAvailability The availability slot to edit, or null to add a new one.
+     */
     private fun showAddOrEditAvailabilityDialog(existingAvailability: Availability?) {
         // TODO: Inflate R.layout.dialog_add_availability instead of a generic one
         // For now, creating EditTexts programmatically for demonstration as layout is not available.
@@ -212,6 +234,11 @@ class DoctorAvailabilityFragment : Fragment() {
         builder.show()
     }
 
+    /**
+     * Saves a new or updated availability slot to Firestore.
+     * @param availability The availability slot to save.
+     * @param isNew `true` if it's a new slot, `false` if it's an existing one being updated.
+     */
     private fun saveAvailability(availability: Availability, isNew: Boolean) {
         val task = if (isNew) {
             firestoreHelper.addAvailability(availability.copy(id = "")) // Ensure ID is not set for new, Firestore will generate
@@ -232,6 +259,10 @@ class DoctorAvailabilityFragment : Fragment() {
         }
     }
 
+    /**
+     * Shows a confirmation dialog before deleting an availability slot.
+     * @param availability The availability slot to delete.
+     */
     private fun showDeleteConfirmationDialog(availability: Availability) {
         AlertDialog.Builder(requireContext())
             .setTitle("Delete Availability")
@@ -250,34 +281,56 @@ class DoctorAvailabilityFragment : Fragment() {
             .show()
     }
 
+    /**
+     * An adapter for displaying availability slots in the RecyclerView.
+     * @property items The list of availability slots.
+     * @property onItemClick A lambda to be invoked when an item is clicked.
+     */
     inner class AvailabilityAdapter(
         private val items: List<Availability>,
         private val onItemClick: (Availability) -> Unit
     ) : RecyclerView.Adapter<AvailabilityAdapter.ViewHolder>() {
 
+        /**
+         * ViewHolder for an availability slot item.
+         * TODO: Find and bind views from the item_availability_day layout.
+         */
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             // TODO: Find and bind views from item_availability_day layout
             private val dateTextView: TextView = view.findViewById(R.id.availabilityDateTextView)
             private val timeRangeTextView: TextView = view.findViewById(R.id.availabilityTimeRangeTextView)
 
+            /**
+             * Binds an availability slot's data to the views.
+             * TODO: Bind data to the views.
+             * @param availability The availability slot to bind.
+             */
             fun bind(availability: Availability) {
-                // TODO: Bind data to views
                 dateTextView.text = availability.date
                 timeRangeTextView.text = "${availability.start_time} - ${availability.end_time}"
                 itemView.setOnClickListener { onItemClick(availability) }
             }
         }
 
+        /**
+         * Creates a new [ViewHolder] for an availability slot item.
+         */
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_availability_day, parent, false)
             return ViewHolder(view)
         }
 
+        /**
+         * Binds the data of an availability slot at a given position to the [ViewHolder].
+         */
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.bind(items[position])
         }
 
+        /**
+         * Returns the total number of availability slots.
+         */
         override fun getItemCount() = items.size
     }
 }

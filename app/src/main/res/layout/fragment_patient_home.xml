@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#856735A4"
+    android:background="@color/white"
     android:fillViewport="true">
 
     <LinearLayout
@@ -41,7 +41,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="How are you feeling today?"
-                    android:textColor="@color/black"
+                    android:textColor="@color/grey"
                     android:textSize="14sp" />
 
             </LinearLayout>

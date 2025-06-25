@@ -11,6 +11,10 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import java.util.*
 
+/**
+ * Helper class for handling file uploads and downloads with Firebase Storage.
+ * Provides methods for uploading files, retrieving metadata, and managing chat file storage.
+ */
 class FirebaseStorageHelper {
     
     private val storage = FirebaseStorage.getInstance()
@@ -22,14 +26,33 @@ class FirebaseStorageHelper {
     }
 
     /**
-     * Upload a file to Firebase Storage
-     * @param context Context for content resolver
-     * @param fileUri URI of the file to upload
-     * @param chatId Chat ID for organizing files
-     * @param senderId ID of the sender
-     * @param onProgress Callback for upload progress (percentage)
-     * @param onSuccess Callback when upload succeeds with download URL
-     * @param onFailure Callback when upload fails
+     * Uploads a file to Firebase Storage.
+     *
+     * @param context The context of the application.
+     * @param fileUri The URI of the file to upload.
+     * @param storagePath The path in Firebase Storage where the file will be uploaded.
+     * @return Task<Void> representing the asynchronous operation.
+     */
+    fun uploadFile(context: Context, fileUri: Uri, storagePath: String): Task<Void> {
+        val storageReference = FirebaseStorage.getInstance().reference.child(storagePath)
+        return storageReference.putFile(fileUri).continueWith { task ->
+            if (!task.isSuccessful) {
+                throw task.exception ?: Exception("File upload failed")
+            }
+            null
+        }
+    }
+
+    /**
+     * Uploads a file to Firebase Storage with progress tracking and callbacks.
+     *
+     * @param context Context for content resolver.
+     * @param fileUri URI of the file to upload.
+     * @param chatId Chat ID for organizing file storage path.
+     * @param senderId ID of the sender uploading the file.
+     * @param onProgress Callback invoked with upload progress percentage.
+     * @param onSuccess Callback invoked when upload succeeds with download URL, file name, file size, and MIME type.
+     * @param onFailure Callback invoked when upload fails with an exception.
      */
     fun uploadFile(
         context: Context,
@@ -94,14 +117,21 @@ class FirebaseStorageHelper {
     }
 
     /**
-     * Delete a file from Firebase Storage
+     * Deletes a file from Firebase Storage.
+     *
+     * @param fileUrl The URL of the file to delete.
+     * @return Task<Void> representing the delete operation.
      */
     fun deleteFile(fileUrl: String): Task<Void> {
         return storage.getReferenceFromUrl(fileUrl).delete()
     }
 
     /**
-     * Get file name from URI
+     * Retrieves the file name from a URI.
+     *
+     * @param context Context for content resolver.
+     * @param uri URI of the file.
+     * @return File name as a String, or null if not found.
      */
     private fun getFileName(context: Context, uri: Uri): String? {
         var fileName: String? = null
@@ -128,7 +158,11 @@ class FirebaseStorageHelper {
     }
 
     /**
-     * Get file size from URI
+     * Retrieves the file size from a URI.
+     *
+     * @param context Context for content resolver.
+     * @param uri URI of the file.
+     * @return File size in bytes.
      */
     private fun getFileSize(context: Context, uri: Uri): Long {
         var fileSize = 0L
@@ -149,7 +183,11 @@ class FirebaseStorageHelper {
     }
 
     /**
-     * Get MIME type from URI
+     * Retrieves the MIME type from a file URI.
+     *
+     * @param context Context for content resolver.
+     * @param uri URI of the file.
+     * @return MIME type as a String, or null if unknown.
      */
     private fun getMimeType(context: Context, uri: Uri): String? {
         return if (uri.scheme == "content") {
@@ -161,7 +199,10 @@ class FirebaseStorageHelper {
     }
 
     /**
-     * Get file extension from filename
+     * Extracts the file extension from a file name.
+     *
+     * @param fileName The name of the file.
+     * @return File extension without the dot, or 'bin' if none.
      */
     private fun getFileExtension(fileName: String): String {
         return if (fileName.contains(".")) {
@@ -172,14 +213,20 @@ class FirebaseStorageHelper {
     }
 
     /**
-     * Check if file is an image
+     * Checks if a given MIME type corresponds to an image.
+     *
+     * @param mimeType The MIME type to check.
+     * @return True if the MIME type starts with 'image/', false otherwise.
      */
     fun isImage(mimeType: String?): Boolean {
         return mimeType?.startsWith("image/") == true
     }
 
     /**
-     * Check if file is a document
+     * Checks if a given MIME type corresponds to a document.
+     *
+     * @param mimeType The MIME type to check.
+     * @return True if the MIME type indicates a document, false otherwise.
      */
     fun isDocument(mimeType: String?): Boolean {
         return when {
@@ -192,7 +239,10 @@ class FirebaseStorageHelper {
     }
 
     /**
-     * Format file size for display
+     * Formats a file size in bytes to a human-readable string.
+     *
+     * @param bytes File size in bytes.
+     * @return Formatted file size string (e.g., '1.2 MB').
      */
     fun formatFileSize(bytes: Long): String {
         if (bytes <= 0) return "0 B"

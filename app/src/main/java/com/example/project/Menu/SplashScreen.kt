@@ -9,6 +9,11 @@ import com.example.project.R
 
 class SplashScreen : AppCompatActivity() {
 
+    /**
+     * Shows the splash screen and navigates to the LogIn activity after a delay.
+     *
+     * @param savedInstanceState The saved instance state bundle.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash_screen)

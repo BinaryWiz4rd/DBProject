@@ -71,6 +71,10 @@ class RegistrationDoctorActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Registers a new doctor user with email, password, and profile details.
+     * Validates inputs, creates Firebase Auth user, and stores doctor info in Firestore.
+     */
     private fun registerDoctor() {
         val email = etEmail.text.toString().trim()
         val password = etPassword.text.toString().trim()
@@ -126,6 +130,9 @@ class RegistrationDoctorActivity : AppCompatActivity() {
             }
     }
 
+    /**
+     * Navigates to the main doctor activity after successful registration.
+     */
     private fun navigateToMainDoctorActivity() {
         val intent = Intent(this, MainDoctorActivity::class.java)
         startActivity(intent)

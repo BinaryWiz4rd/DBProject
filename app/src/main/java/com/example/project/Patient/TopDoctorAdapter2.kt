@@ -10,6 +10,10 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.request.RequestOptions
 import com.example.project.databinding.ViewholderTopDoctor2Binding
 
+/**
+ * RecyclerView Adapter for displaying a list of top doctors in a custom layout.
+ * Binds doctor data to the view and handles image loading with Glide.
+ */
 class TopDoctorAdapter2(val items: MutableList<DoctorsModel>) :
     RecyclerView.Adapter<TopDoctorAdapter2.Viewholder>() {
     private var context: Context? = null
@@ -19,6 +23,13 @@ class TopDoctorAdapter2(val items: MutableList<DoctorsModel>) :
 
     }
 
+    /**
+     * Inflates the item view for each doctor and returns a ViewHolder.
+     *
+     * @param parent The parent ViewGroup.
+     * @param viewType The view type of the new View.
+     * @return A new ViewHolder instance.
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Viewholder {
         context = parent.context
         val binding =
@@ -26,6 +37,12 @@ class TopDoctorAdapter2(val items: MutableList<DoctorsModel>) :
         return Viewholder(binding)
     }
 
+    /**
+     * Binds doctor data to the view holder at the given position.
+     *
+     * @param holder The ViewHolder to bind data to.
+     * @param position The position of the item in the list.
+     */
     override fun onBindViewHolder(holder: Viewholder, position: Int) {
         holder.binding.nameTxt.text = items[position].Name
         holder.binding.specialTxt.text = items[position].Special
@@ -46,5 +63,10 @@ class TopDoctorAdapter2(val items: MutableList<DoctorsModel>) :
         }
     }
 
+    /**
+     * Returns the total number of top doctor items.
+     *
+     * @return The size of the items list.
+     */
     override fun getItemCount(): Int = items.size
 }

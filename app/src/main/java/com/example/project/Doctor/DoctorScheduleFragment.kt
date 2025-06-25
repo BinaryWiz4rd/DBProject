@@ -21,6 +21,10 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
+/**
+ * A [Fragment] that displays a doctor's schedule for a selected date.
+ * It allows the doctor to view bookings and update their status.
+ */
 class DoctorScheduleFragment : Fragment() {
 
     private lateinit var bookingsListView: ListView
@@ -38,6 +42,10 @@ class DoctorScheduleFragment : Fragment() {
     private val displayDateFormat = SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault())
     private var selectedDate: String = dateFormat.format(calendar.time)
 
+    /**
+     * Inflates the layout, initializes UI components and Firebase, and sets up listeners and adapters.
+     * It also loads the initial data for the current date.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -77,6 +85,9 @@ class DoctorScheduleFragment : Fragment() {
         return view
     }
 
+    /**
+     * Sets up listeners for the date picker button, refresh button, and booking list items.
+     */
     private fun setupListeners() {
         datePickerButton.setOnClickListener {
             showDatePickerDialog()
@@ -97,6 +108,9 @@ class DoctorScheduleFragment : Fragment() {
         }
     }
 
+    /**
+     * Shows a [DatePickerDialog] to allow the user to select a date.
+     */
     private fun showDatePickerDialog() {
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
@@ -112,12 +126,19 @@ class DoctorScheduleFragment : Fragment() {
         }, year, month, day).show()
     }
 
+    /**
+     * Updates the text view that displays the selected date.
+     */
     private fun updateDateDisplay() {
         val displayDate = displayDateFormat.format(calendar.time)
         bookingsTitleTextView.text = "Bookings for $displayDate"
         datePickerButton.text = "Change Date"
     }
 
+    /**
+     * Fetches the bookings for a given date from Firestore.
+     * @param date The date for which to fetch bookings.
+     */
     private fun fetchBookingsForDate(date: String) {
         Log.d("DoctorSchedule", "Fetching bookings for doctor: $currentDoctorId on $date")
     
@@ -175,7 +196,11 @@ class DoctorScheduleFragment : Fragment() {
             }
     }
     
-    // New helper function to fetch patient details and then populate the display list
+    /**
+     * A helper function to fetch patient details and then populate the display list.
+     * @param currentBookings The list of bookings for which to fetch patient details.
+     * @param serviceMap A map of service IDs to service names.
+     */
     private fun fetchPatientDetailsAndPopulateList(currentBookings: List<Booking>, serviceMap: Map<String, String>) {
         bookingsDisplayList.clear() // Clear display list before populating
 
@@ -246,6 +271,10 @@ class DoctorScheduleFragment : Fragment() {
     // adapter.notifyDataSetChanged()
     // }
     
+    /**
+     * Shows a dialog to update the status of a booking.
+     * @param booking The booking to be updated.
+     */
     private fun showBookingStatusDialog(booking: Booking) {
         val statusOptions = arrayOf("Confirmed", "Cancelled", "Completed", "No-show")
         
@@ -259,6 +288,11 @@ class DoctorScheduleFragment : Fragment() {
             .show()
     }
     
+    /**
+     * Updates the status of a booking in Firestore.
+     * @param booking The booking to be updated.
+     * @param newStatus The new status of the booking.
+     */
     private fun updateBookingStatus(booking: Booking, newStatus: String) {
         firestoreHelper.updateBookingStatus(booking.id, newStatus)
             .addOnSuccessListener {
@@ -271,7 +305,9 @@ class DoctorScheduleFragment : Fragment() {
             }
     }
     
-    // Helper extension function to capitalize first letter of a string
+    /**
+     * A helper extension function to capitalize the first letter of a string.
+     */
     private fun String.capitalize(): String {
         return if (this.isNotEmpty()) {
             this.substring(0, 1).uppercase() + this.substring(1)

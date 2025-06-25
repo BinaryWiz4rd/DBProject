@@ -17,6 +17,9 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+/**
+ * Activity for patient registration.
+ */
 class RegistrationPatientActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
@@ -31,6 +34,11 @@ class RegistrationPatientActivity : AppCompatActivity() {
     private lateinit var btnRegister: Button
     private lateinit var btnLogIn: Button
 
+    /**
+     * Initializes the patient registration form and sets click listeners.
+     *
+     * @param savedInstanceState The saved instance state bundle.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration_patient)
@@ -60,6 +68,9 @@ class RegistrationPatientActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Registers a new patient user with validated inputs and stores info in Firestore.
+     */
     private fun registerPatient() {
         val firstName = etFirstName.text.toString().trim()
         val lastName = etLastName.text.toString().trim()
@@ -128,6 +139,12 @@ class RegistrationPatientActivity : AppCompatActivity() {
             }
     }
 
+    /**
+     * Checks if the given date of birth corresponds to an adult (18+ years).
+     *
+     * @param dateOfBirth Date of birth to validate.
+     * @return True if the user is 18 or older, false otherwise.
+     */
     private fun isAdult(dateOfBirth: Date): Boolean {
         val dob = Calendar.getInstance().apply { time = dateOfBirth }
         val today = Calendar.getInstance()
@@ -137,6 +154,10 @@ class RegistrationPatientActivity : AppCompatActivity() {
         }
         return age >= 18
     }
+
+    /**
+     * Navigates to the main patient activity after successful registration.
+     */
     private fun navigateToMainPatientActivity() {
         val intent = Intent(this, MainPatientActivity::class.java)
         startActivity(intent)

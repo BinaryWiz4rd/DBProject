@@ -10,6 +10,10 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.request.RequestOptions
 import com.example.project.databinding.ViewholderTopDoctorBinding
 
+/**
+ * RecyclerView Adapter for displaying a list of top doctors.
+ * Binds doctor data to the view and handles click events for doctor selection.
+ */
 class TopDoctorAdapter(val items: MutableList<DoctorsModel>) :
     RecyclerView.Adapter<TopDoctorAdapter.Viewholder>() {
     private var context: Context? = null

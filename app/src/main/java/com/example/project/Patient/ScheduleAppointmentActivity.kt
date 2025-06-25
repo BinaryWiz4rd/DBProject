@@ -5,6 +5,10 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.project.R
 
+/**
+ * Activity for scheduling an appointment with a doctor.
+ * Allows patients to select a doctor, date, and time for booking an appointment.
+ */
 class ScheduleAppointmentActivity : AppCompatActivity() {
 // to jest dla pacjenta
 
