@@ -10,11 +10,19 @@ data class Doctor(
     val phoneNumber: String = "",
     val role: String = "doctor"
 ) {
-    // Computed property for full name
+    /**
+     * A computed property that returns the full name of the doctor,
+     * combining their first name and last name.
+     */
     val fullName: String
         get() = "$firstName $lastName"
 
-    // Helper method to convert doctor to HashMap for Firestore storage
+    /**
+     * Converts the [Doctor] object into a [HashMap] suitable for storage in Firestore.
+     * The `uid` field is not included in the HashMap as it typically serves as the document ID in Firestore.
+     *
+     * @return A [HashMap] containing the doctor's data.
+     */
     fun toHashMap(): HashMap<String, Any> {
         return hashMapOf(
             "firstName" to firstName,

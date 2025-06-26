@@ -19,12 +19,16 @@ import java.text.SimpleDateFormat
 import java.util.*
 import com.example.project.Admin.Doctor
 
+/**
+ * A [Fragment] that displays a calendar and available time slots for a selected service and doctor.
+ * Patients can choose a date and then select an available time slot to proceed with booking.
+ */
 class PatientServiceAvailabilityFragment : Fragment() {
 
     private lateinit var firestoreHelper: FirestoreHelper
     private var serviceId: String = ""
     private var doctorId: String = ""
-    private var serviceDuration: Int = 30 // Default duration
+    private var serviceDuration: Int = 30 // Default duration in minutes
     private var doctorName: String = ""
     private var serviceName: String = ""
 
@@ -37,6 +41,17 @@ class PatientServiceAvailabilityFragment : Fragment() {
     private val timeSlots = mutableListOf<String>()
     private var selectedDate: Calendar = Calendar.getInstance()
 
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment.
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     * @return Return the [View] for the fragment's UI, or null.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -68,6 +83,10 @@ class PatientServiceAvailabilityFragment : Fragment() {
         return view
     }
 
+    /**
+     * Sets up the [RecyclerView] for displaying time slots with a [LinearLayoutManager]
+     * and a [TimeSlotAdapter].
+     */
     private fun setupRecyclerView() {
         timeSlotAdapter = TimeSlotAdapter(timeSlots) { timeSlot ->
             onTimeSlotClicked(timeSlot)
@@ -75,7 +94,12 @@ class PatientServiceAvailabilityFragment : Fragment() {
         timeSlotsRecyclerView.layoutManager = LinearLayoutManager(context)
         timeSlotsRecyclerView.adapter = timeSlotAdapter
     }
-    
+
+    /**
+     * Fetches details of the selected service and doctor from Firestore.
+     * Updates [serviceDuration], [doctorName], and [serviceName] accordingly.
+     * After fetching, it triggers the loading of time slots for the initially selected date.
+     */
     private fun fetchServiceAndDoctorDetails() {
         if (serviceId.isEmpty() || doctorId.isEmpty()) {
             Toast.makeText(context, "Service or Doctor ID not found.", Toast.LENGTH_SHORT).show()
@@ -96,22 +120,30 @@ class PatientServiceAvailabilityFragment : Fragment() {
 
                 val doctor = doctorDoc.toObject(Doctor::class.java)
                 doctorName = doctor?.let { "${it.firstName} ${it.lastName}" } ?: "Unknown Doctor"
-                
-                // Now that we have the details, load slots for the initial date
+
                 loadTimeSlotsForDate(selectedDate.time)
             }
             .addOnFailureListener { e ->
                 Toast.makeText(context, "Failed to get service/doctor details: ${e.message}", Toast.LENGTH_SHORT).show()
-                // Load with default duration even if details fail
                 loadTimeSlotsForDate(selectedDate.time)
             }
     }
 
+    /**
+     * Updates the [selectedDateTextView] to display the currently selected date in a readable format.
+     */
     private fun updateSelectedDateText() {
         val sdf = SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault())
         selectedDateTextView.text = "Available slots for: ${sdf.format(selectedDate.time)}"
     }
-    
+
+    /**
+     * Loads and displays available time slots for the given date.
+     * It fetches the doctor's working hours from settings and existing bookings for the day.
+     * Then, it generates and filters time slots, updating the [timeSlotsRecyclerView].
+     *
+     * @param date The [Date] for which to load time slots.
+     */
     private fun loadTimeSlotsForDate(date: Date) {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val dateString = dateFormat.format(date)
@@ -124,11 +156,11 @@ class PatientServiceAvailabilityFragment : Fragment() {
                 val doctorSettingsDoc = results[0] as com.google.firebase.firestore.DocumentSnapshot
                 val bookingsSnapshot = results[1] as com.google.firebase.firestore.QuerySnapshot
 
-                val startHour = doctorSettingsDoc.getLong("startHour")?.toInt() ?: 8 // Default 8 AM
-                val endHour = doctorSettingsDoc.getLong("endHour")?.toInt() ?: 17 // Default 5 PM
+                val startHour = doctorSettingsDoc.getLong("startHour")?.toInt() ?: 8
+                val endHour = doctorSettingsDoc.getLong("endHour")?.toInt() ?: 17
 
                 val bookings = bookingsSnapshot.toObjects(Booking::class.java)
-                
+
                 val generatedSlots = generateTimeSlots(startHour, endHour, serviceDuration, bookings)
 
                 timeSlots.clear()
@@ -149,7 +181,17 @@ class PatientServiceAvailabilityFragment : Fragment() {
                 timeSlotsRecyclerView.visibility = View.GONE
             }
     }
-    
+
+    /**
+     * Generates a list of available time slots for a given day, considering doctor's working hours,
+     * service duration, and existing bookings.
+     *
+     * @param startHour The starting hour of the doctor's workday (24-hour format).
+     * @param endHour The ending hour of the doctor's workday (24-hour format).
+     * @param durationMinutes The duration of each service in minutes.
+     * @param bookings A list of existing [Booking] objects for the current date.
+     * @return A [List] of strings, where each string represents an available time slot (e.g., "HH:mm - HH:mm").
+     */
     private fun generateTimeSlots(startHour: Int, endHour: Int, durationMinutes: Int, bookings: List<Booking>): List<String> {
         val slots = mutableListOf<String>()
         val calendar = Calendar.getInstance().apply {
@@ -172,7 +214,7 @@ class PatientServiceAvailabilityFragment : Fragment() {
             val slotStart = calendar.time
             calendar.add(Calendar.MINUTE, durationMinutes)
             val slotEnd = calendar.time
-            
+
             if (calendar.after(endCalendar)) break
 
             val slotStartTime = timeFormat.format(slotStart)
@@ -181,7 +223,6 @@ class PatientServiceAvailabilityFragment : Fragment() {
             val isBooked = bookings.any { booking ->
                 val bookingStart = timeFormat.parse(booking.start_time)
                 val bookingEnd = timeFormat.parse(booking.end_time)
-                // Check for overlap
                 slotStart.before(bookingEnd) && slotEnd.after(bookingStart)
             }
 
@@ -192,14 +233,29 @@ class PatientServiceAvailabilityFragment : Fragment() {
         return slots
     }
 
+    /**
+     * Handles the event when a time slot is clicked.
+     * Parses the selected time slot and navigates to the booking confirmation fragment.
+     *
+     * @param timeSlot The selected time slot string (e.g., "HH:mm - HH:mm").
+     */
     private fun onTimeSlotClicked(timeSlot: String) {
         val times = timeSlot.split(" - ")
         val startTime = times[0]
         val endTime = times[1]
-        
+
         navigateToConfirmBooking(serviceId, doctorId, selectedDate, startTime, endTime)
     }
 
+    /**
+     * Navigates to the [ConfirmBookingFragment] with details of the selected service, doctor, date, and time.
+     *
+     * @param serviceId The ID of the selected service.
+     * @param doctorId The ID of the selected doctor.
+     * @param date The selected [Calendar] date.
+     * @param startTime The start time of the selected slot (e.g., "HH:mm").
+     * @param endTime The end time of the selected slot (e.g., "HH:mm").
+     */
     private fun navigateToConfirmBooking(
         serviceId: String,
         doctorId: String,
@@ -210,7 +266,7 @@ class PatientServiceAvailabilityFragment : Fragment() {
         try {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val dateString = dateFormat.format(date.time)
-            
+
             val fragment = ConfirmBookingFragment()
             val bundle = Bundle().apply {
                 putString("service_id", serviceId)

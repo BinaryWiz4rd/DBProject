@@ -18,25 +18,56 @@ import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * A [Fragment] responsible for confirming a new appointment booking.
+ *
+ * This fragment displays the details of a selected service, doctor, date, and time,
+ * and allows the patient to confirm the booking. It performs validation to ensure
+ * the chosen time slot is still available before adding the booking to Firestore.
+ */
 class ConfirmBookingFragment : Fragment() {
 
     private lateinit var firestoreHelper: FirestoreHelper
     private lateinit var auth: FirebaseAuth
 
-    // Arguments from Bundle
+    /**
+     * The ID of the selected service.
+     */
     private var serviceId: String = ""
+    /**
+     * The ID of the selected doctor.
+     */
     private var doctorId: String = ""
+    /**
+     * The selected date for the appointment in "yyyy-MM-dd" format.
+     */
     private var date: String = ""
+    /**
+     * The start time of the selected slot in "HH:mm" format.
+     */
     private var startTime: String = ""
+    /**
+     * The end time of the selected slot in "HH:mm" format.
+     */
     private var endTime: String = ""
+    /**
+     * The name of the selected doctor.
+     */
     private var doctorName: String = ""
+    /**
+     * The name of the selected service.
+     */
     private var serviceName: String = ""
-    
-    // Patient details
+
+    /**
+     * The ID of the currently authenticated patient.
+     */
     private var patientId: String = ""
+    /**
+     * The full name of the currently authenticated patient.
+     */
     private var patientName: String = ""
 
-    // UI Elements
     private lateinit var serviceNameTextView: TextView
     private lateinit var doctorNameTextView: TextView
     private lateinit var dateTextView: TextView
@@ -45,6 +76,17 @@ class ConfirmBookingFragment : Fragment() {
     private lateinit var confirmBookingButton: Button
     private lateinit var progressBar: ProgressBar
 
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment.
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     * @return The View for the fragment's UI, or null.
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -54,7 +96,6 @@ class ConfirmBookingFragment : Fragment() {
         firestoreHelper = FirestoreHelper()
         auth = FirebaseAuth.getInstance()
 
-        // Get arguments from Bundle
         arguments?.let {
             serviceId = it.getString("service_id", "")
             doctorId = it.getString("doctor_id", "")
@@ -65,7 +106,6 @@ class ConfirmBookingFragment : Fragment() {
             serviceName = it.getString("service_name", "N/A")
         }
 
-        // Bind views
         serviceNameTextView = view.findViewById(R.id.bookingServiceNameTextView)
         doctorNameTextView = view.findViewById(R.id.bookingDoctorNameTextView)
         dateTextView = view.findViewById(R.id.bookingDateTextView)
@@ -74,7 +114,6 @@ class ConfirmBookingFragment : Fragment() {
         confirmBookingButton = view.findViewById(R.id.confirmBookingButton)
         progressBar = view.findViewById(R.id.bookingProgressBar)
 
-        // Populate the views
         serviceNameTextView.text = serviceName
         doctorNameTextView.text = doctorName
         dateTextView.text = date
@@ -89,6 +128,13 @@ class ConfirmBookingFragment : Fragment() {
         return view
     }
 
+    /**
+     * Fetches the currently authenticated patient's details from Firestore
+     * and updates the patient name TextView.
+     *
+     * If no user is logged in or the patient profile cannot be found/loaded,
+     * it disables the confirm booking button and shows appropriate messages.
+     */
     private fun fetchAndDisplayPatientName() {
         val currentUser = auth.currentUser
         if (currentUser == null) {
@@ -96,10 +142,10 @@ class ConfirmBookingFragment : Fragment() {
             confirmBookingButton.isEnabled = false
             return
         }
-        
+
         patientId = currentUser.uid
         patientNameTextView.text = "Loading..."
-        
+
         firestoreHelper.getPatientById(patientId).addOnSuccessListener { document ->
             if (document.exists()) {
                 val patient = document.toObject(Patient::class.java)
@@ -117,15 +163,20 @@ class ConfirmBookingFragment : Fragment() {
         }
     }
 
+    /**
+     * Validates the selected time slot against existing bookings for the doctor on the given date.
+     *
+     * If the slot is still available, it proceeds to add the booking to Firestore.
+     * If a conflict is found, it informs the user and navigates back.
+     */
     private fun validateAndConfirmBooking() {
         if (patientId.isEmpty() || patientName.isEmpty()) {
             Toast.makeText(context, "Patient details not loaded yet. Please wait.", Toast.LENGTH_SHORT).show()
             return
         }
-        
+
         setLoading(true)
 
-        // Step 1: Validate that the slot is still free
         firestoreHelper.getBookingsForDoctor(doctorId, date)
             .addOnSuccessListener { bookingsSnapshot ->
                 val bookings = bookingsSnapshot.toObjects(Booking::class.java)
@@ -145,7 +196,6 @@ class ConfirmBookingFragment : Fragment() {
                     Toast.makeText(context, "This time slot is no longer available. Please choose another one.", Toast.LENGTH_LONG).show()
                     parentFragmentManager.popBackStack()
                 } else {
-                    // Step 2: Add the booking
                     addBookingToFirestore()
                 }
             }
@@ -155,6 +205,12 @@ class ConfirmBookingFragment : Fragment() {
             }
     }
 
+    /**
+     * Adds the confirmed booking details to the "bookings" collection in Firestore.
+     *
+     * On success, it shows a confirmation message and pops the entire back stack
+     * to return to the main patient flow. On failure, it shows an error message.
+     */
     private fun addBookingToFirestore() {
         val booking = hashMapOf(
             "doctor_id" to doctorId,
@@ -171,7 +227,6 @@ class ConfirmBookingFragment : Fragment() {
             .addOnSuccessListener {
                 setLoading(false)
                 Toast.makeText(context, "Booking confirmed!", Toast.LENGTH_LONG).show()
-                // Navigate back to the root of the patient flow
                 parentFragmentManager.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
             }
             .addOnFailureListener { e ->
@@ -180,6 +235,11 @@ class ConfirmBookingFragment : Fragment() {
             }
     }
 
+    /**
+     * Controls the visibility of the progress bar and the enabled state of the confirm button.
+     *
+     * @param isLoading A boolean indicating whether the loading state should be active (true) or inactive (false).
+     */
     private fun setLoading(isLoading: Boolean) {
         if (isLoading) {
             progressBar.visibility = View.VISIBLE

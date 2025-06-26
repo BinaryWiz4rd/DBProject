@@ -6,19 +6,50 @@ import android.os.Bundle
 import com.bumptech.glide.Glide
 import com.example.project.databinding.ActivityDetailBinding
 
+/**
+ * [DetailActivity] displays detailed information about a selected doctor.
+ *
+ * This activity receives a [DoctorsModel] object via an Intent and populates
+ * its UI with the doctor's name, specialization, patient count, biography,
+ * address, experience, and rating. It also provides interactive buttons for
+ * visiting the doctor's website, sending a message, making a call, getting
+ * directions, and sharing the doctor's details.
+ */
 class DetailActivity : BaseActivity() {
     private lateinit var binding: ActivityDetailBinding
     private lateinit var item: DoctorsModel
 
+    /**
+     * Called when the activity is first created.
+     *
+     * Initializes the view binding and retrieves the [DoctorsModel] object
+     * passed through the intent.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after
+     * previously being shut down then this Bundle contains the data it most
+     * recently supplied in [onSaveInstanceState]. Note: Otherwise it is null.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         getBundle()
-
     }
 
+    /**
+     * Retrieves the [DoctorsModel] object from the Intent and populates
+     * the UI elements with the doctor's details.
+     *
+     * Sets up click listeners for various action buttons:
+     * - **backBtn**: Finishes the activity.
+     * - **websiteBtn**: Opens the doctor's website in a browser.
+     * - **messageBtn**: Opens the SMS application to send a message to the doctor.
+     * - **callBtn**: Initiates a phone call to the doctor.
+     * - **directionBtn**: Opens a map application for directions to the doctor's location.
+     * - **shareBtn**: Allows sharing the doctor's name, address, and mobile number.
+     * It also loads the doctor's picture using Glide.
+     */
     private fun getBundle() {
         item = intent.getParcelableExtra("object")!!
 
