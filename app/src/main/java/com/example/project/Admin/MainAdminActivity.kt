@@ -6,6 +6,10 @@ import androidx.fragment.app.Fragment
 import com.example.project.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
+/**
+ * Main activity for the admin panel. This activity hosts various admin-specific fragments
+ * and provides navigation between them using a [BottomNavigationView].
+ */
 class MainAdminActivity : AppCompatActivity() {
 
     private lateinit var bottomNavigationView: BottomNavigationView
@@ -31,24 +35,34 @@ class MainAdminActivity : AppCompatActivity() {
             true
         }
 
-        // Load the default fragment
         if (savedInstanceState == null) {
-            bottomNavigationView.selectedItemId = R.id.nav_admin_appointments // Set default selected item
+            bottomNavigationView.selectedItemId = R.id.nav_admin_appointments
             loadFragment(AdminAppointmentsFragment())
         }
     }
 
+    /**
+     * Replaces the current fragment in the [R.id.admin_fragment_container] with the specified [fragment].
+     *
+     * @param fragment The [Fragment] to load into the container.
+     */
     private fun loadFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.admin_fragment_container, fragment)
             .commit()
     }
-    
-    // Add this method to navigate to any fragment
+
+    /**
+     * Navigates to the specified [fragment] by replacing the current fragment in the container
+     * and adding the transaction to the back stack. This allows the user to navigate back to
+     * the previous fragment using the device's back button.
+     *
+     * @param fragment The [Fragment] to navigate to.
+     */
     fun navigateToFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.admin_fragment_container, fragment)
-            .addToBackStack(null)  // Add to back stack so user can navigate back
+            .addToBackStack(null)
             .commit()
     }
 }

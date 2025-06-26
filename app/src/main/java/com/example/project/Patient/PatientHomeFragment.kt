@@ -23,15 +23,36 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+/**
+ * A [Fragment] subclass that displays the patient's home dashboard.
+ * This includes a welcome message, quick action buttons, upcoming appointments,
+ * top doctors, and medical categories. It also provides functionality to
+ * view and edit the patient's profile, log out, and delete the account.
+ */
 class PatientHomeFragment : Fragment() {
-    
+
     private var _binding: FragmentPatientHomeBinding? = null
+
+    /**
+     * This property is only valid between [onCreateView] and [onDestroyView].
+     */
     private val binding get() = _binding!!
-    
+
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
     private lateinit var firestoreHelper: FirestoreHelper
-    
+
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     * @return Return the View for the fragment's UI, or null.
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -40,81 +61,92 @@ class PatientHomeFragment : Fragment() {
         _binding = FragmentPatientHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
-    
+
+    /**
+     * Called immediately after [onCreateView] has returned, but before any saved state has been restored in to the view.
+     * This method initializes Firebase instances, sets up UI listeners, and loads dashboard data.
+     *
+     * @param view The View returned by [onCreateView].
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
         firestoreHelper = FirestoreHelper()
-        
+
         setupUI()
         loadPatientDashboard()
         initCategory()
         initTopDoctors()
     }
-    
+
+    /**
+     * Sets up click listeners for various UI elements like the profile button and quick action buttons.
+     */
     private fun setupUI() {
         binding.profileButton.setOnClickListener {
             showProfileDialog()
         }
-        
-        // Set up quick action buttons
+
         binding.bookAppointmentButton.setOnClickListener {
-            // Navigate to booking flow
             (activity as? MainPatientActivity)?.navigateToBooking()
         }
-          binding.viewAllDoctorsButton.setOnClickListener {
-            // Navigate to doctors tab
+        binding.viewAllDoctorsButton.setOnClickListener {
             (activity as? MainPatientActivity)?.navigateToDoctors()
         }
-        
+
         binding.myAppointmentsButton.setOnClickListener {
-            // Navigate to appointments
             (activity as? MainPatientActivity)?.navigateToAppointments()
         }
     }
-      private fun loadPatientDashboard() {
+
+    /**
+     * Loads patient-specific data for the dashboard, including their name and upcoming appointments.
+     * Displays a welcome message and the next appointment details, or hides the appointment card if none.
+     */
+    private fun loadPatientDashboard() {
         val currentUser = auth.currentUser
         if (currentUser == null) {
             binding.welcomeText.text = "Hi, Welcome!"
-            return        }
-        
-        // Show loading state
+            return
+        }
+
         binding.progressBarCategory?.visibility = View.VISIBLE
-        
-        // Load patient profile
+
         firestoreHelper.getPatientById(currentUser.uid) { patient ->
             activity?.runOnUiThread {
                 if (patient != null) {
-                    binding.welcomeText.text = "Hi, ${patient.firstName} ${patient.lastName}!"                } else {
+                    binding.welcomeText.text = "Hi, ${patient.firstName} ${patient.lastName}!"
+                } else {
                     binding.welcomeText.text = "Hi, Welcome!"
                 }
             }
-        }        
-        // Load upcoming appointments - use email instead of UID
+        }
+
         val patientIdentifier = currentUser.email ?: currentUser.uid
         firestoreHelper.getUpcomingBookingsForPatient(patientIdentifier) { appointmentDetails ->
             activity?.runOnUiThread {
                 binding.progressBarCategory?.visibility = View.GONE
-                
+
                 if (appointmentDetails.isNotEmpty()) {
                     binding.upcomingAppointmentCard.visibility = View.VISIBLE
                     val nextAppointment = appointmentDetails.first()
-                    
-                    // Format date and time
+
                     try {
                         val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                         val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
                         val date = inputFormat.parse(nextAppointment.date)
                         val formattedDate = if (date != null) outputFormat.format(date) else nextAppointment.date
-                          binding.nextAppointmentText.text = "Next appointment: $formattedDate at ${nextAppointment.startTime}"
-                        binding.nextAppointmentDoctor.text = "Dr. ${nextAppointment.doctorName}"                    } catch (e: ParseException) {
+                        binding.nextAppointmentText.text = "Next appointment: $formattedDate at ${nextAppointment.startTime}"
+                        binding.nextAppointmentDoctor.text = "Dr. ${nextAppointment.doctorName}"
+                    } catch (e: ParseException) {
                         binding.nextAppointmentText.text = "Next appointment: ${nextAppointment.date} at ${nextAppointment.startTime}"
                         binding.nextAppointmentDoctor.text = "Dr. ${nextAppointment.doctorName}"
                     }
-                    
-                    // Set click listener for appointment card
+
                     binding.upcomingAppointmentCard.setOnClickListener {
                         (activity as? MainPatientActivity)?.navigateToAppointments()
                     }
@@ -124,49 +156,54 @@ class PatientHomeFragment : Fragment() {
             }
         }
     }
-      private fun initTopDoctors() {
+
+    /**
+     * Initializes and displays a list of top doctors in a horizontal RecyclerView.
+     * Also sets a click listener to navigate to the all doctors tab.
+     */
+    private fun initTopDoctors() {
         binding.apply {
             progressBarTopDoctor.visibility = View.VISIBLE
-            
-            // Load top doctors using FirestoreHelper
+
             firestoreHelper.getAllDoctors { doctors ->
                 activity?.runOnUiThread {
                     progressBarTopDoctor.visibility = View.GONE
-                    
+
                     if (doctors.isNotEmpty()) {
-                        // Take only top 5 doctors for the home screen
                         val topDoctors = doctors.take(5)
                         recyclerViewTopDoctor.layoutManager =
                             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
                         recyclerViewTopDoctor.adapter = DoctorListAdapter(topDoctors) { doctor ->
-                            // Navigate to doctor details
                             (activity as? MainPatientActivity)?.navigateToBookingWithDoctor(doctor.uid)
                         }
                     }
                 }
             }
-            
+
             doctorListTxt.setOnClickListener {
-                // Navigate to doctors tab
                 (activity as? MainPatientActivity)?.navigateToDoctors()
             }
         }
     }
-      private fun initCategory() {
+
+    /**
+     * Initializes and displays medical categories in a horizontal RecyclerView.
+     * Fetches categories from Firestore and handles success and failure scenarios.
+     */
+    private fun initCategory() {
         binding.progressBarCategory.visibility = View.VISIBLE
-        
-        // Load categories from Firebase (if categories collection exists)
+
         db.collection("categories")
             .get()
             .addOnSuccessListener { documents ->
                 binding.progressBarCategory.visibility = View.GONE
                 val categories = mutableListOf<CategoryModel>()
-                
+
                 for (document in documents) {
                     val category = document.toObject(CategoryModel::class.java)
                     categories.add(category)
                 }
-                
+
                 if (categories.isNotEmpty()) {
                     binding.viewCategory.layoutManager =
                         LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -175,23 +212,26 @@ class PatientHomeFragment : Fragment() {
             }
             .addOnFailureListener {
                 binding.progressBarCategory.visibility = View.GONE
-                // Hide category section if no categories found
                 binding.viewCategory.visibility = View.GONE
             }
     }
-    
+
+    /**
+     * Displays an [AlertDialog] for the patient's profile, allowing them to view, edit,
+     * log out, or delete their account.
+     */
     private fun showProfileDialog() {
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_profile_patient, null)
-        
+
         val editTextFirstName = dialogView.findViewById<EditText>(R.id.editTextFirstName)
         val editTextLastName = dialogView.findViewById<EditText>(R.id.editTextLastName)
         val editTextEmail = dialogView.findViewById<EditText>(R.id.editTextEmail)
         val editTextDateOfBirth = dialogView.findViewById<EditText>(R.id.editTextDateOfBirth)
-        
+
         val buttonEdit = dialogView.findViewById<Button>(R.id.buttonEdit)
         val buttonLogout = dialogView.findViewById<Button>(R.id.buttonLogout)
         val buttonDeleteAccount = dialogView.findViewById<Button>(R.id.buttonDeleteAccount)
-        
+
         val currentUser = auth.currentUser
         currentUser?.let { user ->
             db.collection("patients").document(user.uid)
@@ -202,7 +242,7 @@ class PatientHomeFragment : Fragment() {
                         val lastName = document.getString("lastName") ?: ""
                         val email = document.getString("email") ?: ""
                         val dateOfBirth = document.getString("dateOfBirth") ?: ""
-                        
+
                         editTextFirstName.setText(firstName)
                         editTextLastName.setText(lastName)
                         editTextEmail.setText(email)
@@ -217,25 +257,25 @@ class PatientHomeFragment : Fragment() {
         } ?: run {
             Toast.makeText(requireContext(), "User not authenticated.", Toast.LENGTH_SHORT).show()
         }
-        
+
         val builder = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .setTitle("Profile")
-        
+
         val alertDialog = builder.create()
         alertDialog.show()
-        
+
         buttonEdit.setOnClickListener {
             val newFirstName = editTextFirstName.text.toString().trim()
             val newLastName = editTextLastName.text.toString().trim()
             val newEmail = editTextEmail.text.toString().trim()
             val newDateOfBirthStr = editTextDateOfBirth.text.toString().trim()
-            
+
             if (newFirstName.isEmpty() || newLastName.isEmpty() || newEmail.isEmpty() || newDateOfBirthStr.isEmpty()) {
                 Toast.makeText(requireContext(), "Please fill in all fields.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            
+
             val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             sdf.isLenient = false
             val newDateOfBirth: Date
@@ -245,12 +285,12 @@ class PatientHomeFragment : Fragment() {
                 Toast.makeText(requireContext(), "Invalid date format (use yyyy-MM-dd)", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            
+
             if (!isAdult(newDateOfBirth)) {
                 Toast.makeText(requireContext(), "You must be 18 or older.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            
+
             currentUser?.let { user ->
                 db.collection("patients").document(user.uid)
                     .get()
@@ -260,9 +300,9 @@ class PatientHomeFragment : Fragment() {
                             val oldLastName = document.getString("lastName") ?: ""
                             val oldEmail = document.getString("email") ?: ""
                             val oldDateOfBirth = document.getString("dateOfBirth") ?: ""
-                            
+
                             val changes = mutableMapOf<String, Any>()
-                            
+
                             if (newFirstName != oldFirstName) {
                                 changes["firstName"] = newFirstName
                             }
@@ -275,7 +315,7 @@ class PatientHomeFragment : Fragment() {
                             if (newDateOfBirthStr != oldDateOfBirth) {
                                 changes["dateOfBirth"] = newDateOfBirthStr
                             }
-                            
+
                             if (changes.isNotEmpty()) {
                                 val editRequest = hashMapOf(
                                     "userId" to user.uid,
@@ -313,7 +353,7 @@ class PatientHomeFragment : Fragment() {
                 Toast.makeText(requireContext(), "User not authenticated.", Toast.LENGTH_SHORT).show()
             }
         }
-        
+
         buttonLogout.setOnClickListener {
             auth.signOut()
             Toast.makeText(requireContext(), "Logged out", Toast.LENGTH_SHORT).show()
@@ -322,7 +362,7 @@ class PatientHomeFragment : Fragment() {
             startActivity(intent)
             requireActivity().finish()
         }
-        
+
         buttonDeleteAccount.setOnClickListener {
             AlertDialog.Builder(requireContext())
                 .setTitle("Delete Account")
@@ -358,7 +398,13 @@ class PatientHomeFragment : Fragment() {
                 .show()
         }
     }
-    
+
+    /**
+     * Checks if a given [Date] of birth corresponds to an individual who is 18 years or older.
+     *
+     * @param dateOfBirth The [Date] object representing the birth date.
+     * @return `true` if the person is 18 or older, `false` otherwise.
+     */
     private fun isAdult(dateOfBirth: Date): Boolean {
         val dob = Calendar.getInstance().apply { time = dateOfBirth }
         val today = Calendar.getInstance()
@@ -368,7 +414,11 @@ class PatientHomeFragment : Fragment() {
         }
         return age >= 18
     }
-    
+
+    /**
+     * Called when the view previously created by [onCreateView] has been detached from the fragment.
+     * This is an important lifecycle callback to clean up the binding object.
+     */
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
