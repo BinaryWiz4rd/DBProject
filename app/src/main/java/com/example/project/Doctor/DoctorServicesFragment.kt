@@ -23,7 +23,7 @@ import com.google.firebase.auth.FirebaseAuth
  */
 class DoctorServicesFragment : Fragment() {
     private lateinit var servicesRecyclerView: RecyclerView
-    private lateinit var fabAddService: FloatingActionButton // Keep for now, but its click listener will be removed
+    private lateinit var fabAddService: FloatingActionButton
     private lateinit var emptyServicesTextView: TextView
     private val servicesList = mutableListOf<Service>()
     private lateinit var adapter: ServiceAdapter
@@ -32,8 +32,7 @@ class DoctorServicesFragment : Fragment() {
     private var currentDoctorId: String? = null
 
     /**
-     * Inflates the layout, initializes UI components and Firebase, and sets up the RecyclerView adapter.
-     * It also loads the initial list of services.
+     * Initializes the fragment's UI and data.
      */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,11 +48,10 @@ class DoctorServicesFragment : Fragment() {
         auth = FirebaseAuth.getInstance()
         currentDoctorId = auth.currentUser?.uid
 
-        // Initialize adapter with click handlers
         adapter = ServiceAdapter(
             requireContext(),
-            servicesList, // Initially empty, adapter will make a copy
-            true, // showAddItem
+            servicesList,
+            true,
             onItemClick = { service ->
                 showEditDeleteServiceDialog(service)
             },
@@ -75,15 +73,13 @@ class DoctorServicesFragment : Fragment() {
             loadServices()
         }
 
-        // The FAB's click listener is removed as the "add item" in the list handles this.
-        // fabAddService.setOnClickListener { ... } // Removed
-        fabAddService.visibility = View.GONE // This remains correct
+        fabAddService.visibility = View.GONE
 
         return view
     }
 
     /**
-     * Loads the services for the current doctor from Firestore.
+     * Loads services for the current doctor.
      */
     private fun loadServices() {
         val doctorId = currentDoctorId
@@ -106,11 +102,10 @@ class DoctorServicesFragment : Fragment() {
                         newServiceList.add(service)
                     }
                 }
-                
-                // Update fragment's list and then the adapter
+
                 servicesList.clear()
                 servicesList.addAll(newServiceList)
-                adapter.updateServices(newServiceList) // Update adapter data
+                adapter.updateServices(newServiceList)
             }
             .addOnFailureListener { e ->
                 Log.e("DoctorServices", "Error loading services", e)
@@ -120,8 +115,8 @@ class DoctorServicesFragment : Fragment() {
     }
 
     /**
-     * Shows an empty state message when there are no services to display.
-     * @param message The message to be displayed.
+     * Displays a message when no services are available.
+     * @param message The message to display.
      */
     private fun showEmptyState(message: String) {
         servicesRecyclerView.visibility = View.GONE
@@ -130,10 +125,10 @@ class DoctorServicesFragment : Fragment() {
     }
 
     /**
-     * Shows a dialog to add a new service.
+     * Shows a dialog for adding a new service.
      */
     private fun showAddServiceDialog() {
-        val doctorId = currentDoctorId ?: return // Should not be null if this function is called
+        val doctorId = currentDoctorId ?: return
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_service_doctor, null)
         val serviceNameEditText = dialogView.findViewById<EditText>(R.id.serviceNameEditText)
         val servicePriceEditText = dialogView.findViewById<EditText>(R.id.servicePriceEditText)
@@ -167,7 +162,7 @@ class DoctorServicesFragment : Fragment() {
 
     /**
      * Shows a dialog to edit or delete an existing service.
-     * @param service The service to be edited or deleted.
+     * @param service The service to edit or delete.
      */
     private fun showEditDeleteServiceDialog(service: Service) {
         val serviceDocumentId = service.id

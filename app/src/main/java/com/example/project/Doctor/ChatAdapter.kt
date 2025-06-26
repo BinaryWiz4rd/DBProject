@@ -14,7 +14,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-// Definicje typów widoków
 private const val VIEW_TYPE_SENT_TEXT = 1
 private const val VIEW_TYPE_RECEIVED_TEXT = 2
 private const val VIEW_TYPE_SENT_IMAGE = 3
@@ -24,7 +23,6 @@ private const val VIEW_TYPE_RECEIVED_DOCUMENT = 6
 
 /**
  * An adapter for displaying chat messages using a [ListAdapter] for efficient updates.
- * This adapter is a work in progress and contains several TODOs for handling different message types.
  *
  * @property currentUserId The ID of the currently logged-in user.
  */
@@ -49,7 +47,6 @@ class ChatAdapter(private val currentUserId: String) :
 
     /**
      * Creates a new [RecyclerView.ViewHolder] for a message item.
-     * TODO: Add ViewHolder creation for image and document message types.
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -60,18 +57,12 @@ class ChatAdapter(private val currentUserId: String) :
             VIEW_TYPE_RECEIVED_TEXT -> ReceivedTextViewHolder(
                 inflater.inflate(R.layout.activity_list_chat_item_received_text, parent, false)
             )
-            // TODO: Dodać tworzenie ViewHolderów dla obrazów i dokumentów
-            // VIEW_TYPE_SENT_IMAGE -> SentImageViewHolder(...)
-            // VIEW_TYPE_RECEIVED_IMAGE -> ReceivedImageViewHolder(...)
-            // VIEW_TYPE_SENT_DOCUMENT -> SentDocumentViewHolder(...)
-            // VIEW_TYPE_RECEIVED_DOCUMENT -> ReceivedDocumentViewHolder(...)
             else -> throw IllegalArgumentException("Invalid view type")
         }
     }
 
     /**
      * Binds the data of a message at a given position to the [RecyclerView.ViewHolder].
-     * TODO: Add data binding for image and document message types.
      */
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val message = getItem(position)
@@ -80,15 +71,8 @@ class ChatAdapter(private val currentUserId: String) :
         when (holder) {
             is SentTextViewHolder -> holder.bind(message, formattedTime)
             is ReceivedTextViewHolder -> holder.bind(message, formattedTime)
-            // TODO: Dodać bindowanie dla obrazów i dokumentów
-            // is SentImageViewHolder -> holder.bind(message, formattedTime)
-            // is ReceivedImageViewHolder -> holder.bind(message, formattedTime)
-            // is SentDocumentViewHolder -> holder.bind(message, formattedTime)
-            // is ReceivedDocumentViewHolder -> holder.bind(message, formattedTime)
         }
     }
-
-    // --- ViewHoldery ---
 
     /**
      * ViewHolder for a sent text message.
@@ -99,14 +83,12 @@ class ChatAdapter(private val currentUserId: String) :
 
         /**
          * Binds a sent text message's data to the views.
-         * TODO: Handle displaying the sending status.
          * @param message The message to bind.
          * @param time The formatted timestamp.
          */
         fun bind(message: ChatMessage, time: String) {
             contentTextView.text = message.textContent
             timestampTextView.text = time
-            // TODO: Obsługa statusu wysyłania (np. zmiana wyglądu)
         }
     }
 
@@ -128,11 +110,6 @@ class ChatAdapter(private val currentUserId: String) :
         }
     }
 
-    // TODO: Dodać klasy ViewHolderów dla obrazów (z ImageView) i dokumentów (np. z ikoną pliku, nazwą, rozmiarem)
-    // np. inner class SentImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) { ... }
-
-
-    // --- DiffUtil Callback ---
     /**
      * A [DiffUtil.ItemCallback] for calculating the difference between two [ChatMessage] lists.
      */
@@ -141,14 +118,14 @@ class ChatAdapter(private val currentUserId: String) :
          * Checks if two items represent the same object.
          */
         override fun areItemsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean {
-            return oldItem.id == newItem.id // Porównaj po ID
+            return oldItem.id == newItem.id
         }
 
         /**
          * Checks if the contents of two items are the same.
          */
         override fun areContentsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean {
-            return oldItem == newItem // Porównaj całą zawartość
+            return oldItem == newItem
         }
     }
 }

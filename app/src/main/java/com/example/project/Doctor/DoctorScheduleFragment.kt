@@ -26,13 +26,12 @@ import java.util.Locale
  * It allows the doctor to view bookings and update their status.
  */
 class DoctorScheduleFragment : Fragment() {
-
     private lateinit var bookingsListView: ListView
     private lateinit var bookingsTitleTextView: TextView
     private lateinit var datePickerButton: Button
     private lateinit var refreshButton: Button
     private val bookingsDisplayList = mutableListOf<String>()
-    private val bookingsList = mutableListOf<Booking>() // Store bookings for reference when updating status
+    private val bookingsList = mutableListOf<Booking>()
     private lateinit var adapter: ArrayAdapter<String>
     private lateinit var firestoreHelper: FirestoreHelper
     private lateinit var auth: FirebaseAuth
@@ -43,8 +42,7 @@ class DoctorScheduleFragment : Fragment() {
     private var selectedDate: String = dateFormat.format(calendar.time)
 
     /**
-     * Inflates the layout, initializes UI components and Firebase, and sets up listeners and adapters.
-     * It also loads the initial data for the current date.
+     * Initializes the fragment's UI and data.
      */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -86,7 +84,7 @@ class DoctorScheduleFragment : Fragment() {
     }
 
     /**
-     * Sets up listeners for the date picker button, refresh button, and booking list items.
+     * Sets up UI event listeners.
      */
     private fun setupListeners() {
         datePickerButton.setOnClickListener {
@@ -100,7 +98,6 @@ class DoctorScheduleFragment : Fragment() {
         }
 
         bookingsListView.setOnItemClickListener { _, _, position, _ ->
-            // Skip if the item is not a booking (e.g., "No bookings for today")
             if (position < bookingsList.size) {
                 val selectedBooking = bookingsList[position]
                 showBookingStatusDialog(selectedBooking)
@@ -109,7 +106,7 @@ class DoctorScheduleFragment : Fragment() {
     }
 
     /**
-     * Shows a [DatePickerDialog] to allow the user to select a date.
+     * Displays a date picker dialog.
      */
     private fun showDatePickerDialog() {
         val year = calendar.get(Calendar.YEAR)
@@ -127,7 +124,7 @@ class DoctorScheduleFragment : Fragment() {
     }
 
     /**
-     * Updates the text view that displays the selected date.
+     * Updates the displayed date.
      */
     private fun updateDateDisplay() {
         val displayDate = displayDateFormat.format(calendar.time)
@@ -136,13 +133,12 @@ class DoctorScheduleFragment : Fragment() {
     }
 
     /**
-     * Fetches the bookings for a given date from Firestore.
-     * @param date The date for which to fetch bookings.
+     * Fetches bookings for the selected date.
+     * @param date The date to fetch bookings for.
      */
     private fun fetchBookingsForDate(date: String) {
         Log.d("DoctorSchedule", "Fetching bookings for doctor: $currentDoctorId on $date")
-    
-        // currentDoctorId is now nullable, ensure it's not null before proceeding
+
         val doctorId = currentDoctorId
         if (doctorId.isNullOrBlank()) {
             Log.w("DoctorSchedule", "Doctor ID is not set. Cannot fetch bookings.")
@@ -151,11 +147,11 @@ class DoctorScheduleFragment : Fragment() {
             adapter.notifyDataSetChanged()
             return
         }
-    
+
         firestoreHelper.getBookingsForDoctor(doctorId, date)
             .addOnSuccessListener { result ->
-                bookingsList.clear() // Clear the main booking list for new data
-                
+                bookingsList.clear()
+
                 if (result.isEmpty) {
                     Log.d("DoctorSchedule", "No bookings found for $doctorId on $date")
                     bookingsDisplayList.clear()
@@ -166,24 +162,19 @@ class DoctorScheduleFragment : Fragment() {
                         val booking = document.toObject(Booking::class.java).copy(id = document.id)
                         bookingsList.add(booking)
                     }
-                    // Sort bookings by time before further processing
                     bookingsList.sortWith(compareBy { it.start_time })
-                    
-                    // Fetch all services to map service_id to service_name
+
                     firestoreHelper.getAllServices()
                         .addOnSuccessListener { servicesResult ->
                             val serviceMap = mutableMapOf<String, String>()
                             for (serviceDoc in servicesResult) {
                                 val service = serviceDoc.toObject(com.example.project.Service::class.java)
-                                // Assuming serviceDoc.id is the service_id and service.name is what we want
-                                serviceMap[serviceDoc.id] = service.name 
+                                serviceMap[serviceDoc.id] = service.name
                             }
-                            // Now that we have services, fetch patient details and update UI
                             fetchPatientDetailsAndPopulateList(bookingsList, serviceMap)
                         }
                         .addOnFailureListener { e_services ->
                             Log.w("DoctorSchedule", "Error getting services. Proceeding without service names.", e_services)
-                            // Proceed with an empty service map; service_id will be shown as fallback
                             fetchPatientDetailsAndPopulateList(bookingsList, emptyMap())
                         }
                 }
@@ -195,31 +186,28 @@ class DoctorScheduleFragment : Fragment() {
                 adapter.notifyDataSetChanged()
             }
     }
-    
+
     /**
-     * A helper function to fetch patient details and then populate the display list.
-     * @param currentBookings The list of bookings for which to fetch patient details.
-     * @param serviceMap A map of service IDs to service names.
+     * Fetches patient details and populates the booking list.
+     * @param currentBookings List of bookings.
+     * @param serviceMap Map of service IDs to names.
      */
     private fun fetchPatientDetailsAndPopulateList(currentBookings: List<Booking>, serviceMap: Map<String, String>) {
-        bookingsDisplayList.clear() // Clear display list before populating
+        bookingsDisplayList.clear()
 
         if (currentBookings.isEmpty()) {
-            // This case should ideally be handled by the caller setting "No bookings for this date."
-            // If bookingsDisplayList is still empty, add a default message.
-            if (bookingsDisplayList.isEmpty()) { // Check if it wasn't already set by caller
-                 bookingsDisplayList.add("No bookings for this date.")
+            if (bookingsDisplayList.isEmpty()) {
+                bookingsDisplayList.add("No bookings for this date.")
             }
             adapter.notifyDataSetChanged()
             return
         }
 
-        val patientNamesMap = mutableMapOf<String, String>() // patientId -> patientDisplayName
+        val patientNamesMap = mutableMapOf<String, String>()
         val totalBookingsToProcess = currentBookings.size
         var patientsFetchedCounter = 0
 
         for (booking in currentBookings) {
-            // Assuming booking.patient_name is the patient's UID
             firestoreHelper.getPatientById(booking.patient_name)
                 .addOnCompleteListener { task ->
                     val patientDisplayName = if (task.isSuccessful && task.result?.exists() == true) {
@@ -230,28 +218,26 @@ class DoctorScheduleFragment : Fragment() {
                             "$firstName $lastName".trim()
                         } else {
                             Log.w("DoctorSchedule", "Patient name fields empty for ${booking.patient_name}, using ID.")
-                            booking.patient_name // Fallback to ID
+                            booking.patient_name
                         }
                     } else {
                         Log.w("DoctorSchedule", "Failed to fetch patient details for ${booking.patient_name}, using ID.", task.exception)
-                        booking.patient_name // Fallback to ID
+                        booking.patient_name
                     }
                     patientNamesMap[booking.patient_name] = patientDisplayName
-                    
+
                     patientsFetchedCounter++
 
                     if (patientsFetchedCounter == totalBookingsToProcess) {
-                        // All patient data fetched (or failed with fallback), now populate the display list in order
-                        for (b_item in currentBookings) { // Iterate original sorted list
+                        for (b_item in currentBookings) {
                             val finalPatientName = patientNamesMap[b_item.patient_name] ?: b_item.patient_name
-                            val finalServiceName = serviceMap[b_item.service_id] ?: b_item.service_id // Fallback to service_id
-                            val bookingStatus = b_item.status.capitalize() // Assuming capitalize extension exists
+                            val finalServiceName = serviceMap[b_item.service_id] ?: b_item.service_id
+                            val bookingStatus = b_item.status.capitalize()
                             val bookingInfo = "Patient: $finalPatientName\nService: $finalServiceName\nTime: ${b_item.start_time} - ${b_item.end_time}\nStatus: $bookingStatus"
                             bookingsDisplayList.add(bookingInfo)
                         }
-                        
+
                         if (bookingsDisplayList.isEmpty() && currentBookings.isNotEmpty()) {
-                            // Fallback if list is empty despite having bookings (e.g., all fetches failed catastrophically)
                             bookingsDisplayList.add("Error displaying booking details.")
                         }
                         adapter.notifyDataSetChanged()
@@ -259,25 +245,14 @@ class DoctorScheduleFragment : Fragment() {
                 }
         }
     }
-    
-    // Comment out or remove the old displayBookingsWithoutServiceNames function
-    // private fun displayBookingsWithoutServiceNames() {
-    // bookingsDisplayList.clear()
-    // for (booking in bookingsList) {
-    // val bookingStatus = booking.status.capitalize()
-    // val bookingInfo = "Patient: ${booking.patient_name}\nService: ${booking.service_id}\nTime: ${booking.start_time} - ${booking.end_time}\nStatus: $bookingStatus"
-    // bookingsDisplayList.add(bookingInfo)
-    // }
-    // adapter.notifyDataSetChanged()
-    // }
-    
+
     /**
-     * Shows a dialog to update the status of a booking.
-     * @param booking The booking to be updated.
+     * Shows a dialog to update booking status.
+     * @param booking The booking to update.
      */
     private fun showBookingStatusDialog(booking: Booking) {
         val statusOptions = arrayOf("Confirmed", "Cancelled", "Completed", "No-show")
-        
+
         AlertDialog.Builder(requireContext())
             .setTitle("Update Booking Status")
             .setItems(statusOptions) { _, which ->
@@ -287,26 +262,26 @@ class DoctorScheduleFragment : Fragment() {
             .setNegativeButton("Cancel", null)
             .show()
     }
-    
+
     /**
-     * Updates the status of a booking in Firestore.
-     * @param booking The booking to be updated.
-     * @param newStatus The new status of the booking.
+     * Updates a booking's status in Firestore.
+     * @param booking The booking to update.
+     * @param newStatus The new status.
      */
     private fun updateBookingStatus(booking: Booking, newStatus: String) {
         firestoreHelper.updateBookingStatus(booking.id, newStatus)
             .addOnSuccessListener {
                 Toast.makeText(context, "Booking status updated to $newStatus", Toast.LENGTH_SHORT).show()
-                fetchBookingsForDate(selectedDate) // Refresh the list with the current selected date
+                fetchBookingsForDate(selectedDate)
             }
             .addOnFailureListener { e ->
                 Toast.makeText(context, "Failed to update status: ${e.message}", Toast.LENGTH_LONG).show()
                 Log.e("DoctorSchedule", "Error updating booking status", e)
             }
     }
-    
+
     /**
-     * A helper extension function to capitalize the first letter of a string.
+     * Capitalizes the first letter of a string.
      */
     private fun String.capitalize(): String {
         return if (this.isNotEmpty()) {

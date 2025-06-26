@@ -25,14 +25,37 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 
+/**
+ * Main activity for the doctor's application, managing navigation between fragments,
+ * user profile updates, logout, and account deletion.
+ */
 class MainDoctorActivity : AppCompatActivity() {
 
+    /**
+     * Bottom navigation view for switching between main sections.
+     */
     private lateinit var bottomNavigationView: BottomNavigationView
+    /**
+     * Floating action button, typically used for chat.
+     */
     private lateinit var floatingActionButton: FloatingActionButton
+    /**
+     * Button for accessing the user's profile.
+     */
     private lateinit var profileButton: ImageButton
+    /**
+     * Firebase authentication instance.
+     */
     private lateinit var auth: FirebaseAuth
+    /**
+     * Firebase Firestore database instance.
+     */
     private lateinit var db: FirebaseFirestore
 
+    /**
+     * Initializes the activity, sets up Firebase, and configures UI listeners.
+     * @param savedInstanceState If the activity is re-initialized, this Bundle contains previous state.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_doctor)
@@ -40,7 +63,6 @@ class MainDoctorActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        //this is to retrieve FCM token and save it in Firestore
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val token = task.result
@@ -108,12 +130,20 @@ class MainDoctorActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Loads the specified fragment into the `frame_layout` container.
+     * @param fragment The fragment to load.
+     */
     private fun loadFragment(fragment: Fragment) {
         val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.frame_layout, fragment)
         transaction.commit()
     }
 
+    /**
+     * Displays a dialog for viewing and editing the doctor's profile.
+     * Handles data retrieval, update requests, logout, and account deletion.
+     */
     private fun showProfileDialog() {
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_profile_doctor, null)
 
@@ -177,7 +207,6 @@ class MainDoctorActivity : AppCompatActivity() {
             }
 
             currentUser?.let { user ->
-                //fetching data to compare changes
                 db.collection("doctors").document(user.uid)
                     .get()
                     .addOnSuccessListener { document ->
@@ -207,11 +236,8 @@ class MainDoctorActivity : AppCompatActivity() {
                                 updates["pwz"] = newPWZ
                                 changes["pwz"] = newPWZ
                             }
-                            //nie chce mi sie pozwalac na zmienianie specki, na razie sprawdzam
-                            // jak to dziala sobie
 
                             if (changes.isNotEmpty()) {
-                                //store the edit request for admin review
                                 val editRequest = hashMapOf(
                                     "userId" to user.uid,
                                     "timestamp" to com.google.firebase.Timestamp.now(),
@@ -219,7 +245,6 @@ class MainDoctorActivity : AppCompatActivity() {
                                 )
                                 db.collection("edit_requests").add(editRequest)
                                     .addOnSuccessListener {
-                                        // Update the user's 'edit' status
                                         db.collection("doctors").document(user.uid)
                                             .update("edit", true)
                                             .addOnSuccessListener {
@@ -250,7 +275,7 @@ class MainDoctorActivity : AppCompatActivity() {
 
         buttonLogout.setOnClickListener {
             auth.signOut()
-            alertDialog.dismiss() // Dismiss dialog before finishing activity
+            alertDialog.dismiss()
             Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show()
             finish()
             startActivity(Intent(this, LogIn::class.java))

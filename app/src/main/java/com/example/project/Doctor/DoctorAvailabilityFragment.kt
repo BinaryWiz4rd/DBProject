@@ -26,7 +26,6 @@ import java.util.Locale
 /**
  * A [Fragment] for doctors to manage their availability slots.
  * It displays a list of existing availability slots and allows adding, editing, and deleting them.
- * This fragment contains several TODOs.
  */
 class DoctorAvailabilityFragment : Fragment() {
 
@@ -35,7 +34,7 @@ class DoctorAvailabilityFragment : Fragment() {
     private val availabilityList = mutableListOf<Availability>()
     private lateinit var adapter: AvailabilityAdapter
     private lateinit var firestoreHelper: FirestoreHelper
-    private var currentDoctorId: String = "" // Will be fetched from Firebase Auth
+    private var currentDoctorId: String = ""
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     private val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
 
@@ -54,26 +53,20 @@ class DoctorAvailabilityFragment : Fragment() {
 
         firestoreHelper = FirestoreHelper()
 
-        // Initialize the RecyclerView with layout manager
         availabilityRecyclerView.layoutManager = LinearLayoutManager(context)
 
-        // Create adapter for the RecyclerView
         adapter = AvailabilityAdapter(availabilityList) { availability ->
-            // Item click listener
             showAddOrEditAvailabilityDialog(availability)
         }
         availabilityRecyclerView.adapter = adapter
 
-        // Fetch current doctor's ID from Firebase Auth
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
             currentDoctorId = currentUser.uid
             loadAvailability()
         } else {
-            // Handle the case where the user is not logged in or ID is not available
             Log.w("DoctorAvailability", "User not logged in.")
             Toast.makeText(context, "User not logged in. Cannot load availability.", Toast.LENGTH_LONG).show()
-            // Optionally, disable UI elements or navigate away
         }
 
         fabAddAvailability.setOnClickListener {
@@ -93,9 +86,7 @@ class DoctorAvailabilityFragment : Fragment() {
             return
         }
 
-        // For simplicity, loading all availability for a doctor.
-        // In a real app, you might want to filter by date range or show upcoming availability.
-        firestoreHelper.getAllAvailabilityForDoctor(currentDoctorId) // Changed to use the new method
+        firestoreHelper.getAllAvailabilityForDoctor(currentDoctorId)
             .get()
             .addOnSuccessListener { result ->
                 val newAvailabilityList = mutableListOf<Availability>()
@@ -123,7 +114,6 @@ class DoctorAvailabilityFragment : Fragment() {
         availabilityList.clear()
         availabilityList.addAll(availabilities)
 
-        // Check if the list is empty to show empty state view
         if (availabilities.isEmpty()) {
             view?.findViewById<View>(R.id.emptyAvailabilityView)?.visibility = View.VISIBLE
             availabilityRecyclerView.visibility = View.GONE
@@ -137,13 +127,9 @@ class DoctorAvailabilityFragment : Fragment() {
 
     /**
      * Shows a dialog to add a new or edit an existing availability slot.
-     * TODO: Use a proper XML layout for the dialog instead of programmatic creation.
      * @param existingAvailability The availability slot to edit, or null to add a new one.
      */
     private fun showAddOrEditAvailabilityDialog(existingAvailability: Availability?) {
-        // TODO: Inflate R.layout.dialog_add_availability instead of a generic one
-        // For now, creating EditTexts programmatically for demonstration as layout is not available.
-        // This is NOT a good practice for real apps. Use XML layouts.
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_availability_placeholder, null)
         val dateEditText = dialogView.findViewById<EditText>(R.id.editTextAvailabilityDate)
         val startTimeEditText = dialogView.findViewById<EditText>(R.id.editTextAvailabilityStartTime)
@@ -195,11 +181,9 @@ class DoctorAvailabilityFragment : Fragment() {
                 val endTime = endTimeEditText.text.toString()
 
                 if (date.isNotBlank() && startTime.isNotBlank() && endTime.isNotBlank()) {
-                    // Basic validation: end time should be after start time
                     try {
                         val fullStartDateTimeStr = "$date $startTime"
                         val fullEndDateTimeStr = "$date $endTime"
-                        // Explicitly use a combined format for parsing date and time together
                         val combinedDateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
 
                         val startDate = combinedDateTimeFormat.parse(fullStartDateTimeStr)
@@ -207,7 +191,7 @@ class DoctorAvailabilityFragment : Fragment() {
 
                         if (startDate != null && endDate != null && endDate.after(startDate)) {
                             val availability = Availability(
-                                id = existingAvailability?.id ?: "", // Keep existing ID if editing
+                                id = existingAvailability?.id ?: "",
                                 doctor_id = currentDoctorId,
                                 date = date,
                                 start_time = startTime,
@@ -224,7 +208,7 @@ class DoctorAvailabilityFragment : Fragment() {
                     Toast.makeText(context, "Please fill all fields.", Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("Cancel") { dialogInterface, which -> /* Do nothing or dismiss */ }
+            .setNegativeButton("Cancel") { dialogInterface, which -> }
 
         if (existingAvailability != null) {
             builder.setNeutralButton("Delete") { dialogInterface, which ->
@@ -241,13 +225,12 @@ class DoctorAvailabilityFragment : Fragment() {
      */
     private fun saveAvailability(availability: Availability, isNew: Boolean) {
         val task = if (isNew) {
-            firestoreHelper.addAvailability(availability.copy(id = "")) // Ensure ID is not set for new, Firestore will generate
+            firestoreHelper.addAvailability(availability.copy(id = ""))
         } else {
             firestoreHelper.updateAvailability(availability.id, mapOf(
                 "date" to availability.date,
                 "start_time" to availability.start_time,
                 "end_time" to availability.end_time
-                // doctor_id should not change here
             ))
         }
 
@@ -277,7 +260,7 @@ class DoctorAvailabilityFragment : Fragment() {
                         Toast.makeText(context, "Failed to delete slot: ${e.message}", Toast.LENGTH_LONG).show()
                     }
             }
-            .setNegativeButton("Cancel") { dialogInterface, which -> /* Do nothing or dismiss */ }
+            .setNegativeButton("Cancel") { dialogInterface, which -> }
             .show()
     }
 
@@ -293,16 +276,13 @@ class DoctorAvailabilityFragment : Fragment() {
 
         /**
          * ViewHolder for an availability slot item.
-         * TODO: Find and bind views from the item_availability_day layout.
          */
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            // TODO: Find and bind views from item_availability_day layout
             private val dateTextView: TextView = view.findViewById(R.id.availabilityDateTextView)
             private val timeRangeTextView: TextView = view.findViewById(R.id.availabilityTimeRangeTextView)
 
             /**
              * Binds an availability slot's data to the views.
-             * TODO: Bind data to the views.
              * @param availability The availability slot to bind.
              */
             fun bind(availability: Availability) {
